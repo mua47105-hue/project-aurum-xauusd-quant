@@ -1,0 +1,8 @@
+{
+ "sig": "4323ba0da159",
+ "engine_fit_sharpe": 1.4652,
+ "frozen_fit_sharpe": 1.3867,
+ "engine_turnover": 198.83660878341908,
+ "frozen_turnover": 212.31661614666746,
+ "engine_shipped": true
+}

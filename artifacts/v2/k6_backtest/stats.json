@@ -1,0 +1,309 @@
+{
+ "M1_GBDT_v2": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.137,
+    2.024
+   ],
+   "sharpe_p05": 0.041,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0933,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0745
+ },
+ "M2_RFF_Ridge": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -1.91,
+    0.446
+   ],
+   "sharpe_p05": -1.721,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0
+ },
+ "RLSBank": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.453,
+    1.639
+   ],
+   "sharpe_p05": -0.288,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0275,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0205
+ },
+ "M3c_DAE": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.058,
+    2.109
+   ],
+   "sharpe_p05": 0.109,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.1087,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0875
+ },
+ "M3m_DAE": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -2.332,
+    -0.064
+   ],
+   "sharpe_p05": -2.152,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0
+ },
+ "M4_DMN_Lite": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -2.15,
+    -0.025
+   ],
+   "sharpe_p05": -1.983,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0
+ },
+ "M4b_DMN_Lite": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -2.236,
+    0.085
+   ],
+   "sharpe_p05": -2.067,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0
+ },
+ "M5_ContinuumNet": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -1.519,
+    0.627
+   ],
+   "sharpe_p05": -1.345,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0001,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0001
+ },
+ "Carver_EWMAC": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    0.097,
+    2.353
+   ],
+   "sharpe_p05": 0.254,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.2021,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.1691
+ },
+ "Channel_A": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -1.341,
+    0.915
+   ],
+   "sharpe_p05": -1.159,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0005,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0003
+ },
+ "Channel_B": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    0.0,
+    0.0
+   ],
+   "sharpe_p05": 0.0,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0029,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.002
+ },
+ "BuyHold_Gold": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.012,
+    3.295
+   ],
+   "sharpe_p05": 1.195,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.7769,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.7383
+ },
+ "M0_Champ_v13": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.448,
+    3.777
+   ],
+   "sharpe_p05": 1.635,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.9352,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.9182
+ },
+ "M0_Champ_v13_cap1": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.363,
+    3.726
+   ],
+   "sharpe_p05": 1.546,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.9202,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.9004
+ },
+ "M6_AURUM_v2_Ensemble": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.403,
+    1.853
+   ],
+   "sharpe_p05": -0.209,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0465,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0357
+ },
+ "M6b_Ensemble_EQW": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.403,
+    1.853
+   ],
+   "sharpe_p05": -0.209,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0465,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0357
+ },
+ "M7_Active_Grand_Hybrid": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    0.786,
+    3.104
+   ],
+   "sharpe_p05": 0.971,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.6502,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.6046
+ },
+ "M7_Core_Satellite": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.486,
+    3.765
+   ],
+   "sharpe_p05": 1.688,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.9407,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.9248
+ },
+ "_meta": {
+  "N_trials_ledger": 170,
+  "ledger_rows": 446,
+  "pbo_cscv": 0.0049,
+  "code_rev": "k6-v2.0.2",
+  "dsr_family": "K6 v2.0.2 tournament selection panel, effective-independent families (Bailey-LdP: correlated siblings are not independent trials; frozen FIT Sharpes under causal accounting). Primary = signal families + ONE blend slot (fixed a-priori portfolio constructions over counted members are correlated re-weightings, counted once at their best-FIT variant -- the v2.0.1 pre-registered convention, applied consistently)",
+  "dsr_family_N": 12,
+  "dsr_family_sharpes": [
+   -2.1423,
+   -0.8394,
+   -0.5086,
+   -0.2819,
+   -0.2391,
+   -0.0057,
+   0.0,
+   0.3614,
+   0.6158,
+   0.6992,
+   2.0126,
+   1.4492
+  ],
+  "dsr_family_conservative_N": 14,
+  "dsr_family_conservative_sharpes": [
+   -2.1423,
+   -0.8394,
+   -0.5537,
+   -0.5086,
+   -0.2819,
+   -0.2391,
+   -0.0057,
+   0.0,
+   0.3614,
+   0.6158,
+   0.6992,
+   1.3867,
+   1.4492,
+   2.0126
+  ],
+  "dsr_conservative_note": "conservative accounting: every distinct (deduped) blend stream counts as a trial; flagship DSR under this vintage is exported per strategy as oos_dsr_conservative",
+  "trial_sharpe_units": "per-bar (annualized / sqrt(5786))",
+  "dsr_sensitivity_m7": {
+   "primary": 0.9407,
+   "conservative": 0.9248,
+   "with_m7_grid": 0.7301,
+   "with_k2_prefix": 0.5498,
+   "all_ledger_mixed_units": 0.0,
+   "family_N": {
+    "primary": 12,
+    "conservative": 14,
+    "with_grid": 56,
+    "with_k2": 86,
+    "all": 116
+   }
+  }
+ }
+}

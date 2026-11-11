@@ -1,0 +1,144 @@
+{
+ "M1_GBDT_v2": {
+  "sig": "99144a31f7ee",
+  "engine_fit_sharpe": -0.1264,
+  "frozen_fit_sharpe": -0.2391,
+  "engine_turnover": 69.28697065567447,
+  "frozen_turnover": 128.28182350499787,
+  "engine_shipped": true
+ },
+ "M2_RFF_Ridge": {
+  "sig": "4b138a5f6c9b",
+  "engine_fit_sharpe": -0.7356,
+  "frozen_fit_sharpe": -0.8394,
+  "engine_turnover": 226.11052459639458,
+  "frozen_turnover": 467.19275512969807,
+  "engine_shipped": true
+ },
+ "RLSBank": {
+  "sig": "b598ec916d35",
+  "engine_fit_sharpe": -1.1437,
+  "frozen_fit_sharpe": -2.1423,
+  "engine_turnover": 144.75979056534675,
+  "frozen_turnover": 170.7247660251787,
+  "engine_shipped": true
+ },
+ "M3c_DAE": {
+  "sig": "71d2cb81b085",
+  "engine_fit_sharpe": 0.6843,
+  "frozen_fit_sharpe": 0.6158,
+  "engine_turnover": 346.0811595357161,
+  "frozen_turnover": 640.8496508642437,
+  "engine_shipped": true
+ },
+ "M3m_DAE": {
+  "sig": "60dfd5ed33df",
+  "engine_fit_sharpe": 0.0831,
+  "frozen_fit_sharpe": 0.0986,
+  "engine_turnover": 425.9897991356142,
+  "frozen_turnover": 774.5710231881394,
+  "engine_shipped": false
+ },
+ "M4_DMN_Lite": {
+  "sig": "20abad53126e",
+  "engine_fit_sharpe": -0.5558,
+  "frozen_fit_sharpe": -0.5933,
+  "engine_turnover": 19.10165640327142,
+  "frozen_turnover": 0.10115378610369456,
+  "engine_shipped": true
+ },
+ "M4b_DMN_Lite": {
+  "sig": "559b0dad0a67",
+  "engine_fit_sharpe": -0.3199,
+  "frozen_fit_sharpe": -0.2819,
+  "engine_turnover": 27.18347705050539,
+  "frozen_turnover": 0.04406110666229019,
+  "engine_shipped": false
+ },
+ "M5_ContinuumNet": {
+  "sig": "5c3e7faa8008",
+  "engine_fit_sharpe": -1.5466,
+  "frozen_fit_sharpe": -0.0057,
+  "engine_turnover": 105.92632944993112,
+  "frozen_turnover": 337.34280495975923,
+  "engine_shipped": false
+ },
+ "Carver_EWMAC": {
+  "sig": "4a05a0b20bdd",
+  "engine_fit_sharpe": 0.3721,
+  "frozen_fit_sharpe": 0.3614,
+  "engine_turnover": 127.49469981643527,
+  "frozen_turnover": 121.4460993016211,
+  "engine_shipped": true
+ },
+ "Channel_A": {
+  "sig": "2e23f40d6ceb",
+  "engine_fit_sharpe": -0.2248,
+  "frozen_fit_sharpe": -0.5086,
+  "engine_turnover": 267.23071184169015,
+  "frozen_turnover": 224.31646500123807,
+  "engine_shipped": true
+ },
+ "Channel_B": {
+  "sig": "e6bbf2bfd16d",
+  "engine_fit_sharpe": -0.2726,
+  "frozen_fit_sharpe": 0.0,
+  "engine_turnover": 48.91443506079376,
+  "frozen_turnover": 0.0,
+  "engine_shipped": false
+ },
+ "BuyHold_Gold": {
+  "sig": "9c47824b1525",
+  "engine_fit_sharpe": 0.605,
+  "frozen_fit_sharpe": 0.6992,
+  "engine_turnover": 18.59172441141962,
+  "frozen_turnover": 0.0,
+  "engine_shipped": false
+ },
+ "M0_Champ_v13": {
+  "sig": "c52aa8aa590d",
+  "forced": "frozen_translation",
+  "engine_fit_sharpe": null,
+  "frozen_fit_sharpe": 2.0126,
+  "engine_shipped": false
+ },
+ "M0_Champ_v13_cap1": {
+  "sig": "c069913ee0d3",
+  "forced": "frozen_translation",
+  "engine_fit_sharpe": null,
+  "frozen_fit_sharpe": 1.7381,
+  "engine_shipped": false
+ },
+ "M6_AURUM_v2_Ensemble": {
+  "sig": "b0fa4b5f4835",
+  "engine_fit_sharpe": -0.4075,
+  "frozen_fit_sharpe": -0.5537,
+  "engine_turnover": 128.85014794059796,
+  "frozen_turnover": 269.07084492558243,
+  "engine_shipped": true
+ },
+ "M6b_Ensemble_EQW": {
+  "sig": "7de3baec61d5",
+  "engine_fit_sharpe": -0.4075,
+  "frozen_fit_sharpe": -0.5537,
+  "engine_turnover": 128.85014794059796,
+  "frozen_turnover": 269.07084492558243,
+  "engine_shipped": true
+ },
+ "M7_Active_Grand_Hybrid": {
+  "sig": "4323ba0da159",
+  "engine_fit_sharpe": 1.4652,
+  "frozen_fit_sharpe": 1.3867,
+  "engine_turnover": 198.83660878341908,
+  "frozen_turnover": 212.31661614666746,
+  "engine_shipped": true
+ },
+ "M7_Core_Satellite": {
+  "sig": "2a33184add45",
+  "engine_fit_sharpe": 1.41,
+  "frozen_fit_sharpe": 1.4492,
+  "engine_turnover": 76.2503729670374,
+  "frozen_turnover": 100.15713930108559,
+  "engine_shipped": false
+ }
+}

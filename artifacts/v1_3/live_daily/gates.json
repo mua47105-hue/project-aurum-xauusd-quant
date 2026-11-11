@@ -1,0 +1,37 @@
+{
+  "G6.0_mounts": {
+    "gate": "G6.0_mounts",
+    "pass": true,
+    "detail": "phase1-data at /kaggle/input/datasets/tskdev/aurum-phase1-data (OK); aurum-models-v1 at /kaggle/input/datasets/tskdev/aurum-models-v1 (OK); policy constants from aurum-p4-backtest v1.3 policy_fit.json; fit window 2016-2022; OOS 2023-25 never touched"
+  },
+  "G6.1_state": {
+    "gate": "G6.1_state",
+    "pass": true,
+    "detail": "serialized latest state: 338 tokens (expect 280-380)"
+  },
+  "G6.2_forward": {
+    "gate": "G6.2_forward",
+    "pass": true,
+    "detail": "forwards r=[1, 2, 3, 4] on cpu; all heads finite=True; h1 shape (48,); temperatures {'h1': 1.0, 'h5': 1.5}"
+  },
+  "G6.3_calibration": {
+    "gate": "G6.3_calibration",
+    "pass": true,
+    "detail": "temperature scaling applied {'h1': 1.0, 'h5': 1.5}; pooled p_bar in [0,1]; prod p_bar=0.3091; shrunk p=0.3091; loop-OOD mean=0.0054 max=0.0265"
+  },
+  "G6.4b_policy_consistency": {
+    "gate": "G6.4b_policy_consistency",
+    "pass": true,
+    "detail": "EV_LCB reproduced from components (d=0.00e+00); p_bar pooling reproduced (d=0.00e+00); sigma_loop population-std reproduced (d=0.00e+00); ood reproduced (d=0.00e+00)"
+  },
+  "G6.4_decision": {
+    "gate": "G6.4_decision",
+    "pass": true,
+    "detail": "action=TRADE; cell=L_m1.0_t4.0_h24; p_bar=0.3091; p_sh=0.3091; EV_LCB=+0.4835R (>= 0.0); sigma_loop=0.0060; lambda_var*b*sig=0.0121; cost=0.0500R; GBDT L (pL=0.512/pS=0.386) agrees=True; f_risk_cap1=0.01000 (cap 0.01); all gates clear"
+  },
+  "G6.5_audit": {
+    "gate": "G6.5_audit",
+    "pass": true,
+    "detail": "decision.json + risk_audit.json written; action=BUY"
+  }
+}

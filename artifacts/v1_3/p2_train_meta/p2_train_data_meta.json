@@ -1,0 +1,9 @@
+{
+ "n_labeled_states": 87948,
+ "n_pretest": 72241,
+ "n_oos": 15707,
+ "pretest_tokens": 23898368,
+ "mean_tokens": 330.9,
+ "min_tokens": 298,
+ "max_tokens": 363
+}

@@ -1,0 +1,95 @@
+{
+ "column": "z_rff (tskdev/aurum-v2-cpu-preds)",
+ "by_year": [
+  {
+   "year": 2016,
+   "z_nunique": 5922,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 0.0003,
+   "pred_std": 0.000117,
+   "pred_mean": 0.00124
+  },
+  {
+   "year": 2017,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": -1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 0.0,
+   "pred_mean": -0.0
+  },
+  {
+   "year": 2018,
+   "z_nunique": 6035,
+   "z_std": 0.28954,
+   "z_mean": 0.7922,
+   "z_modal_share": 0.0002,
+   "pred_std": 8e-06,
+   "pred_mean": 1e-05
+  },
+  {
+   "year": 2019,
+   "z_nunique": 3,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 0.9868,
+   "pred_std": 0.000134,
+   "pred_mean": 0.00311
+  },
+  {
+   "year": 2020,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 8.9e-05,
+   "pred_mean": 0.00382
+  },
+  {
+   "year": 2021,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 0.0,
+   "pred_mean": 0.0
+  },
+  {
+   "year": 2022,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 0.000129,
+   "pred_mean": 0.01064
+  },
+  {
+   "year": 2023,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 0.0,
+   "pred_mean": 0.0
+  },
+  {
+   "year": 2024,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 9.7e-05,
+   "pred_mean": 0.00977
+  },
+  {
+   "year": 2025,
+   "z_nunique": 1,
+   "z_std": 0.0,
+   "z_mean": 1.0,
+   "z_modal_share": 1.0,
+   "pred_std": 0.000114,
+   "pred_mean": 0.01096
+  }
+ ]
+}

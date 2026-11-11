@@ -1,0 +1,57 @@
+{
+ "rev": "k2-v2.0.2",
+ "base_run": "k2_out2 (tskdev/aurum-v2-cpu-preds v2)",
+ "pred_rff_unchanged": true,
+ "z_transform": "tanh((p - EWMA_504(p)) / (2*max(EWSTD_504(p), 1e-9))) re-anchored per fold, min_periods=63",
+ "audit_g48": {
+  "fit": {
+   "n": 41079,
+   "std": 0.42479,
+   "sat_frac_gt_0p99": 0.0,
+   "nunique": 41079,
+   "frozen_turnover_py": 467.19,
+   "frozen_sharpe": -0.8394
+  },
+  "oos": {
+   "n": 16805,
+   "std": 0.41589,
+   "sat_frac_gt_0p99": 0.0,
+   "nunique": 16805,
+   "frozen_turnover_py": 557.95,
+   "frozen_sharpe": -0.5554
+  }
+ },
+ "negative_control_foldiqr": {
+  "fit": {
+   "std": 0.70079,
+   "sat_frac_gt_0p99": 0.882475,
+   "nunique": 11808
+  },
+  "oos": {
+   "std": 0.0,
+   "sat_frac_gt_0p99": 1.0,
+   "nunique": 1
+  }
+ },
+ "m2_engine_metrics_v202": {
+  "fit": {
+   "full": -0.7356,
+   "no_buffer": -0.893,
+   "frozen_rls_off": -0.7803,
+   "no_regimes": -0.7663,
+   "frozen_raw": -0.8394,
+   "full_cost1.5": -0.9339,
+   "full_cost2.0": -0.9643
+  },
+  "oos": {
+   "full": -0.7438,
+   "no_buffer": -0.8603,
+   "frozen_rls_off": -0.9465,
+   "no_regimes": -0.248,
+   "frozen_raw": -0.5554
+  }
+ },
+ "wall_s": 20.0,
+ "ledger_entries": 81,
+ "unique_configs": 81
+}

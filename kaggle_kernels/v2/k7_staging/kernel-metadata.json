@@ -1,0 +1,18 @@
+{
+ "id": "tskdev/aurum-v2-live-daily",
+ "title": "AURUM v2 Live Daily",
+ "code_file": "kernel.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_internet": true,
+ "dataset_sources": [
+  "tskdev/aurum-v2-featstore",
+  "tskdev/aurum-v2-cpu-preds",
+  "tskdev/aurum-v13-artifacts",
+  "tskdev/aurum-v2-backtest-outputs"
+ ],
+ "kernel_sources": [],
+ "competition_sources": []
+}

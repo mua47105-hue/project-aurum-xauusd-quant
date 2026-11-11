@@ -1,0 +1,200 @@
+{
+ "as_of_bar": "2025-12-29 00:00:00+00:00",
+ "symbol": "XAUUSD",
+ "policy": {
+  "spec": "v1.3",
+  "source": "aurum-p4-backtest v1.3 policy_fit.json; fit window 2016-2022; OOS 2023-25 never touched",
+  "w_pool": [
+   0.6,
+   0.2,
+   0.2
+  ],
+  "kappa": 0.0,
+  "lambda_var": 0.5,
+  "ev_min": 0.0,
+  "cost_base_R": 0.05,
+  "overlay_rule": "path",
+  "ood_threshold": 0.1,
+  "kelly_fraction": 0.25,
+  "equity_risk_cap": 0.01
+ },
+ "model": {
+  "core": "tskdev/aurum-models-v1/core_fp16.pt",
+  "heads": "heads_main.pt",
+  "forward_depths_r": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "pool_depths_r": [
+   1,
+   2,
+   3
+  ],
+  "ood_reference_depth_r": 3,
+  "temperatures": {
+   "h1": 1.0,
+   "h5": 1.5
+  }
+ },
+ "depths_h1_at_selected_cell": {
+  "r1": 0.3142,
+  "r2": 0.3004,
+  "r3": 0.3027,
+  "r4": 0.3093
+ },
+ "pooling": {
+  "w": [
+   0.6,
+   0.2,
+   0.2
+  ],
+  "p_bar_cell": 0.3091,
+  "sigma_loop_cell": 0.006,
+  "ood_mean": 0.00536,
+  "ood_max": 0.0265
+ },
+ "lcb_ev": {
+  "b_geo": 4.0,
+  "cost_R": 0.05,
+  "base_rate_prior_cell": 0.3019,
+  "p_shrunk_cell": 0.3091,
+  "var_penalty_R": 0.0121,
+  "ev_lcb_R": 0.4835,
+  "ev_min_hurdle": 0.0
+ },
+ "gbdt_agreement": {
+  "fold_year": 2025,
+  "train_through": 2024,
+  "n_features": 54,
+  "pL": 0.5124,
+  "pS": 0.3862,
+  "dir": "L",
+  "cell_dir": "L",
+  "agrees": true,
+  "audit": [
+   {
+    "dir": "L",
+    "n_train": 66811,
+    "best_iter": 66,
+    "max_train_year": 2024
+   },
+   {
+    "dir": "S",
+    "n_train": 66811,
+    "best_iter": 62,
+    "max_train_year": 2024
+   }
+  ]
+ },
+ "overlay_path": {
+  "rule": "path",
+  "source": "empirical_le2024_h24",
+  "hard_stop_atr": 1.0,
+  "take_profit_atr": 4.0,
+  "partial_tp_atr": 1.98,
+  "trail_mae_atr": 0.853,
+  "time_stop_bars": 24,
+  "orders_placed_at_entry": true,
+  "partial_tp_active": true,
+  "tightened_stop_active": true
+ },
+ "decision": {
+  "action": "BUY",
+  "cell": "L_m1.0_t4.0_h24",
+  "direction": "long",
+  "stop_atr_mult": 1.0,
+  "tp_atr_mult": 4.0,
+  "horizon_h1_bars": 24,
+  "p_win_pooled": 0.3091,
+  "p_win_shrunk": 0.3091,
+  "b_geo": 4.0,
+  "ev_lcb_R": 0.4835,
+  "kelly_raw": 0.1364,
+  "kelly_fraction_quarter": 0.0341,
+  "risk_fraction_capped_cap1": 0.01,
+  "risk_fraction_capped_cap3": 0.00333,
+  "no_trade_reason": null
+ },
+ "sizing_reference": {
+  "account_usd": 10000.0,
+  "risk_usd_cap1": 100.0,
+  "atr14_h1_usd": 21.42,
+  "close_usd": 4474.18,
+  "stop_distance_usd": 21.42,
+  "position_oz_cap1": 4.669,
+  "position_lots_cap1": 0.0467
+ },
+ "gates": {
+  "ev_lcb_ok": true,
+  "prob_ok": true,
+  "loop_ood_ok": true,
+  "loop_ood_mean": 0.00536,
+  "loop_ood_max": 0.0265,
+  "gbdt_agrees": true,
+  "blackout_clear": true,
+  "blackout_detail": {
+   "nfp_window": false,
+   "vix_shock": false,
+   "mi_vix_d20z": -0.4061943144928922
+  },
+  "overlay_ok": true,
+  "era_score": 0.2255633920431137,
+  "era_disagreement": 0.0836
+ },
+ "heads_detail": {
+  "h2_up_prob": {
+   "up4": 0.5093,
+   "up12": 0.5092,
+   "up24": 0.5101,
+   "up48": 0.5033,
+   "big4": 0.5066,
+   "big12": 0.505,
+   "big24": 0.5061,
+   "big48": 0.5095
+  },
+  "h3_excursions_R_atr": {
+   "L_mfe_q25": 1.145,
+   "L_mfe_q50": 2.523,
+   "L_mfe_q75": 5.411,
+   "L_mae_q25": 0.852,
+   "L_mae_q50": 2.602,
+   "L_mae_q75": 5.027,
+   "S_mfe_q25": 0.935,
+   "S_mfe_q50": 2.672,
+   "S_mfe_q75": 5.304,
+   "S_mae_q25": 1.025,
+   "S_mae_q50": 2.35,
+   "S_mae_q75": 5.302
+  },
+  "h4_vol": {
+   "expansion_probs": [
+    0.0002,
+    0.0002,
+    0.0002,
+    0.0004
+   ],
+   "vol_tercile_probs": [
+    0.346,
+    0.3179,
+    0.3361
+   ],
+   "vol_q50_ratio": 0.469
+  },
+  "h5_regime_probs": {
+   "trend_dn/low": 0.0984,
+   "trend_dn/mid": 0.1011,
+   "trend_dn/high": 0.1307,
+   "range/low": 0.1102,
+   "range/mid": 0.1333,
+   "range/high": 0.0985,
+   "trend_up/low": 0.1037,
+   "trend_up/mid": 0.1213,
+   "trend_up/high": 0.1027
+  },
+  "regime_call": "range/mid"
+ },
+ "generated_at_utc": "2026-11-09 06:26:47",
+ "wall_s": 63.6
+}

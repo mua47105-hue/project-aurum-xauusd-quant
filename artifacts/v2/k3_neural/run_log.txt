@@ -1,0 +1,48 @@
+[14:30:26] device=cuda; torch=2.11.0+cu130; gpu=Tesla T4
+[14:30:26] ===== STAGE load data START =====
+[14:30:31] matrix (95008, 372); VSN groups: [(0, 24, 'clock'), (24, 49, 'sessions'), (49, 187, 'realized'), (187, 234, 'signatures'), (234, 249, 'toxicity'), (249, 267, 'residual'), (267, 313, 'trend'), (313, 317, 'regime'), (317, 332, 'macro'), (332, 372, 'other')]
+[14:30:31] ===== STAGE load data DONE in 5.2s =====
+[14:30:31] ===== STAGE config search (train<2022 / val 2022) START =====
+[14:31:11]   M3c dr=0.2 lr=0.001: val2022 Sharpe -2.973 (es 2.125)
+[14:31:11]   M3c BEST: (-2.973091029065036, {'dropout': 0.2, 'lr': 0.001})
+[14:31:41]   M3m dr=0.2 lr=0.001: val2022 Sharpe -9.069 (es 0.986)
+[14:31:41]   M3m BEST: (-9.068571420615557, {'dropout': 0.2, 'lr': 0.001})
+[14:32:01]   M4 dr=0.2 lr=0.001: val2022 Sharpe nan
+[14:32:01]   M4 BEST: (nan, {'dropout': 0.2, 'lr': 0.001, 'd_model': 32})
+[14:58:30]   M5 d=64 lr=0.001: val2022 Sharpe -18.149 rho=0.502
+[15:24:58]   M5 d=64 lr=0.0003: val2022 Sharpe -17.760 rho=0.503
+[15:24:59]   M5 BEST: (-17.76013277349417, {'d_model': 64, 'lr': 0.0003})
+[15:24:59] ===== STAGE config search (train<2022 / val 2022) DONE in 3267.2s =====
+[15:24:59] ===== STAGE walk-forward fold refits START =====
+[15:25:24]   M3c fold 2016: predicted 5923 bars (z std 0.520)
+[15:25:55]   M3c fold 2017: predicted 5944 bars (z std 0.529)
+[15:26:42]   M3c fold 2018: predicted 6035 bars (z std 0.470)
+[15:27:06]   M3c fold 2019: predicted 5899 bars (z std 0.000)
+[15:27:30]   M3c fold 2020: predicted 5907 bars (z std 0.000)
+[15:28:08]   M3c fold 2021: predicted 5891 bars (z std 0.288)
+[15:28:39]   M3c fold 2022: predicted 5914 bars (z std 0.429)
+[15:29:03]   M3c fold 2023: predicted 5153 bars (z std 0.000)
+[15:29:45]   M3c fold 2024: predicted 5933 bars (z std 0.368)
+[15:30:09]   M3c fold 2025: predicted 5905 bars (z std 0.000)
+[15:30:26]   M4 fold 2016: predicted 5923 bars (z std nan)
+[15:30:43]   M4 fold 2017: predicted 5944 bars (z std nan)
+[15:31:00]   M4 fold 2018: predicted 6035 bars (z std nan)
+[15:31:17]   M4 fold 2019: predicted 5899 bars (z std nan)
+[15:31:34]   M4 fold 2020: predicted 5907 bars (z std nan)
+[15:31:52]   M4 fold 2021: predicted 5891 bars (z std nan)
+[15:32:09]   M4 fold 2022: predicted 5914 bars (z std nan)
+[15:32:26]   M4 fold 2023: predicted 5153 bars (z std nan)
+[15:32:42]   M4 fold 2024: predicted 5933 bars (z std nan)
+[15:33:00]   M4 fold 2025: predicted 5905 bars (z std nan)
+[15:39:37]   M5 fold 2016: predicted 5923 bars (z std 0.124)
+[15:47:15]   M5 fold 2017: predicted 5944 bars (z std 0.153)
+[15:55:56]   M5 fold 2018: predicted 6035 bars (z std 0.176)
+[16:05:41]   M5 fold 2019: predicted 5899 bars (z std 0.156)
+[16:05:41]   BUDGET STOP before M5 fold 2020 (0.31h left)
+[16:05:41] GATE G3.4_folds: FAIL | fold status: {'M3c': 'complete', 'M3m': 'skipped (compact budget; search-only)', 'M4': 'complete', 'M5': 'complete'}; budget used 1.59h
+[16:05:41] ===== STAGE walk-forward fold refits DONE in 2442.0s =====
+[16:05:41] ===== STAGE spectral gate + export START =====
+[16:05:41] GATE G3.3_spectral: PASS | rho at every audited M5 checkpoint < 0.95: [{'fold': 2016, 'seed': 1337, 'rho': 0.5012, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}, {'fold': 2017, 'seed': 1337, 'rho': 0.5012, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}, {'fold': 2018, 'seed': 1337, 'rho': 0.5013, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}, {'fold': 2019, 'seed': 1337, 'rho': 0.5014, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}]...
+[16:05:41] GATE G3.5_export: PASS | v2_neural_forecasts.parquet (10 cols); rho_log.json; trial_ledger.jsonl (9 entries)
+[16:05:41] ===== STAGE spectral gate + export DONE in 0.1s =====
+[16:05:41] GATE G3_ALL: PASS | all K3 gates green

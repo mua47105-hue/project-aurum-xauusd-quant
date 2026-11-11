@@ -1,0 +1,321 @@
+{
+ "audit": {
+  "M1_GBDT_v2": {
+   "fit": {
+    "n": 41513,
+    "nunique": 6609,
+    "std": 0.52076,
+    "top_value_share": 0.0135
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 1123,
+    "std": 0.46446,
+    "top_value_share": 0.0218
+   },
+   "oos_saturated": false
+  },
+  "M2_RFF_Ridge": {
+   "fit": {
+    "n": 41079,
+    "nunique": 41079,
+    "std": 0.42479,
+    "top_value_share": 0.0
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16805,
+    "nunique": 16805,
+    "std": 0.41589,
+    "top_value_share": 0.0001
+   },
+   "oos_saturated": false
+  },
+  "RLSBank": {
+   "fit": {
+    "n": 41513,
+    "nunique": 41513,
+    "std": 0.07828,
+    "top_value_share": 0.0
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 16991,
+    "std": 0.07583,
+    "top_value_share": 0.0001
+   },
+   "oos_saturated": false
+  },
+  "M3c_DAE": {
+   "fit": {
+    "n": 41513,
+    "nunique": 8760,
+    "std": 0.58723,
+    "top_value_share": 0.2848
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 4085,
+    "std": 0.5799,
+    "top_value_share": 0.5963
+   },
+   "oos_saturated": false
+  },
+  "M3m_DAE": {
+   "fit": {
+    "n": 41513,
+    "nunique": 12136,
+    "std": 0.37934,
+    "top_value_share": 0.0006
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 8630,
+    "std": 0.46662,
+    "top_value_share": 0.0063
+   },
+   "oos_saturated": false
+  },
+  "M4_DMN_Lite": {
+   "fit": {
+    "n": 41513,
+    "nunique": 332,
+    "std": 0.18726,
+    "top_value_share": 0.1151
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 144,
+    "std": 0.16855,
+    "top_value_share": 0.152
+   },
+   "oos_saturated": false
+  },
+  "M4b_DMN_Lite": {
+   "fit": {
+    "n": 41513,
+    "nunique": 348,
+    "std": 0.17066,
+    "top_value_share": 0.0626
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 144,
+    "std": 0.17733,
+    "top_value_share": 0.135
+   },
+   "oos_saturated": false
+  },
+  "M5_ContinuumNet": {
+   "fit": {
+    "n": 41513,
+    "nunique": 11427,
+    "std": 0.22219,
+    "top_value_share": 0.0006
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 16988,
+    "std": 0.26226,
+    "top_value_share": 0.0001
+   },
+   "oos_saturated": false
+  },
+  "Carver_EWMAC": {
+   "fit": {
+    "n": 41513,
+    "nunique": 41513,
+    "std": 0.35658,
+    "top_value_share": 0.0
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 16991,
+    "std": 0.33486,
+    "top_value_share": 0.0001
+   },
+   "oos_saturated": false
+  },
+  "Channel_A": {
+   "fit": {
+    "n": 41513,
+    "nunique": 39649,
+    "std": 0.24175,
+    "top_value_share": 0.0002
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 15091,
+    "std": 0.2656,
+    "top_value_share": 0.0009
+   },
+   "oos_saturated": false,
+   "by_design_position_schedule": true
+  },
+  "Channel_B": {
+   "fit": {
+    "n": 39516,
+    "nunique": 1,
+    "std": 0.0,
+    "top_value_share": 1.0
+   },
+   "fit_saturated": true,
+   "oos": {
+    "n": 15004,
+    "nunique": 1,
+    "std": 0.0,
+    "top_value_share": 1.0
+   },
+   "oos_saturated": true,
+   "by_design_position_schedule": true
+  },
+  "BuyHold_Gold": {
+   "fit": {
+    "n": 41513,
+    "nunique": 1,
+    "std": 0.0,
+    "top_value_share": 1.0
+   },
+   "fit_saturated": true,
+   "oos": {
+    "n": 16991,
+    "nunique": 1,
+    "std": 0.0,
+    "top_value_share": 1.0
+   },
+   "oos_saturated": true,
+   "by_design_position_schedule": true
+  },
+  "M0_Champ_v13": {
+   "fit": {
+    "n": 41513,
+    "nunique": 7,
+    "std": 0.56368,
+    "top_value_share": 0.3849
+   },
+   "fit_saturated": true,
+   "oos": {
+    "n": 16991,
+    "nunique": 7,
+    "std": 0.55675,
+    "top_value_share": 0.3626
+   },
+   "oos_saturated": true,
+   "by_design_position_schedule": true
+  },
+  "M0_Champ_v13_cap1": {
+   "fit": {
+    "n": 41513,
+    "nunique": 3,
+    "std": 0.74979,
+    "top_value_share": 0.4093
+   },
+   "fit_saturated": true,
+   "oos": {
+    "n": 16991,
+    "nunique": 3,
+    "std": 0.72374,
+    "top_value_share": 0.5564
+   },
+   "oos_saturated": true,
+   "by_design_position_schedule": true
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "fit": {
+    "n": 41513,
+    "nunique": 41162,
+    "std": 0.34279,
+    "top_value_share": 0.0009
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 16819,
+    "std": 0.3084,
+    "top_value_share": 0.0021
+   },
+   "oos_saturated": false,
+   "legs": {
+    "M1_GBDT_v2": false,
+    "M2_RFF_Ridge": false
+   },
+   "has_flagged_leg": false
+  },
+  "M6b_Ensemble_EQW": {
+   "fit": {
+    "n": 41513,
+    "nunique": 41162,
+    "std": 0.34279,
+    "top_value_share": 0.0009
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 16819,
+    "std": 0.3084,
+    "top_value_share": 0.0021
+   },
+   "oos_saturated": false,
+   "legs": {
+    "M1_GBDT_v2": false,
+    "M2_RFF_Ridge": false
+   },
+   "has_flagged_leg": false
+  },
+  "M7_Active_Grand_Hybrid": {
+   "fit": {
+    "n": 41513,
+    "nunique": 41199,
+    "std": 0.35634,
+    "top_value_share": 0.0006
+   },
+   "fit_saturated": false,
+   "oos": {
+    "n": 16991,
+    "nunique": 16840,
+    "std": 0.33459,
+    "top_value_share": 0.0009
+   },
+   "oos_saturated": false,
+   "legs": {
+    "M6_AURUM_v2_Ensemble": false,
+    "M0_Champ_v13": "exempt (position schedule by design)"
+   },
+   "has_flagged_leg": false
+  },
+  "M7_Core_Satellite": {
+   "fit": {
+    "n": 41513,
+    "nunique": 7,
+    "std": 0.28184,
+    "top_value_share": 0.3849
+   },
+   "fit_saturated": true,
+   "oos": {
+    "n": 16991,
+    "nunique": 7,
+    "std": 0.27837,
+    "top_value_share": 0.3626
+   },
+   "oos_saturated": true,
+   "legs": {
+    "M0_Champ_v13": "exempt (position schedule by design)",
+    "BuyHold_Gold": "exempt (position schedule by design)"
+   },
+   "has_flagged_leg": false,
+   "by_design_position_schedule": true
+  }
+ },
+ "flagged_strategies": [],
+ "criteria": "std < 0.05 or nunique <= 8 or top-value share >= 0.90, per window",
+ "note": "flagged = saturated/degenerate z (per-fold directional bet); results are still exported verbatim and quarantined in the report"
+}

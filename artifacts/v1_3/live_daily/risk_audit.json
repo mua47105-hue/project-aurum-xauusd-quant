@@ -1,0 +1,55 @@
+{
+ "checklist": {
+  "state_serialized_from_latest_fully_featured_bar": true,
+  "tokens": 338,
+  "forward_depths_r": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "cpu_only": true,
+  "temperature_scaling_applied_h1_h5": true,
+  "probabilities_bounded_0_1": true,
+  "multi_depth_pool_w": [
+   0.6,
+   0.2,
+   0.2
+  ],
+  "lcb_ev_gate": {
+   "hurdle": 0.0,
+   "value": 0.48353,
+   "pass": true
+  },
+  "lambda_var": 0.5,
+  "sigma_loop_at_cell": 0.00603,
+  "loop_ood_gate": {
+   "threshold": 0.1,
+   "value": 0.00536,
+   "pass": true
+  },
+  "gbdt_agreement_gate": {
+   "dir": "L",
+   "cell_dir": "L",
+   "agrees": true,
+   "train_through": 2024
+  },
+  "event_blackout_gate": {
+   "nfp_window": false,
+   "vix_shock": false,
+   "mi_vix_d20z": -0.4061943144928922
+  },
+  "overlay_orders_placed_at_entry": true,
+  "overlay_rule": "path",
+  "kelly_capped_at": 0.01,
+  "quarter_kelly": 0.25,
+  "risk_fraction": 0.01,
+  "stop_distance_usd": 21.42,
+  "position_oz_ref_account": 4.669,
+  "decision_emitted": "BUY",
+  "no_lookahead": "state uses bar features at/ before as_of_bar only; GBDT fold trained <= y-1; overlay quantiles h48 from H3 head, h24 empirical <= y-1; base-rate prior <= y-1",
+  "policy_source": "aurum-p4-backtest v1.3 policy_fit.json; fit window 2016-2022; OOS 2023-25 never touched"
+ },
+ "era_score": 0.2255633920431137,
+ "n_gates_passed": 6
+}

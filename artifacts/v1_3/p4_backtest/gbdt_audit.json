@@ -1,0 +1,142 @@
+[
+ {
+  "year": 2016,
+  "dir": "L",
+  "n_train": 25234,
+  "best_iter": 63,
+  "max_train_year": 2015
+ },
+ {
+  "year": 2016,
+  "dir": "S",
+  "n_train": 25234,
+  "best_iter": 22,
+  "max_train_year": 2015
+ },
+ {
+  "year": 2017,
+  "dir": "L",
+  "n_train": 29922,
+  "best_iter": 30,
+  "max_train_year": 2016
+ },
+ {
+  "year": 2017,
+  "dir": "S",
+  "n_train": 29922,
+  "best_iter": 38,
+  "max_train_year": 2016
+ },
+ {
+  "year": 2018,
+  "dir": "L",
+  "n_train": 34635,
+  "best_iter": 71,
+  "max_train_year": 2017
+ },
+ {
+  "year": 2018,
+  "dir": "S",
+  "n_train": 34635,
+  "best_iter": 56,
+  "max_train_year": 2017
+ },
+ {
+  "year": 2019,
+  "dir": "L",
+  "n_train": 39411,
+  "best_iter": 50,
+  "max_train_year": 2018
+ },
+ {
+  "year": 2019,
+  "dir": "S",
+  "n_train": 39411,
+  "best_iter": 22,
+  "max_train_year": 2018
+ },
+ {
+  "year": 2020,
+  "dir": "L",
+  "n_train": 44074,
+  "best_iter": 53,
+  "max_train_year": 2019
+ },
+ {
+  "year": 2020,
+  "dir": "S",
+  "n_train": 44074,
+  "best_iter": 21,
+  "max_train_year": 2019
+ },
+ {
+  "year": 2021,
+  "dir": "L",
+  "n_train": 48740,
+  "best_iter": 33,
+  "max_train_year": 2020
+ },
+ {
+  "year": 2021,
+  "dir": "S",
+  "n_train": 48740,
+  "best_iter": 58,
+  "max_train_year": 2020
+ },
+ {
+  "year": 2022,
+  "dir": "L",
+  "n_train": 53394,
+  "best_iter": 84,
+  "max_train_year": 2021
+ },
+ {
+  "year": 2022,
+  "dir": "S",
+  "n_train": 53394,
+  "best_iter": 71,
+  "max_train_year": 2021
+ },
+ {
+  "year": 2023,
+  "dir": "L",
+  "n_train": 58072,
+  "best_iter": 117,
+  "max_train_year": 2022
+ },
+ {
+  "year": 2023,
+  "dir": "S",
+  "n_train": 58072,
+  "best_iter": 126,
+  "max_train_year": 2022
+ },
+ {
+  "year": 2024,
+  "dir": "L",
+  "n_train": 62127,
+  "best_iter": 106,
+  "max_train_year": 2023
+ },
+ {
+  "year": 2024,
+  "dir": "S",
+  "n_train": 62127,
+  "best_iter": 140,
+  "max_train_year": 2023
+ },
+ {
+  "year": 2025,
+  "dir": "L",
+  "n_train": 66811,
+  "best_iter": 66,
+  "max_train_year": 2024
+ },
+ {
+  "year": 2025,
+  "dir": "S",
+  "n_train": 66811,
+  "best_iter": 62,
+  "max_train_year": 2024
+ }
+]

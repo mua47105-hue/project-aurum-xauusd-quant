@@ -1,0 +1,32 @@
+{
+  "G2.1_folds": {
+    "pass": true,
+    "detail": "10/10 GBDT folds; NaN rows = pre-2016 warmup 36504"
+  },
+  "G2.1b_rff": {
+    "pass": true,
+    "detail": "RFF covers 58504 bars"
+  },
+  "G2.1c_rlsbank": {
+    "pass": true,
+    "detail": "RLSBank floor n=94288"
+  },
+  "G2.3_gauntlet": {
+    "pass": true,
+    "detail": "{\"M1_GBDT_v2\": {\"engine_beats_frozen\": true, \"buffer_turnover_cut_pct\": 32.0, \"decision\": \"engine+buffer on\"}, \"M2_RFF_Ridge\": {\"engine_beats_frozen\": true, \"buffer_turnover_cut_pct\": 38.6, \"decision\": \"engine+buffer on\"}}"
+  },
+  "G2.4_export": {
+    "pass": true,
+    "detail": "v2_cpu_forecasts.parquet"
+  },
+  "G2_ALL": {
+    "gate": "G2_ALL",
+    "pass": true,
+    "detail": "K2 gates green at k2-v2.0.2 (local patch over k2_out2; pred_rff byte-identical)"
+  },
+  "G4.8_z_rff_producer": {
+    "gate": "G4.8_z_rff_producer",
+    "pass": true,
+    "detail": "k2-v2.0.2 producer-side saturation gate on z_rff: {\"fit\": {\"n\": 41079, \"std\": 0.42479, \"sat_frac_gt_0p99\": 0.0, \"nunique\": 41079, \"frozen_turnover_py\": 467.19, \"frozen_sharpe\": -0.8394}, \"oos\": {\"n\": 16805, \"std\": 0.41589, \"sat_frac_gt_0p99\": 0.0, \"nunique\": 16805, \"frozen_turnover_py\": 557.95, \"frozen_sharpe\": -0.5554}} -- negative control (fold-mean-retained IQR variant, expected saturated): {\"fit\": {\"std\": 0.70079, \"sat_frac_gt_0p99\": 0.882475, \"nunique\": 11808}, \"oos\": {\"std\": 0.0, \"sat_frac_gt_0p99\": 1.0, \"nunique\": 1}}"
+  }
+}

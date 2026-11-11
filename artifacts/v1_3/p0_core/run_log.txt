@@ -1,0 +1,35 @@
+[03:57:42] ENV: {"python": "3.13.16", "numpy": "2.1.3", "cwd": "/kaggle/working", "argv": ["/kaggle/src/script.py"], "pandas": "2.3.3", "torch": "2.11.0+cu130", "cuda_available": true, "gpu_count": 2, "gpus": ["Tesla T4", "Tesla T4"], "capability": "(7, 5)", "total_mem_gb": 15.64, "bf16_supported": true, "transformers": "4.57.1"}
+[03:57:42] GATE G0.1_env: PASS | ['Tesla T4', 'Tesla T4'] cap=(7, 5) bf16=True mem=15.64GB torch=2.11.0+cu130 transformers=4.57.1
+[03:57:42] GATE G0.1_fp16_policy: PASS | fp16 + GradScaler enforced structurally (autocast fp16 hardcoded; fp32 RMSNorm accumulation; residual clamp C=16384). torch reports bf16 'supported' on sm_75 but that is emulation only - Turing has no bf16 tensor cores, fp16 stays the mandated path.
+[03:58:22] ===== STAGE G0.2 correctness START =====
+[03:58:24] GATE G0.2_loop_correctness: PASS | R=1 sandwich-off maxdiff=5.44e-05; identity-init sandwich maxdiff=5.44e-05; R=3 finite=True heads=True padmask_finite=True
+[03:58:24] ===== STAGE G0.2 correctness DONE in 2.2s =====
+[03:58:24] ===== STAGE G0.3 scale invariance START =====
+[03:58:29]   histdata xauusd 2024: OK 4.4 MB
+[03:58:32] GATE G0.3_scale_invariance: PASS | features maxdiff=2.04e-10 labels maxdiff=2.24e-13 serializer identical=True; real XAUUSD-2024 x137 scale maxdiff=9.17e-11
+[03:58:32] ===== STAGE G0.3 scale invariance DONE in 7.7s =====
+[03:58:32] ===== STAGE G0.4 throughput START =====
+[03:59:30]   bench {'r': 1, 'bs': 8, 'ckpt': True, 'tok_per_s': 1674.6, 'step_ms': 2446.0, 'mem_gb': 10.97, 'scale': 16384.0}
+[04:01:41]   bench {'r': 1, 'bs': 16, 'ckpt': True, 'tok_per_s': 1500.8, 'step_ms': 5458.4, 'mem_gb': 14.73, 'scale': 65536.0}
+[04:01:44]   bench OOM r=1 bs=32 ckpt=True
+[04:03:00]   bench {'r': 2, 'bs': 8, 'ckpt': True, 'tok_per_s': 1299.1, 'step_ms': 3153.0, 'mem_gb': 10.97, 'scale': 65536.0}
+[04:05:42]   bench {'r': 2, 'bs': 16, 'ckpt': True, 'tok_per_s': 1208.8, 'step_ms': 6777.0, 'mem_gb': 14.73, 'scale': 16384.0}
+[04:05:46]   bench OOM r=2 bs=32 ckpt=True
+[04:05:47]   bench OOM r=3 bs=8 ckpt=False
+[04:07:18]   bench {'r': 3, 'bs': 8, 'ckpt': True, 'tok_per_s': 1076.9, 'step_ms': 3803.5, 'mem_gb': 10.97, 'scale': 16384.0}
+[04:07:20]   bench OOM r=3 bs=16 ckpt=False
+[04:10:26]   bench {'r': 3, 'bs': 16, 'ckpt': True, 'tok_per_s': 1051.4, 'step_ms': 7791.4, 'mem_gb': 14.73, 'scale': 8192.0}
+[04:10:28]   bench OOM r=3 bs=32 ckpt=False
+[04:10:32]   bench OOM r=3 bs=32 ckpt=True
+[04:10:33] GATE G0.4_throughput_1gpu: PASS | r=3/bs=16/ckpt=on tok/s=1051.4; full grid in bench.json (6 OOM configs)
+[04:10:33] ===== STAGE G0.4 throughput DONE in 721.1s =====
+[04:10:33]   main-process GPU after phase_a: 0.02 GB allocated, 0.07 GB reserved
+[04:10:33] ===== STAGE G0.5 DDP START =====
+[04:12:42] GATE G0.5_ddp_throughput: PASS | 2xT4 DDP tok/s=4334 step=3780ms mem=10.98GB grad_norm_gap=0.00e+00
+[04:12:42] ===== STAGE G0.5 DDP DONE in 128.4s =====
+[04:12:42] ===== STAGE G0.6 table timing START =====
+[04:21:20] GATE G0.6_table_timing: PASS | 30k rows x 85 outputs (R=3, 2 GPUs) in 479s wall (62.6 rows/s); probs in [0,1]: True
+[04:21:20] ===== STAGE G0.6 table timing DONE in 517.9s =====
+[04:21:20] ===== STAGE G0.7 kill/resume START =====
+[04:26:42] GATE G0.7_kill_resume: PASS | killed=True checkpoint_existed=False resume_rc=0 maxdiff=0.00e+00 resume_wall=142s
+[04:26:42] ===== STAGE G0.7 kill/resume DONE in 322.1s =====

@@ -1,0 +1,13 @@
+[STATE h00 dow=MON sess=ASIA]
+ret_atr r1=-.03 r4=-1.97 r12=-2.65 r24=-1.73 r48=-.14
+vol_atr atrr=1.18 volz=2.95
+osc rsi=-1.88 stoch=-1.31 macd=-.29
+range bb=-1.09 bbw=.26 d20=.28 d55=.28 run=-.40
+candle c1=b-1.48/u.19/d.18 c2=b-.43/u.18/d.07 c3=b-.03/u.15/d.37
+shape m1=06 h1=02 vlm=.00
+xasset xag=-2.26 eur=.68 jpy=-.03
+macro vix=-1.02
+minnov y10 -1.1 -.9 74 y2 -.3 -.2 16 sp -1.1 -.7 95 dx -.8 -.8 04 vx -.4 .4 03
+regime trend=down vol=mid
+prior zw24=2.24 zl24=-.70 zw48=2.30 zl48=-.48
+coh Lpw=.40 Lb=1.58 Spw=.39 Sb=1.46 arg=00

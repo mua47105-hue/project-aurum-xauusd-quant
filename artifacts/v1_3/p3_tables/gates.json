@@ -1,0 +1,42 @@
+{
+  "G4.0_mounts": {
+    "gate": "G4.0_mounts",
+    "pass": true,
+    "detail": "prev_tables=OK phase1-data=OK models-meta=OK"
+  },
+  "G4.1_data": {
+    "gate": "G4.1_data",
+    "pass": true,
+    "detail": "labeled states=87948 (expect 87948); mean tokens=330.9; pre-test=72241 OOS=15707 (expect 72241 / 15707)"
+  },
+  "G4.2_depth_forwards": {
+    "gate": "G4.2_depth_forwards",
+    "pass": true,
+    "detail": "ro_h shapes {\"1\": [87948, 5, 1024], \"2\": [87948, 5, 1024], \"3\": [87948, 5, 1024], \"4\": [87948, 5, 1024]} | v3: CARRIED from the v2 GPU run (forward-dependent property); table re-validated below via r-column completeness"
+  },
+  "G4.3_heads_validated": {
+    "gate": "G4.3_heads_validated",
+    "pass": true,
+    "detail": "fold-cal Brier matches training values for 10/10 folds (tol 0.01); main-head 2022 Brier 0.19697 vs training 0.19685374200344086 (tol 0.012); detail={\"2016\": {\"brier_recomputed\": 0.20311, \"brier_ref\": 0.20311354100704193, \"match\": true}, \"2017\": {\"brier_recomputed\": 0.20155, \"brier_ref\": 0.20155057311058044, \"match\": true}, \"2018\": {\"brier_recomputed\": 0.19876, \"brier_ref\": 0.19875593483448029, \"match\": true}, \"2019\": {\"brier_recomputed\": 0.19901, \"brier_ref\": 0.19900885224342346, \"match\": true}, \"2020\": {\"brier_recomputed\": 0.1984, \"brier_ref\": 0.19840200245380402, \"match\": true}, \"2021\": {\"br | v3: CARRIED from the v2 GPU run (head-network property)"
+  },
+  "G4.4_tables": {
+    "gate": "G4.4_tables",
+    "pass": true,
+    "detail": "parquet rows=569,152 (expect 569,152); 98 cols; 63.3 MB; h1 col-blocks with NaN=0.0000 (v3 re-derived)"
+  },
+  "G4.5_ood": {
+    "gate": "G4.5_ood",
+    "pass": true,
+    "detail": "loop-divergence |p_r - p_3| (v3 re-derived from the parquet): {\"r1\": {\"mean\": 0.009623, \"p95\": 0.025146}, \"r2\": {\"mean\": 0.004529, \"p95\": 0.011719}, \"r4\": {\"mean\": 0.003211, \"p95\": 0.008301}, \"table_ood_mean\": {\"mean\": 0.004341, \"p95\": 0.012293}}"
+  },
+  "G4.6_era_score": {
+    "gate": "G4.6_era_score",
+    "pass": true,
+    "detail": "era_clf coverage=100.00% (imputed 15,684 warmup rows {2010: 15560, 2011: 124} with 0.5 = the value the neutralization pass already used for those rows; fold rows were 100% clean pre-fix)"
+  },
+  "G4.7_export_v3": {
+    "gate": "G4.7_export_v3",
+    "pass": true,
+    "detail": "exported 4/4 v3 artifacts"
+  }
+}

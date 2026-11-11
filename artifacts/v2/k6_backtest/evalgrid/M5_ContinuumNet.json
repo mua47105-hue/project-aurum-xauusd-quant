@@ -1,0 +1,176 @@
+{
+ "sig": "db6ef15a3870",
+ "entry": {
+  "gauntlet_engine": false,
+  "fit": {
+   "metrics": {
+    "n": 41513,
+    "sharpe_ann": -0.0057,
+    "ret_ann_volunits": -0.00019,
+    "maxdd_volunits": 0.13356,
+    "calmar": -0.0014,
+    "ulcer": 0.033258,
+    "win_rate": 0.4836
+   },
+   "turnover_py": 337.34280495975923,
+   "cost1.5": {
+    "n": 41513,
+    "sharpe_ann": -0.6402,
+    "ret_ann_volunits": -0.02081,
+    "maxdd_volunits": 0.16615,
+    "calmar": -0.1253,
+    "ulcer": 0.053228,
+    "win_rate": 0.4725
+   },
+   "cost2.0": {
+    "n": 41513,
+    "sharpe_ann": -1.2765,
+    "ret_ann_volunits": -0.04144,
+    "maxdd_volunits": 0.30158,
+    "calmar": -0.1374,
+    "ulcer": 0.120214,
+    "win_rate": 0.4622
+   },
+   "speed_limit_ok": false,
+   "cost_drag_sharpe": 1.262,
+   "pre_cost_sharpe": 1.257,
+   "year_rows": [
+    {
+     "year": 2016,
+     "window": "FIT",
+     "sharpe_ann": 0.2394,
+     "ret_ann_volunits": 0.00499,
+     "maxdd_volunits": 0.02279,
+     "calmar": 0.2189,
+     "ulcer": 0.010475,
+     "win_rate": 0.4859
+    },
+    {
+     "year": 2017,
+     "window": "FIT",
+     "sharpe_ann": -0.8038,
+     "ret_ann_volunits": -0.01804,
+     "maxdd_volunits": 0.03241,
+     "calmar": -0.5566,
+     "ulcer": 0.02011,
+     "win_rate": 0.4775
+    },
+    {
+     "year": 2018,
+     "window": "FIT",
+     "sharpe_ann": 1.0831,
+     "ret_ann_volunits": 0.02886,
+     "maxdd_volunits": 0.02174,
+     "calmar": 1.3273,
+     "ulcer": 0.008198,
+     "win_rate": 0.4885
+    },
+    {
+     "year": 2019,
+     "window": "FIT",
+     "sharpe_ann": 0.3313,
+     "ret_ann_volunits": 0.00763,
+     "maxdd_volunits": 0.01991,
+     "calmar": 0.3835,
+     "ulcer": 0.008729,
+     "win_rate": 0.4813
+    },
+    {
+     "year": 2020,
+     "window": "FIT",
+     "sharpe_ann": 0.7169,
+     "ret_ann_volunits": 0.03441,
+     "maxdd_volunits": 0.04035,
+     "calmar": 0.8529,
+     "ulcer": 0.016895,
+     "win_rate": 0.4901
+    },
+    {
+     "year": 2021,
+     "window": "FIT",
+     "sharpe_ann": 2.3746,
+     "ret_ann_volunits": 0.05691,
+     "maxdd_volunits": 0.00927,
+     "calmar": 6.1379,
+     "ulcer": 0.003411,
+     "win_rate": 0.4836
+    },
+    {
+     "year": 2022,
+     "window": "FIT",
+     "sharpe_ann": -2.5041,
+     "ret_ann_volunits": -0.1213,
+     "maxdd_volunits": 0.13241,
+     "calmar": -0.9161,
+     "ulcer": 0.074483,
+     "win_rate": 0.4778
+    }
+   ]
+  },
+  "oos": {
+   "metrics": {
+    "n": 16991,
+    "sharpe_ann": -0.4526,
+    "ret_ann_volunits": -0.01761,
+    "maxdd_volunits": 0.12632,
+    "calmar": -0.1394,
+    "ulcer": 0.072991,
+    "win_rate": 0.4772
+   },
+   "turnover_py": 420.00863878024046,
+   "cost1.5": {
+    "n": 16991,
+    "sharpe_ann": -1.0348,
+    "ret_ann_volunits": -0.0402,
+    "maxdd_volunits": 0.17338,
+    "calmar": -0.2319,
+    "ulcer": 0.09761,
+    "win_rate": 0.4677
+   },
+   "cost2.0": {
+    "n": 16991,
+    "sharpe_ann": -1.6188,
+    "ret_ann_volunits": -0.06279,
+    "maxdd_volunits": 0.22229,
+    "calmar": -0.2824,
+    "ulcer": 0.124396,
+    "win_rate": 0.4574
+   },
+   "speed_limit_ok": false,
+   "cost_drag_sharpe": 1.159,
+   "pre_cost_sharpe": 0.706,
+   "year_rows": [
+    {
+     "year": 2023,
+     "window": "OOS",
+     "sharpe_ann": -1.0833,
+     "ret_ann_volunits": -0.02985,
+     "maxdd_volunits": 0.05205,
+     "calmar": -0.5735,
+     "ulcer": 0.01673,
+     "win_rate": 0.4708
+    },
+    {
+     "year": 2024,
+     "window": "OOS",
+     "sharpe_ann": -1.5879,
+     "ret_ann_volunits": -0.04631,
+     "maxdd_volunits": 0.05612,
+     "calmar": -0.8251,
+     "ulcer": 0.030909,
+     "win_rate": 0.4721
+    },
+    {
+     "year": 2025,
+     "window": "OOS",
+     "sharpe_ann": 0.4118,
+     "ret_ann_volunits": 0.02194,
+     "maxdd_volunits": 0.0526,
+     "calmar": 0.4172,
+     "ulcer": 0.028363,
+     "win_rate": 0.4877
+    }
+   ]
+  }
+ }
+}

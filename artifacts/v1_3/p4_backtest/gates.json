@@ -1,0 +1,57 @@
+{
+  "G5.0_mounts": {
+    "gate": "G5.0_mounts",
+    "pass": true,
+    "detail": "phase1-data=OK p3_out=OK models=OK"
+  },
+  "G5.0b_p3_gates": {
+    "gate": "G5.0b_p3_gates",
+    "pass": true,
+    "detail": "p3 gates (all must be green incl G4.6): {\"G4.0_mounts\": true, \"G4.1_data\": true, \"G4.2_depth_forwards\": true, \"G4.3_heads_validated\": true, \"G4.4_tables\": true, \"G4.5_ood\": true, \"G4.6_era_score\": true, \"G4.7_export_v3\": true}"
+  },
+  "G5.2a_cohort_gap": {
+    "gate": "G5.2a_cohort_gap",
+    "pass": true,
+    "detail": "USED-neighbour audit (strict >= 96-bar mask enforced before use): used violations=0; raw excluded=2/300 spot states (2 neighbours dropped by the mask)"
+  },
+  "G5.7_fit_causality": {
+    "gate": "G5.7_fit_causality",
+    "pass": true,
+    "detail": "all policy fits used years 2016..2022 only; OOS [2023, 2024, 2025] never touched by any fit; fold predictions are themselves walk-forward (heads trained <=y-1)"
+  },
+  "G5.6_walk_validation": {
+    "gate": "G5.6_walk_validation",
+    "pass": true,
+    "detail": "H1 walk (conservative, adverse-first) vs p1 M1 labels on flagship trades: |dR|<=0.25 agreement=87.42%; corr=0.96087; mean|dR|=0.1621. Residual gap = intra-hour M1 sequencing (H1 cannot resolve TP-vs-SL order inside one hour; walk takes the adverse side) + weekend clock-vs-bar-count windows. Clean trades resolve from the labels themselves; the walk supplies exit bars for concurrency."
+  },
+  "G5.1_determinism": {
+    "gate": "G5.1_determinism",
+    "pass": true,
+    "detail": "flagship trade-hash 34ea98f27ea95f7a == 34ea98f27ea95f7a; GBDT pL hash 946c06007d4a7410"
+  },
+  "G5.3_coverage": {
+    "gate": "G5.3_coverage",
+    "pass": true,
+    "detail": "flagship EXECUTED (cap1) in 10/10 years [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]; OOS executed trades=1354"
+  },
+  "G5.8_portfolio_realism": {
+    "gate": "G5.8_portfolio_realism",
+    "pass": true,
+    "detail": "flagship MaxDD% < 20%% and concurrency respected: {\"cap1\": {\"max_concurrent\": 1, \"overlap_violations\": 0, \"exposure\": 0.6224, \"max_dd_pct\": 14.671530067167943}, \"cap3\": {\"max_concurrent\": 3, \"overlap_violations\": 0, \"exposure\": 0.6626, \"max_dd_pct\": 13.060412085157608}}"
+  },
+  "G5.4_metrics_finite": {
+    "gate": "G5.4_metrics_finite",
+    "pass": true,
+    "detail": "all metrics finite (NaN-guarded) = True"
+  },
+  "G5.9_postmortem_parity": {
+    "gate": "G5.9_postmortem_parity",
+    "pass": true,
+    "detail": "fixed GBDT OOS E[R]=0.0310 vs postmortem 0.0599 (tol 0.06); k-NN -0.0155 vs 0.0078"
+  },
+  "G5.5_export": {
+    "gate": "G5.5_export",
+    "pass": true,
+    "detail": "exported 7/7 files; trades=308,934 rows"
+  }
+}

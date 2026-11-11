@@ -1,0 +1,17 @@
+# secrets & credentials — NEVER commit tokens
+scripts/creds/token_*
+**/kaggle.json
+*.env
+
+# caches & build output
+__pycache__/
+node_modules/
+*.pyc
+.part
+*.log
+
+# large local data (restored via scripts/download_heavy_assets.py)
+data/aurum_v2_features.parquet
+data/phase1/
+models/
+backup/

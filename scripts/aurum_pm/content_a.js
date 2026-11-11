@@ -1,0 +1,98 @@
+"use strict";
+// Sections 1-2: Executive Summary, Failure #1 (Cohort-Label Memorization)
+const S = [];
+
+// ══════════════════════════════ 1. EXECUTIVE SUMMARY ══════════════════════════════
+S.push({ h1: "1. Executive Summary", blocks: [
+  { t: "p", x: "Phase 0 and Phase 1 of AURUM executed cleanly on Kaggle (all 9 gates that passed did so honestly), but the numbers they produced expose four fundamental failures that must be solved before Phase 2 training touches a single GPU hour. This pass did exactly what the owner ordered: a deep-research and local-verification pass on the four failures, run entirely on CPU against the pulled aurum-phase1-data artifacts (766 MB re-fetched from the tskdev kernels; zero Kaggle GPU quota consumed), with every claimed number below reproduced locally unless explicitly marked otherwise. Two facts anchor the credibility of everything that follows: the adversarial-audit protocol was replicated locally to within noise (raw-39 AUC 1.0000 vs 1.0000 on Kaggle; post-drop 31-feature AUC 0.8048 vs 0.8055), and the full Kaggle kernel source tree was reconstructed byte-exactly from a local lib/ + kernels/ build, so every experiment ran against the same code that ran on the T4s." },
+  { t: "table",
+    caption: "Table 1: The four failures, root causes, and locally verified fixes",
+    headers: ["#", "Failure (observed)", "Root cause (verified)", "Fix (locally verified)", "Headline local number"],
+    widths: [4, 24, 24, 26, 22],
+    size: 17,
+    rows: [
+      ["1", "Soft-label Brier 0.0022 but realized Brier 0.247 and EV-argmax -0.060R per trade", "p_win is a K=200 k-NN average over the SAME features the model sees; a 4-second XGBoost replicates it to Brier 0.0017 - the 450M transformer learned a lookup table, not dynamics", "Target formulation v1.2: realized hard outcomes + adjacent-cell triangular smoothing as primary target; cohort demoted to input features and a small auxiliary loss with a kill-switch", "Walk-forward 2016-25: realized-target +0.0297R/yr vs cohort-target +0.0070R/yr; realized AUC 0.532 vs 0.495"],
+      ["2", "Adversarial AUC 0.8055 vs gate <=0.55; macro panel (y10/y2/spread/dxy) dropped entirely", "The within-era reference AUC is itself 0.5969-0.7996: gold features are naturally non-stationary; feature-level era-invariance and signal are entangled (every transform that lowers audit AUC destroys the signal)", "Gate redefinition (three-part) + macro recovered as INPUTS with prediction-level neutralization as the defense; walk-forward and regime conditioning remain the structural guards", "Neutralization keeps realized AUC 0.532->0.533 and 0.541->0.542; qmap+drop8 reaches audit 0.6166 but kills signal AUC 0.533->0.482"],
+      ["3", "151,936-vocab lm_head caused OOMs and ~1,051 tok/s/GPU", "The state format uses only 97 unique token IDs (measured over all 95,008 states); the 151,936-way projection + fp32 CE chunks burn ~24% of forward FLOPs and 2.4-4.9 GB, forcing checkpointing and bs caps", "Vocabulary slicing: slice the frozen tied lm_head to vocab_keep_ids (exact, not an approximation); remap targets; the restricted softmax IS the deployment objective", "1,566x projection compression; matmul 996x; projected 1.32-1.76x throughput; bs16 fits at ~11.3 GB"],
+      ["4", "18 kernel pushes (v1-v8 x 3 kernels) to debug pins, OOMs, DDP teardown, .values crashes", "No local pre-flight: kernels were the first place code ever executed", "Rebuilt local source tree (byte-exact roundtrip) + test_local.py pre-flight suite: build, static crash-class audit, env pins, labeler unit tests, cohort leakage asserts, scale invariance, sliced-CE identity, DDP teardown, VRAM model, kill/resume", "40/40 checks green in 13 s; push protocol requires both gates green before any Kaggle push"],
+    ],
+  },
+  { t: "p", x: "One more accounting correction came out of this pass and changes every downstream hour estimate: the G0.5 DDP benchmark double-counted tokens (it counted 16 sequences per GPU while running 8), so the reported 4,334 tok/s across 2xT4 is actually 2,167 tok/s - consistent with the honest single-GPU bench of 1,077 tok/s. The corrected Stage A' budget is therefore ~5.3-7.0 h on 2xT4 after the vocabulary fix, not the 14 h claimed at G0.8d, and it fits the remaining 25 h 50 m weekly quota with room for two full retries.", opts: { bold: false } },
+  { t: "p", x: "The recommendation is: adopt the Spec v1.2 deltas in Section 6, run the 30-40 minute T4 re-validation listed in Section 6.2 (the only items that genuinely cannot be verified on CPU), and then execute Phase 2. No Kaggle GPU was touched by this pass.", opts: { after: 200 } },
+]});
+
+// ══════════════════════════════ 2. FAILURE #1 ══════════════════════════════
+S.push({ h1: "2. Failure #1: The Cohort-Label Memorization Trap", blocks: [
+  { t: "h2", x: "2.1 What the pilot actually measured" },
+  { t: "p", x: "Pilot v6 reported a held-out soft-label Brier of 0.0022 against the cohort target p_win, a realized-outcome Brier of 0.2473 (a coin flip is 0.25), AUC 0.5610, and an EV-argmax simulation that lost -0.0595R per trade - worse than the fixed canonical cell at -0.0536R. The gate text already flagged the soft number as a replication check rather than an edge metric, but the mechanism deserves to be stated precisely, because it determines the fix." },
+  { t: "p", x: "The labeler builds a matched-cohort index (build_cohort_index) by running exact k-NN over the standardized 27-feature state vector, restricted to bars at least 96 bars in the past; p_win for bar i is then the mean realized win rate of those K=200 neighbors (cohort_soft_labels). The fatal property is that the k-NN query keys are the same features the transformer reads as input: p_win is a deterministic, smooth, low-entropy function of the current state. A model with enough capacity does not need to learn forward price dynamics to minimize BCE against p_win - it only needs to simulate a nearest-neighbor lookup. The 0.0022 Brier says it did exactly that. The information-theoretic tell is the entropy gap: averaging 200 Bernoulli outcomes leaves roughly p(1-p)/200 ~ 0.0013 of irreducible variance, which is precisely the floor the model reached; the realized outcome it was supposed to predict carries ~0.24 and it never moved (0.2473)." },
+  { t: "h2", x: "2.2 Local proof that the trap is model-independent" },
+  { t: "p", x: "Experiment 1 (exp1_memorization.py) trains a 5-depth, 300-tree XGBoost regressor - a model that trains in seconds - on 35 features to predict either the cohort p_win or the realized win flag of 8 representative barrier cells, with train era <=2020 and test era 2023-25 (84,721 cohort-valid bars, exactly matching the Kaggle label count). Results on the canonical long cell (L, m=1.5, t=2.5, h=48):" },
+  { t: "table",
+    caption: "Table 2: A cheap model reproduces the memorization; the realized task is untouched",
+    headers: ["Target", "Test era", "In-sample eras (2012-20)", "Val 2021-22", "Test Brier", "Test AUC"],
+    widths: [30, 12, 20, 12, 13, 13],
+    size: 18,
+    rows: [
+      ["cohort p_win (k-NN replica)", "2023-25", "0.00099-0.00105", "0.00158", "0.00174", "~0.50 (n/a)"],
+      ["realized win (the actual task)", "2023-25", "-", "-", "0.2597", "0.5235"],
+      ["base rate (train mean)", "2023-25", "-", "-", "0.2485", "0.500"],
+    ],
+  },
+  { t: "p", x: "Three conclusions follow. First, the memorization is not a transformer pathology: any model class can invert the k-NN target, so the 450M parameters bought nothing that four seconds of gradient boosting buys. Second, the replication error is remarkably stable out-of-distribution (0.0010 in-sample to 0.0017 in 2023-25) - the k-NN estimator is a smooth enough functional that it survives era drift, which is exactly why the pilot loss curve looked healthy while the model learned nothing about price dynamics. Third, on the realized task the same features give an XGBoost test Brier of 0.2506 (mean over 8 cells) versus a base-rate Brier of 0.2388, with AUC 0.523: a weak but consistent directional signal exists (all 8 cells AUC > 0.5) that unregularized trees bury in variance. That variance observation drives the fix." },
+  { t: "h2", x: "2.3 The fix: target formulation v1.2" },
+  { t: "p", x: "Spec v1.1 Section 4.2 already contains the right switch-off rule - a model trained on soft labels must not lose out-of-sample log-loss/Brier against hard realized labels, or the soft-label machinery is switched off. The pilot violated the rule's spirit by never training on hard labels at all. The v1.2 formulation, verified below, is:" },
+  { t: "bullets", items: [
+    "Primary target = realized hard outcomes. The H1 head trains on the realized win flag of each of the 48 barrier cells (BCE), exactly the labels already materialized in labels_R_actual / labels_cls_actual / expand_actual - no Phase-1 data re-run is required.",
+    "Adjacent-cell triangular smoothing. Each cell's target is convolved over the cell grid with weights: own cell 1.0, stop +-1 step 0.5, TP +-1 step 0.5, diagonal 0.25, horizon +-1 0.5 (rows normalized). This shares statistical strength across 48 highly correlated outputs of the same path without ever touching future information - sibling outcomes at the same historical bar are legal label structure.",
+    "Cohort labels are demoted to inputs and to a small auxiliary loss. As input, a compact summary (canonical long/short p_win, b_eff, and the cohort EV-argmax cell id) enters the serialized state - the k-NN estimate is genuinely predictive prior information computed strictly from the past, it just must never be the target. As auxiliary loss, cohort p_win may enter with weight lambda <= 0.3, and Section 4.2's kill-switch compares realized out-of-sample Brier with and without it at the first Phase-2 checkpoint.",
+    "Variance discipline is a first-class design constraint (the T5 lesson). The strongest local variant was not a smarter target but a shallower, heavily regularized model; the transformer analogues are listed in Section 2.5.",
+  ] },
+  { t: "h2", x: "2.4 Local verification: the target tournament" },
+  { t: "p", x: "Experiment 2 (exp2_targets.py) holds features, rows, splits, and the squared-error objective fixed and varies only the target: T0 cohort (status quo), T1 realized, T2 triangular-smoothed realized, T3a/T3b mixes (0.3/0.5 cohort), T4 realized with all 48 cohort p_win as extra inputs, T5 shallow-regularized realized (depth 3, 150 trees). All are evaluated on realized 2023-25 outcomes across 8 representative cells, with the pilot's EV-argmax protocol on top." },
+  { t: "table",
+    caption: "Table 3: Target tournament, test era 2023-25, realized outcomes (mean over 8 cells)",
+    headers: ["Variant", "Test Brier", "Test AUC", "EV-argmax mean R", "Win rate", "n"],
+    widths: [34, 13, 13, 18, 11, 11],
+    size: 18,
+    rows: [
+      ["T0 cohort p_win (pilot status quo)", "0.2400", "0.495", "+0.0035R", "38.8%", "15,707"],
+      ["T1 realized hard", "0.2506", "0.523", "+0.0453R", "40.9%", "15,707"],
+      ["T2 smoothed realized (fix)", "0.2485", "0.526", "+0.0537R", "40.8%", "15,707"],
+      ["T3a 0.7-realized + 0.3-cohort", "0.2430", "0.524", "+0.0512R", "41.0%", "15,707"],
+      ["T3b 0.5-realized + 0.5-cohort", "0.2408", "0.520", "+0.0437R", "40.6%", "15,707"],
+      ["T4 realized + cohort as INPUT", "0.2486", "0.523", "+0.0444R", "40.6%", "15,707"],
+      ["T5 shallow realized (fix)", "0.2388", "0.532", "+0.0599R", "41.4%", "15,707"],
+      ["k-NN strategy (cohort direct, no learning)", "0.2402", "0.505", "+0.0078R", "39.5%", "15,707"],
+      ["base rate (train mean)", "0.2388", "0.500", "-", "-", "-"],
+    ],
+  },
+  { t: "p", x: "Readings: (i) the cohort target T0 is the only variant with realized AUC below 0.5 - training on the k-NN replica is worse than useless for the real task; (ii) every realized-target variant dominates T0 on AUC and on trade simulation by an order of magnitude (+0.044R to +0.060R vs +0.0035R); (iii) smoothing (T2) improves on T1 on all three metrics with a block-bootstrap p-value of 0.023 on the Brier delta; (iv) cohort-as-input (T4) matches T1 - the prior is absorbed as a feature without distorting the target, and paired bootstrap on the canonical cell gives T4 better than T1 with p=0.044; (v) no variant beats the base rate on Brier - with AUC ~0.52-0.53 the resolution gain is smaller than the sharpness penalty, which is the textbook weak-signal calibration regime, and the reason the evaluation doctrine below leans on AUC and trade simulation rather than Brier alone." },
+  { t: "h2", x: "2.5 The honest alpha-versus-beta question, answered with a full walk-forward" },
+  { t: "p", x: "The 2023-25 window is a strong gold bull market - the canonical fixed long cell alone makes +0.088R per trade in it - so positive 2023-25 simulation numbers alone would prove nothing. Experiment 2b (exp2b_walkforward.py) therefore refits T0 and T5 yearly on an expanding window (train <= y-1, evaluate year y) across 2016-2025, with the k-NN strategy and the canonical long cell as references." },
+  { t: "figure", path: "/home/z/my-project/scripts/aurum_pm/fig1_walkforward.png", caption: "Figure 1: Yearly mean realized R per trade, expanding-window walk-forward 2016-2025. The realized-target variant (gold) is positive in 7 of 10 years including non-bull years, while the cohort-target variant (black) stays at noise level.", width: 620 },
+  { t: "table",
+    caption: "Table 4: Walk-forward yearly means (R per trade), expanding window",
+    headers: ["Year", "T0 cohort", "T5 shallow realized", "k-NN direct", "Canonical long (beta)"],
+    widths: [12, 22, 22, 22, 22],
+    size: 18,
+    rows: [
+      ["2016", "-0.0004", "+0.0148", "+0.0326", "-0.0178"],
+      ["2017", "+0.0052", "+0.0244", "+0.0237", "+0.0248"],
+      ["2018", "+0.0114", "-0.0664", "+0.0086", "-0.0165"],
+      ["2019", "-0.0421", "+0.0022", "-0.0479", "+0.0384"],
+      ["2020", "+0.0455", "+0.0389", "+0.0491", "+0.0666"],
+      ["2021", "-0.0214", "-0.0014", "-0.0092", "-0.0175"],
+      ["2022", "+0.0454", "+0.0005", "-0.0050", "-0.0193"],
+      ["2023", "-0.0084", "-0.0033", "-0.0039", "+0.0345"],
+      ["2024", "+0.0004", "+0.1069", "-0.0046", "+0.1186"],
+      ["2025", "+0.0343", "+0.1806", "+0.0306", "+0.1037"],
+      ["Mean", "+0.0070", "+0.0297", "+0.0074", "+0.0316"],
+      ["Positive years", "6/10", "7/10", "5/10", "6/10"],
+    ],
+  },
+  { t: "p", x: "The honest reading: the realized-target fix is real but modest. It is positive in 7 of 10 years including non-bull years (2016, 2017, 2019, 2022 - the last two being years when the canonical long cell lost money), it roughly matches the buy-and-hold beta reference on the yearly mean (+0.0297R vs +0.0316R) while drawing down much less in the beta-negative years (2021: -0.0014 vs -0.0175; 2022: +0.0005 vs -0.0193), and its two worst years are 2018 (-0.066R, a high-volatility chop year in which direction signals die) and near-zero 2021/2023. The cohort target and the raw k-NN strategy are indistinguishable from noise (+0.0070R / +0.0074R, 6/10 and 5/10 positive years). This is the correct baseline sandwich for Phase 2: the transformer must beat not zero, but +0.03R/year - and 2018 is the year to watch in walk-forward reporting." },
+  { t: "note", x: "Design consequences carried into Spec v1.2: the H1 head target swaps to realized outcomes with triangular smoothing (labels already on disk); cohort p_win/b_eff enter the state as a compact input block; the auxiliary-loss weight is capped at 0.3 behind the Section 4.2 kill-switch; walk-forward reports must include the canonical-long beta reference and the k-NN reference every year; and the transformer's variance discipline (the T5 lesson) is implemented as: smaller head hidden width, dropout on the readout MLPs, weight decay on head parameters only, early stopping on realized val AUC, and the 48-cell smoothing." },
+]});
+
+module.exports = S;

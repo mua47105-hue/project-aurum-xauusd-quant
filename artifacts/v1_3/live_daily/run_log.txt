@@ -1,0 +1,18 @@
+[06:25:44] ENV: {"python": "3.13.18", "numpy": "2.1.3", "cwd": "/kaggle/working", "argv": ["/kaggle/src/script.py"], "pandas": "2.3.3", "torch": "2.11.0+cpu", "cuda_available": false, "transformers": "4.57.1"}
+[06:25:44] LIVE POLICY v1.3: aurum-p4-backtest v1.3 policy_fit.json; fit window 2016-2022; OOS 2023-25 never touched
+[06:25:44] GATE G6.0_mounts: PASS | phase1-data at /kaggle/input/datasets/tskdev/aurum-phase1-data (OK); aurum-models-v1 at /kaggle/input/datasets/tskdev/aurum-models-v1 (OK); policy constants from aurum-p4-backtest v1.3 policy_fit.json; fit window 2016-2022; OOS 2023-25 never touched
+[06:25:45] latest fully-featured bar: 2025-12-29 00:00:00+00:00 (row 94947/95008); live fold year 2025
+[06:25:51] GATE G6.1_state: PASS | serialized latest state: 338 tokens (expect 280-380)
+[06:25:52] compute device: cpu (CPU-only by design)
+[06:26:27]   loaded Qwen/Qwen3-0.6B (596.0M params, 28 layers, d=1024, tied=True)
+[06:26:31]   forward r=1: h1 shape (48,); finite=True
+[06:26:35]   forward r=2: h1 shape (48,); finite=True
+[06:26:39]   forward r=3: h1 shape (48,); finite=True
+[06:26:39]   r=4 extrapolation: iterations 3..3 reuse trained norm index 2
+[06:26:44]   forward r=4: h1 shape (48,); finite=True
+[06:26:44] GATE G6.2_forward: PASS | forwards r=[1, 2, 3, 4] on cpu; all heads finite=True; h1 shape (48,); temperatures {'h1': 1.0, 'h5': 1.5}
+[06:26:47]   GBDT fold 2025: train<= 2024 (L 66,811 / S 66,811 rows, 54 era-safe features); pL=0.5124 pS=0.3862 -> L
+[06:26:47] GATE G6.3_calibration: PASS | temperature scaling applied {'h1': 1.0, 'h5': 1.5}; pooled p_bar in [0,1]; prod p_bar=0.3091; shrunk p=0.3091; loop-OOD mean=0.0054 max=0.0265
+[06:26:47] GATE G6.4b_policy_consistency: PASS | EV_LCB reproduced from components (d=0.00e+00); p_bar pooling reproduced (d=0.00e+00); sigma_loop population-std reproduced (d=0.00e+00); ood reproduced (d=0.00e+00)
+[06:26:47] GATE G6.4_decision: PASS | action=TRADE; cell=L_m1.0_t4.0_h24; p_bar=0.3091; p_sh=0.3091; EV_LCB=+0.4835R (>= 0.0); sigma_loop=0.0060; lambda_var*b*sig=0.0121; cost=0.0500R; GBDT L (pL=0.512/pS=0.386) agrees=True; f_risk_cap1=0.01000 (cap 0.01); all gates clear
+[06:26:47] GATE G6.5_audit: PASS | decision.json + risk_audit.json written; action=BUY

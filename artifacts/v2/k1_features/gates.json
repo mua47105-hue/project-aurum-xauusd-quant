@@ -1,0 +1,42 @@
+{
+  "G1.4_dst": {
+    "gate": "G1.4_dst",
+    "pass": true,
+    "detail": "autumn+spring 4h gap windows detected in 16/16 years; PM fix NY-hour check passed (dst_gap_sanity_check)"
+  },
+  "G1.1_shape": {
+    "gate": "G1.1_shape",
+    "pass": true,
+    "detail": "rows=95008 (expect ~95,008); features=376 (budget ~345 with B1 additions; tolerance 300-430)"
+  },
+  "G1.2_nan": {
+    "gate": "G1.2_nan",
+    "pass": true,
+    "detail": "median column NaN=0.0000; cols>5% NaN=42 (documented warmups: ['minutes_to_LBMA_AM', 'minutes_to_LBMA_PM', 'minutes_to_LBMA_SILVER', 'minutes_to_WMR_FIX', 'eps', 'pred', 'R2_ew', 'spread_lvl', 'spread_z', 'q_B', 'ewmac_F_2h_xau', 'ewmac_sat_2h_xau']...)"
+  },
+  "G1.5_units": {
+    "gate": "G1.5_units",
+    "pass": true,
+    "detail": "corr(sig1_xau, independently recomputed z-increment sum)=1.00000 (>0.99: exact unit identity); diagnostic corr vs raw H1 ret=nan (0.70-0.75 expected on gappy M1); eps vol < raw vol on 97.8% of bars (>=80%)"
+  },
+  "G1.6_coverage": {
+    "gate": "G1.6_coverage",
+    "pass": true,
+    "detail": "M1 coverage by year: {'2010': 0.922, '2011': 0.938, '2012': 0.944, '2013': 0.945, '2014': 0.936, '2015': 0.936, '2016': 0.941, '2017': 0.938, '2018': 0.942, '2019': 0.939, '2020': 0.943, '2021': 0.941, '2022': 0.944, '2023': 0.822, '2024': 0.947, '2025': 0.942} (2023 dip documented)"
+  },
+  "G1.3_causality": {
+    "gate": "G1.3_causality",
+    "pass": true,
+    "detail": "truncated rebuild on 23050 bars x 372 cols through 2014-01; max|diff|=0.00e+00 over 8342630 values (bit-identical required)"
+  },
+  "G1.7_export": {
+    "gate": "G1.7_export",
+    "pass": true,
+    "detail": "aurum_v2_features.parquet 253.7 MB; ic_audit.parquet; feature_meta.json with 10 VSN groups"
+  },
+  "G1_ALL": {
+    "gate": "G1_ALL",
+    "pass": true,
+    "detail": "all K1 gates green"
+  }
+}

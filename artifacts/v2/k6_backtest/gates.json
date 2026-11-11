@@ -1,0 +1,42 @@
+{
+  "G4.7_causality_v201": {
+    "gate": "G4.7_causality_v201",
+    "pass": true,
+    "detail": "v2.0.1 frozen_net causality regression on Channel_A: same-bar (lookahead) Sharpe {\"fit\": 14.429, \"oos\": 15.508} vs fixed causal Sharpe {\"fit\": -0.509, \"oos\": -0.127} -- trap must be detected (>3) and the fixed accounting must show no residual same-bar edge"
+  },
+  "G6.2_stack": {
+    "gate": "G6.2_stack",
+    "pass": true,
+    "detail": "M6 FIXED family ['M1_GBDT_v2', 'M2_RFF_Ridge'] (a priori, no FIT membership filter): engine FIT Sharpes {\"M1_GBDT_v2\": -0.1264, \"M2_RFF_Ridge\": -0.7356} (frozen_net FIT for reference: {\"M1_GBDT_v2\": -0.2391, \"M2_RFF_Ridge\": -0.8394}): weights={'M1_GBDT_v2': 0.5, 'M2_RFF_Ridge': 0.5} (Carver S24: SR-shrink 0.90 toward equal weights, corr-shrink 0.50, shrunk SRs {\"M1_GBDT_v2\": -0.4005, \"M2_RFF_Ridge\": -0.4615})"
+  },
+  "G4.8_z_quality_audit": {
+    "gate": "G4.8_z_quality_audit",
+    "pass": true,
+    "detail": "z saturation audit exported for all strategies (v2.0.2: independent downstream verification of the K2 producer gate); flagged (saturated/degenerate): none; full audit in z_quality.json"
+  },
+  "G6.1_stats": {
+    "gate": "G6.1_stats",
+    "pass": false,
+    "detail": "DSR over N=170 ledger configs: shipping flagship M7_Core_Satellite DSR=0.9407 (gate >= 0.95, primary family N=12: signal families + one blend slot); conservative full-panel vintage (every distinct blend counts, N=14): flagship DSR=0.9248; active measurement arm M7_Active_Grand_Hybrid DSR=0.6502; CSCV-PBO=0.0049 (gate <= 0.20); PRE-REGISTERED BAR MISSED (v2.0.2 finding, reported verbatim): the Flaw #8 fix replaces the saturated-M2 artifact trial (+0.3504 FIT) with the true de-saturated trial (-0.8394), widening the honest trial dispersion and raising the Bailey-LdP null threshold -- the flagship's 95% DSR certification (v2.0.1: 0.958 on the artifact panel) is withdrawn to borderline; all: {\"M1_GBDT_v2\": 0.0933, \"M2_RFF_Ridge\": 0.0, \"RLSBank\": 0.0275, \"M3c_DAE\": 0.1087, \"M3m_DAE\": 0.0, \"M4_DMN_Lite\": 0.0, \"M4b_DMN_Lite\": 0.0, \"M5_ContinuumNet\": 0.0001, \"Carver_EWMAC\": 0.2021, \"Channel_A\": 0.0005, \"Channel_B\": 0.0029, \"BuyHold_Gold\": 0.7769, \"M0_Champ_v13\": 0.9352, \"M0_Champ_v13_cap1\": 0.9202, \"M6_AURUM_v2_Ensemble\": 0.0465, \"M6b_Ensemble_EQW\": 0.0465, \"M7_Active_Grand_Hybrid\": 0.6502, \"M7_Core_Satellite\": 0.9407}"
+  },
+  "G5.4_speed_limit": {
+    "gate": "G5.4_speed_limit",
+    "pass": true,
+    "detail": "Carver speed limit (annual cost <= 1/3 pre-cost SR), shipping family: {'BuyHold_Gold_fit': True, 'BuyHold_Gold_oos': True, 'M0_Champ_v13_fit': True, 'M0_Champ_v13_oos': True, 'M0_Champ_v13_cap1_fit': True, 'M0_Champ_v13_cap1_oos': True, 'M7_Active_Grand_Hybrid_fit': True, 'M7_Active_Grand_Hybrid_oos': True, 'M7_Core_Satellite_fit': True, 'M7_Core_Satellite_oos': True}; reference-only (also-rans/baselines, not gated): {'M1_GBDT_v2_oos': True, 'M2_RFF_Ridge_fit': False, 'M2_RFF_Ridge_oos': False, 'RLSBank_oos': False, 'M3c_DAE_fit': False, 'M3c_DAE_oos': True, 'M3m_DAE_fit': False, 'M3m_DAE_oos': False, 'M5_ContinuumNet_fit': False, 'M5_ContinuumNet_oos': False, 'Carver_EWMAC_fit': False, 'Carver_EWMAC_oos': True, 'Channel_A_fit': False, 'Channel_A_oos': False, 'M6_AURUM_v2_Ensemble_fit': False, 'M6_AURUM_v2_Ensemble_oos': False, 'M6b_Ensemble_EQW_fit': False, 'M6b_Ensemble_EQW_oos': False}"
+  },
+  "G5.3_gauntlet": {
+    "gate": "G5.3_gauntlet",
+    "pass": true,
+    "detail": "engine vs frozen per strategy (engine ships iff it beats frozen on FIT; v1.3 translations forced frozen): {\"M1_GBDT_v2\": true, \"M2_RFF_Ridge\": true, \"RLSBank\": true, \"M3c_DAE\": true, \"M3m_DAE\": false, \"M4_DMN_Lite\": true, \"M4b_DMN_Lite\": false, \"M5_ContinuumNet\": false, \"Carver_EWMAC\": true, \"Channel_A\": true, \"Channel_B\": false, \"BuyHold_Gold\": false, \"M0_Champ_v13\": false, \"M0_Champ_v13_cap1\": false, \"M6_AURUM_v2_Ensemble\": true, \"M6b_Ensemble_EQW\": true, \"M7_Active_Grand_Hybrid\": true, \"M7_Core_Satellite\": false}"
+  },
+  "G6.6_export": {
+    "gate": "G6.6_export",
+    "pass": true,
+    "detail": "backtest_v2.json + year_table.csv + net_series.parquet + stats.json + champion_compare.json + trial_ledger.jsonl + gauntlet.json + k6_meta.json + ckpt/"
+  },
+  "G6_ALL": {
+    "gate": "G6_ALL",
+    "pass": false,
+    "detail": "K6 gate failure"
+  }
+}

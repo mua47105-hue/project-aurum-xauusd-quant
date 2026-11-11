@@ -1,0 +1,2 @@
+[16:28:28] as-of bar: 2025-12-31 14:00:00+00:00 (features frozen at dataset version)
+[16:30:19] GATE G6.4_live_decision: PASS | v2.0 decision emitted at 2025-12-31 14:00:00+00:00: z_target=0.0365 z_exec=0.0193 regime=0.127 buffer_inside=False

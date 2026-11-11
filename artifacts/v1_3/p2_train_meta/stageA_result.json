@@ -1,0 +1,15 @@
+{
+ "tokens": 40009728,
+ "lm_steps": 2442,
+ "loss_first10": 0.6975,
+ "ref_start": 0.6975,
+ "loss_last10": 0.5336,
+ "loss_reduction": 0.235,
+ "z_final": 0.9973,
+ "nan_skips": 0,
+ "clamp_rate": 0.0,
+ "resid_max": 9316.5,
+ "tok_s_ddp": 2444.0,
+ "final_scale": 131072.0,
+ "world": 2
+}

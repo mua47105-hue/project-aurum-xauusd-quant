@@ -1,0 +1,203 @@
+{
+ "summary": {
+  "main_r1": {
+   "n_states": 87948,
+   "brier_sm_argmax": 0.18014,
+   "brier_re_argmax": 0.2002,
+   "auc_re_argmax": 0.50234,
+   "ev_mean": 0.5875,
+   "ood_mean": 0.00963,
+   "ood_p95": 0.01701,
+   "neut_cell_agree": 0.98304
+  },
+  "main_r2": {
+   "n_states": 87948,
+   "brier_sm_argmax": 0.17993,
+   "brier_re_argmax": 0.19939,
+   "auc_re_argmax": 0.50461,
+   "ev_mean": 0.52154,
+   "ood_mean": 0.00452,
+   "ood_p95": 0.00795,
+   "neut_cell_agree": 0.97477
+  },
+  "main_r3": {
+   "n_states": 87948,
+   "brier_sm_argmax": 0.17927,
+   "brier_re_argmax": 0.19893,
+   "auc_re_argmax": 0.50471,
+   "ev_mean": 0.5366,
+   "ood_mean": 0.0,
+   "ood_p95": 0.0,
+   "neut_cell_agree": 0.97504
+  },
+  "main_r4": {
+   "n_states": 87948,
+   "brier_sm_argmax": 0.17919,
+   "brier_re_argmax": 0.19889,
+   "auc_re_argmax": 0.50372,
+   "ev_mean": 0.54814,
+   "ood_mean": 0.0032,
+   "ood_p95": 0.00558,
+   "neut_cell_agree": 0.98099
+  },
+  "fold_r1": {
+   "n_states": 54340,
+   "brier_sm_argmax": 0.18101,
+   "brier_re_argmax": 0.20077,
+   "auc_re_argmax": 0.50041,
+   "ev_mean": 0.58905,
+   "ood_mean": 0.00961,
+   "ood_p95": 0.01696,
+   "neut_cell_agree": 0.98506
+  },
+  "fold_r2": {
+   "n_states": 54340,
+   "brier_sm_argmax": 0.18109,
+   "brier_re_argmax": 0.20006,
+   "auc_re_argmax": 0.50517,
+   "ev_mean": 0.52281,
+   "ood_mean": 0.00455,
+   "ood_p95": 0.00801,
+   "neut_cell_agree": 0.98193
+  },
+  "fold_r3": {
+   "n_states": 54340,
+   "brier_sm_argmax": 0.1802,
+   "brier_re_argmax": 0.19935,
+   "auc_re_argmax": 0.50567,
+   "ev_mean": 0.53736,
+   "ood_mean": 0.0,
+   "ood_p95": 0.0,
+   "neut_cell_agree": 0.98278
+  },
+  "fold_r4": {
+   "n_states": 54340,
+   "brier_sm_argmax": 0.18008,
+   "brier_re_argmax": 0.19926,
+   "auc_re_argmax": 0.50539,
+   "ev_mean": 0.54876,
+   "ood_mean": 0.00323,
+   "ood_p95": 0.00563,
+   "neut_cell_agree": 0.98579
+  }
+ },
+ "ood": {
+  "main_r1": {
+   "mean": 0.009631,
+   "p95": 0.017014
+  },
+  "main_r2": {
+   "mean": 0.004517,
+   "p95": 0.00795
+  },
+  "main_r3": {
+   "mean": 0.0,
+   "p95": 0.0
+  },
+  "main_r4": {
+   "mean": 0.003199,
+   "p95": 0.00558
+  },
+  "fold_r1": {
+   "mean": 0.00961,
+   "p95": 0.016958
+  },
+  "fold_r2": {
+   "mean": 0.004548,
+   "p95": 0.008008
+  },
+  "fold_r3": {
+   "mean": 0.0,
+   "p95": 0.0
+  },
+  "fold_r4": {
+   "mean": 0.00323,
+   "p95": 0.005625
+  }
+ },
+ "validation": {
+  "folds": {
+   "2016": {
+    "brier_recomputed": 0.20311,
+    "brier_ref": 0.20311354100704193,
+    "match": true
+   },
+   "2017": {
+    "brier_recomputed": 0.20155,
+    "brier_ref": 0.20155057311058044,
+    "match": true
+   },
+   "2018": {
+    "brier_recomputed": 0.19876,
+    "brier_ref": 0.19875593483448029,
+    "match": true
+   },
+   "2019": {
+    "brier_recomputed": 0.19901,
+    "brier_ref": 0.19900885224342346,
+    "match": true
+   },
+   "2020": {
+    "brier_recomputed": 0.1984,
+    "brier_ref": 0.19840200245380402,
+    "match": true
+   },
+   "2021": {
+    "brier_recomputed": 0.19865,
+    "brier_ref": 0.19864891469478607,
+    "match": true
+   },
+   "2022": {
+    "brier_recomputed": 0.20086,
+    "brier_ref": 0.20085686445236206,
+    "match": true
+   },
+   "2023": {
+    "brier_recomputed": 0.19959,
+    "brier_ref": 0.1995871514081955,
+    "match": true
+   },
+   "2024": {
+    "brier_recomputed": 0.20031,
+    "brier_ref": 0.20030713081359863,
+    "match": true
+   },
+   "2025": {
+    "brier_recomputed": 0.19906,
+    "brier_ref": 0.19906161725521088,
+    "match": true
+   }
+  },
+  "main_2022": {
+   "brier": 0.19697,
+   "ref": 0.19685374200344086
+  }
+ },
+ "wall_s": 89.4,
+ "v3_finalize": {
+  "spec": "v1.3",
+  "mode": "CPU finalize (no GPU forwards)",
+  "era_imputation": {
+   "rows": 15684,
+   "value": 0.5,
+   "by_year": {
+    "2010": 15560,
+    "2011": 124
+   }
+  },
+  "carried_forward_from_v2": [
+   "G4.2_depth_forwards",
+   "G4.3_heads_validated"
+  ],
+  "re_derived_in_v3": [
+   "G4.1_data",
+   "G4.4_tables",
+   "G4.5_ood",
+   "G4.6_era_score"
+  ],
+  "not_shipped": [
+   "roh_r*_part*.npy (3.6GB hidden states; not needed downstream)",
+   "p2_train_data.npz"
+  ]
+ }
+}

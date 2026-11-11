@@ -1,0 +1,295 @@
+{
+ "code_rev": "k6-v2.0.2",
+ "wall_seconds": 29.0,
+ "m6_weights": {
+  "M1_GBDT_v2": 0.5,
+  "M2_RFF_Ridge": 0.5
+ },
+ "m6_members": [
+  "M1_GBDT_v2",
+  "M2_RFF_Ridge"
+ ],
+ "m6_member_fit_sharpes": {
+  "engine": {
+   "M1_GBDT_v2": -0.1264,
+   "M2_RFF_Ridge": -0.7356
+  },
+  "frozen": {
+   "M1_GBDT_v2": -0.2391,
+   "M2_RFF_Ridge": -0.8394
+  }
+ },
+ "m7_active_blend": "0.5 * M6 + 0.5 * M0_Champ_v13 (fixed)",
+ "m7_core_satellite_blend": "0.5 * BuyHold_Gold + 0.5 * M0_Champ_v13 (fixed; transparent continuation of the v2.0.1 M7 OOS stream)",
+ "m7_grid_diagnostic": {
+  "best_w_v2": 0.0,
+  "best_fit_sharpe": 2.0126,
+  "curve": {
+   "0.0": 2.013,
+   "0.05": 1.991,
+   "0.1": 1.961,
+   "0.15": 1.924,
+   "0.2": 1.88,
+   "0.25": 1.827,
+   "0.3": 1.765,
+   "0.35": 1.692,
+   "0.4": 1.606,
+   "0.45": 1.505,
+   "0.5": 1.387,
+   "0.55": 1.251,
+   "0.6": 1.096,
+   "0.65": 0.922,
+   "0.7": 0.731,
+   "0.75": 0.525,
+   "0.8": 0.31,
+   "0.85": 0.089,
+   "0.9": -0.132,
+   "0.95": -0.348,
+   "1.0": -0.554
+  }
+ },
+ "strategies": [
+  "M1_GBDT_v2",
+  "M2_RFF_Ridge",
+  "RLSBank",
+  "M3c_DAE",
+  "M3m_DAE",
+  "M4_DMN_Lite",
+  "M4b_DMN_Lite",
+  "M5_ContinuumNet",
+  "Carver_EWMAC",
+  "Channel_A",
+  "Channel_B",
+  "BuyHold_Gold",
+  "M0_Champ_v13",
+  "M0_Champ_v13_cap1",
+  "M6_AURUM_v2_Ensemble",
+  "M6b_Ensemble_EQW",
+  "M7_Active_Grand_Hybrid",
+  "M7_Core_Satellite"
+ ],
+ "n_strategies": 18,
+ "data_signatures": {
+  "M1_GBDT_v2": "ffa953f1a37c",
+  "M2_RFF_Ridge": "d84d43be52b4",
+  "RLSBank": "41031283ede2",
+  "M3c_DAE": "13257161516e",
+  "M3m_DAE": "5324577239f0",
+  "M4_DMN_Lite": "b76ff3eccae0",
+  "M4b_DMN_Lite": "249fb2d4d5f7",
+  "M5_ContinuumNet": "2a3444e7794a",
+  "Carver_EWMAC": "8d16516cb329",
+  "Channel_A": "b9069ee87c69",
+  "Channel_B": "a6a3e988c067",
+  "BuyHold_Gold": "a4d3e34e3abf",
+  "M0_Champ_v13": "6ef5c6c0c1e1",
+  "M0_Champ_v13_cap1": "39753b4b1cd9",
+  "M6_AURUM_v2_Ensemble": "12f09f67874f",
+  "M6b_Ensemble_EQW": "12f09f67874f",
+  "M7_Active_Grand_Hybrid": "a89f319ee6f0",
+  "M7_Core_Satellite": "25bbbd3294ca"
+ },
+ "z_quality_flagged": [],
+ "z_quality_summary": {
+  "M1_GBDT_v2": {
+   "fit": {
+    "nunique": 6609,
+    "std": 0.52076
+   },
+   "oos": {
+    "nunique": 1123,
+    "std": 0.46446
+   }
+  },
+  "M2_RFF_Ridge": {
+   "fit": {
+    "nunique": 41079,
+    "std": 0.42479
+   },
+   "oos": {
+    "nunique": 16805,
+    "std": 0.41589
+   }
+  },
+  "RLSBank": {
+   "fit": {
+    "nunique": 41513,
+    "std": 0.07828
+   },
+   "oos": {
+    "nunique": 16991,
+    "std": 0.07583
+   }
+  },
+  "M3c_DAE": {
+   "fit": {
+    "nunique": 8760,
+    "std": 0.58723
+   },
+   "oos": {
+    "nunique": 4085,
+    "std": 0.5799
+   }
+  },
+  "M3m_DAE": {
+   "fit": {
+    "nunique": 12136,
+    "std": 0.37934
+   },
+   "oos": {
+    "nunique": 8630,
+    "std": 0.46662
+   }
+  },
+  "M4_DMN_Lite": {
+   "fit": {
+    "nunique": 332,
+    "std": 0.18726
+   },
+   "oos": {
+    "nunique": 144,
+    "std": 0.16855
+   }
+  },
+  "M4b_DMN_Lite": {
+   "fit": {
+    "nunique": 348,
+    "std": 0.17066
+   },
+   "oos": {
+    "nunique": 144,
+    "std": 0.17733
+   }
+  },
+  "M5_ContinuumNet": {
+   "fit": {
+    "nunique": 11427,
+    "std": 0.22219
+   },
+   "oos": {
+    "nunique": 16988,
+    "std": 0.26226
+   }
+  },
+  "Carver_EWMAC": {
+   "fit": {
+    "nunique": 41513,
+    "std": 0.35658
+   },
+   "oos": {
+    "nunique": 16991,
+    "std": 0.33486
+   }
+  },
+  "Channel_A": {
+   "fit": {
+    "nunique": 39649,
+    "std": 0.24175
+   },
+   "oos": {
+    "nunique": 15091,
+    "std": 0.2656
+   }
+  },
+  "Channel_B": {
+   "fit": {
+    "nunique": 1,
+    "std": 0.0
+   },
+   "oos": {
+    "nunique": 1,
+    "std": 0.0
+   }
+  },
+  "BuyHold_Gold": {
+   "fit": {
+    "nunique": 1,
+    "std": 0.0
+   },
+   "oos": {
+    "nunique": 1,
+    "std": 0.0
+   }
+  },
+  "M0_Champ_v13": {
+   "fit": {
+    "nunique": 7,
+    "std": 0.56368
+   },
+   "oos": {
+    "nunique": 7,
+    "std": 0.55675
+   }
+  },
+  "M0_Champ_v13_cap1": {
+   "fit": {
+    "nunique": 3,
+    "std": 0.74979
+   },
+   "oos": {
+    "nunique": 3,
+    "std": 0.72374
+   }
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "fit": {
+    "nunique": 41162,
+    "std": 0.34279
+   },
+   "oos": {
+    "nunique": 16819,
+    "std": 0.3084
+   }
+  },
+  "M6b_Ensemble_EQW": {
+   "fit": {
+    "nunique": 41162,
+    "std": 0.34279
+   },
+   "oos": {
+    "nunique": 16819,
+    "std": 0.3084
+   }
+  },
+  "M7_Active_Grand_Hybrid": {
+   "fit": {
+    "nunique": 41199,
+    "std": 0.35634
+   },
+   "oos": {
+    "nunique": 16840,
+    "std": 0.33459
+   }
+  },
+  "M7_Core_Satellite": {
+   "fit": {
+    "nunique": 7,
+    "std": 0.28184
+   },
+   "oos": {
+    "nunique": 7,
+    "std": 0.27837
+   }
+  }
+ },
+ "forced_frozen": [
+  "M0_Champ_v13",
+  "M0_Champ_v13_cap1"
+ ],
+ "cost_r": 5e-05,
+ "bars_per_year": 5786,
+ "fit_years": [
+  2016,
+  2017,
+  2018,
+  2019,
+  2020,
+  2021,
+  2022
+ ],
+ "oos_years": [
+  2023,
+  2024,
+  2025
+ ]
+}

@@ -1,0 +1,64 @@
+[13:19:14] ===== STAGE module self-tests (test_local subset) START =====
+[13:19:21] ===== STAGE module self-tests (test_local subset) DONE in 7.8s =====
+[13:19:21] ===== STAGE load phase1 data START =====
+[13:19:22] dataset: /kaggle/input/datasets/tskdev/aurum-phase1-data
+[13:19:23]   xau: 5604396 M1 rows, 95008 H1 bars (2010-01-03 16:01:00+00:00 .. 2025-12-31 14:57:00+00:00)
+[13:19:24]   xag: 5396078 M1 rows, 94962 H1 bars (2010-01-03 16:01:00+00:00 .. 2025-12-31 14:57:00+00:00)
+[13:19:25]   eur: 5863026 M1 rows, 98742 H1 bars (2010-01-03 20:01:00+00:00 .. 2025-12-31 19:57:00+00:00)
+[13:19:26]   jpy: 5772843 M1 rows, 98723 H1 bars (2010-01-03 17:01:00+00:00 .. 2025-12-31 16:57:00+00:00)
+[13:19:27]   macro innovations: 15 mi_* columns from h1_features.parquet
+[13:19:27] ===== STAGE load phase1 data DONE in 5.6s =====
+[13:19:27] ===== STAGE G1.4 DST verification (real 2010-2025) START =====
+[13:19:32]   gap-week fraction by year: {2010: 0.058, 2011: 0.058, 2012: 0.058, 2013: 0.076, 2014: 0.079, 2015: 0.078, 2016: 0.054, 2017: 0.059, 2018: 0.058, 2019: 0.078, 2020: 0.078, 2021: 0.059, 2022: 0.058, 2023: 0.054, 2024: 0.074, 2025: 0.078}
+[13:19:32] GATE G1.4_dst: PASS | autumn+spring 4h gap windows detected in 16/16 years; PM fix NY-hour check passed (dst_gap_sanity_check)
+[13:19:32] ===== STAGE G1.4 DST verification (real 2010-2025) DONE in 5.3s =====
+[13:19:32] ===== STAGE full feature build START =====
+[13:21:34]   built 95008 H1 bars x 376 features
+[13:21:34] ===== STAGE full feature build DONE in 121.9s =====
+[13:21:34] ===== STAGE gates G1.1/G1.2/G1.5/G1.6 START =====
+[13:21:34] GATE G1.1_shape: PASS | rows=95008 (expect ~95,008); features=376 (budget ~345 with B1 additions; tolerance 300-430)
+[13:21:34] GATE G1.2_nan: PASS | median column NaN=0.0000; cols>5% NaN=42 (documented warmups: ['minutes_to_LBMA_AM', 'minutes_to_LBMA_PM', 'minutes_to_LBMA_SILVER', 'minutes_to_WMR_FIX', 'eps', 'pred', 'R2_ew', 'spread_lvl', 'spread_z', 'q_B', 'ewmac_F_2h_xau', 'ewmac_sat_2h_xau']...)
+[13:21:35] GATE G1.5_units: PASS | corr(sig1_xau, independently recomputed z-increment sum)=1.00000 (>0.99: exact unit identity); diagnostic corr vs raw H1 ret=nan (0.70-0.75 expected on gappy M1); eps vol < raw vol on 97.8% of bars (>=80%)
+[13:21:37] GATE G1.6_coverage: PASS | M1 coverage by year: {'2010': 0.922, '2011': 0.938, '2012': 0.944, '2013': 0.945, '2014': 0.936, '2015': 0.936, '2016': 0.941, '2017': 0.938, '2018': 0.942, '2019': 0.939, '2020': 0.943, '2021': 0.941, '2022': 0.944, '2023': 0.822, '2024': 0.947, '2025': 0.942} (2023 dip documented)
+[13:21:37] ===== STAGE gates G1.1/G1.2/G1.5/G1.6 DONE in 3.4s =====
+[13:21:37] ===== STAGE G1.3 causality (real-data truncated rebuild) START =====
+[13:22:04] GATE G1.3_causality: PASS | truncated rebuild on 23050 bars x 372 cols through 2014-01; max|diff|=0.00e+00 over 8342630 values (bit-identical required)
+[13:22:04] ===== STAGE G1.3 causality (real-data truncated rebuild) DONE in 26.8s =====
+[13:22:04] ===== STAGE Rank-IC audit START =====
+[13:22:07] family summary:
+       family  n_features          best_feature  best_abs_t  median_abs_t  n_abs_t_gt2
+     F1_clock          49   sess_ldn_pm_cluster    4.944293      1.232909           12
+  F2_realized         177   jumpShare_1h_har120    4.633086      1.492458           55
+  F5_residual          18            spread_lvl    4.214846      0.954471            2
+F3_signatures          47          sig2_eur_xau    3.532794      0.946731            4
+  F4_toxicity          15         amihud_1h_xau    2.764594      1.545192            3
+     macro_mi          15            mi_vix_d5z    1.900634      0.270270            0
+ F6_trend_cpd          50 cfm_onesided_504h_xau    1.808740      0.533450            0
+[13:22:07] top-20 features by |t|:
+                         mean       std  count    t_stat
+feature                                                 
+sess_ldn_pm_cluster  0.007247  0.003878      7  4.944293
+jumpShare_1h_har120  0.054136  0.030915      7  4.633086
+sess_ny_day          0.012531  0.007324      7  4.526827
+RVpos_1h_jpy        -0.037765  0.022328      7 -4.474998
+RVpos_4h_jpy        -0.043720  0.025886      7 -4.468585
+BV_4h_jpy           -0.045789  0.027266      7 -4.443084
+MinRV_1h_jpy        -0.037643  0.022469      7 -4.432619
+BV_1h_jpy           -0.038647  0.023123      7 -4.422064
+MedRV_1h_jpy        -0.038229  0.022950      7 -4.407183
+MinRV_4h_jpy        -0.044828  0.027146      7 -4.369020
+MedRV_4h_jpy        -0.045484  0.027756      7 -4.335659
+logRV_4h_jpy        -0.044527  0.027458      7 -4.290369
+RV_4h_jpy           -0.044527  0.027458      7 -4.290369
+logRV_1h_jpy        -0.038411  0.024009      7 -4.232820
+RV_1h_jpy           -0.038411  0.024009      7 -4.232820
+spread_lvl          -0.033423  0.020981      7 -4.214846
+RVneg_1h_jpy        -0.036148  0.023698      7 -4.035668
+RVneg_4h_jpy        -0.042906  0.028501      7 -3.982946
+beta_xag            -0.054485  0.038515      7 -3.742809
+sig2_eur_xau         0.011107  0.008318      7  3.532794
+[13:22:07] ===== STAGE Rank-IC audit DONE in 2.5s =====
+[13:22:07] ===== STAGE export START =====
+[13:22:11] GATE G1.7_export: PASS | aurum_v2_features.parquet 253.7 MB; ic_audit.parquet; feature_meta.json with 10 VSN groups
+[13:22:11] ===== STAGE export DONE in 4.2s =====
+[13:22:11] GATE G1_ALL: PASS | all K1 gates green

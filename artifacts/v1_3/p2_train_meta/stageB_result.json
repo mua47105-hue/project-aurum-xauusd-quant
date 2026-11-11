@@ -1,0 +1,27 @@
+{
+ "kill_switch_triggered": false,
+ "kept_branch": "lam03",
+ "nan_skips_b": 296,
+ "fp32_fallback": {
+  "lam03": true
+ },
+ "ckpt1_lam03": {
+  "brier_sm": 0.19685374200344086,
+  "brier_re": 0.23469214141368866,
+  "auc_re": 0.6173685410084229
+ },
+ "ckpt1_lam00": {
+  "brier_sm": 0.196793332695961,
+  "brier_re": 0.23468923568725586,
+  "auc_re": 0.6167011339335888
+ },
+ "final_val": {
+  "brier_sm": 0.19685374200344086,
+  "brier_re": 0.23469214141368866,
+  "auc_re": 0.6173685410084229
+ },
+ "early_stop_reverted": true,
+ "world": 2,
+ "n_sb_train": 7993,
+ "n_val": 4895
+}

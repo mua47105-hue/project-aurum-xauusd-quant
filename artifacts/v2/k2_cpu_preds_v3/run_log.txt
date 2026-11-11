@@ -1,0 +1,6 @@
+[16:07:57] rebuilding z_rff via causal trailing standardization (v2.0.2)
+[16:08:01] G4.8_z_rff_producer: PASS | {'fit': {'n': 41079, 'std': 0.42479, 'sat_frac_gt_0p99': 0.0, 'nunique': 41079, 'frozen_turnover_py': 467.19, 'frozen_sharpe': -0.8394}, 'oos': {'n': 16805, 'std': 0.41589, 'sat_frac_gt_0p99': 0.0, 'nunique': 16805, 'frozen_turnover_py': 557.95, 'frozen_sharpe': -0.5554}}
+[16:08:01]   negative control (foldiqr, expected saturated): {'fit': {'std': 0.70079, 'sat_frac_gt_0p99': 0.882475, 'nunique': 11808}, 'oos': {'std': 0.0, 'sat_frac_gt_0p99': 1.0, 'nunique': 1}}
+[16:08:01] engine evaluation for M2_RFF_Ridge (v2.0.2 z)
+[16:08:14]   M2 [fit] full: {'n': 41079, 'sharpe_ann': -0.7356, 'ret_ann_volunits': -0.02564, 'maxdd_volunits': 0.19713, 'calmar': -0.1301, 'ulcer': 0.153697, 'win_rate': 0.4809} turnover=226.1/y
+[16:08:17]   M2 [oos] full: {'n': 16805, 'sharpe_ann': -0.7438, 'ret_ann_volunits': -0.03149, 'maxdd_volunits': 0.14004, 'calmar': -0.2249, 'ulcer': 0.083595, 'win_rate': 0.4793} turnover=306.8/y

@@ -1,0 +1,106 @@
+[03:41:14] ENV: {"python": "3.13.18", "numpy": "2.1.3", "pandas": "2.3.3", "cwd": "/kaggle/working", "argv": ["/kaggle/src/script.py"], "local_mode": false, "xgboost": "3.4.1", "sklearn": "1.6.1", "numba": "0.61.2"}
+[03:41:15] GATE G5.0_mounts: PASS | phase1-data=OK p3_out=OK models=OK
+[03:41:15] GATE G5.0b_p3_gates: PASS | p3 gates (all must be green incl G4.6): {"G4.0_mounts": true, "G4.1_data": true, "G4.2_depth_forwards": true, "G4.3_heads_validated": true, "G4.4_tables": true, "G4.5_ood": true, "G4.6_era_score": true, "G4.7_export_v3": true}
+[03:41:15] loading p3 probability tables ...
+[03:41:17]   tables: 569,152 rows x 98 cols
+[03:41:17]   fold rows: 217,360
+[03:41:19]   labels: (95008, 48); years 2010..2025; px bars 95,008
+[03:41:19] ===== STAGE pivots / priors / quantiles START =====
+[03:41:20] ===== STAGE pivots / priors / quantiles DONE in 1.0s =====
+[03:41:20]   pivot states=54,340; base-rate priors for 10 years
+[03:41:20] ===== STAGE gbdt walk-forward (44 era-safe features, per fold year) START =====
+[03:41:21]   GBDT fold 2016: train<= 2015 (L 25,234 / S 25,234 rows)
+[03:41:22]   GBDT fold 2017: train<= 2016 (L 29,922 / S 29,922 rows)
+[03:41:23]   GBDT fold 2018: train<= 2017 (L 34,635 / S 34,635 rows)
+[03:41:24]   GBDT fold 2019: train<= 2018 (L 39,411 / S 39,411 rows)
+[03:41:25]   GBDT fold 2020: train<= 2019 (L 44,074 / S 44,074 rows)
+[03:41:27]   GBDT fold 2021: train<= 2020 (L 48,740 / S 48,740 rows)
+[03:41:28]   GBDT fold 2022: train<= 2021 (L 53,394 / S 53,394 rows)
+[03:41:31]   GBDT fold 2023: train<= 2022 (L 58,072 / S 58,072 rows)
+[03:41:34]   GBDT fold 2024: train<= 2023 (L 62,127 / S 62,127 rows)
+[03:41:36]   GBDT fold 2025: train<= 2024 (L 66,811 / S 66,811 rows)
+[03:41:36] ===== STAGE gbdt walk-forward (44 era-safe features, per fold year) DONE in 16.0s =====
+[03:41:36] ===== STAGE k-NN cohort probabilities (canonical cells, strict mask) START =====
+[03:41:36] ===== STAGE k-NN cohort probabilities (canonical cells, strict mask) DONE in 0.3s =====
+[03:41:36] GATE G5.2a_cohort_gap: PASS | USED-neighbour audit (strict >= 96-bar mask enforced before use): used violations=0; raw excluded=2/300 spot states (2 neighbours dropped by the mask)
+[03:41:36] ===== STAGE causal policy fit on 2016-2022 (zero 2023-25 peeking) START =====
+[03:41:39]   F1 pool weights w=[0.0, 0.0, 1.0] Brier=0.24104
+[03:41:40]   F2 kappa=0.4 Brier=0.23855
+[03:44:37]   F3 (kappa, lambda_var, EV_min)=(0.0, 0.5, 0.0) ann-Sharpe=0.4881 E[R]=0.11573 n=2957 (kappa_Brier from F2 was 0.4)
+[03:44:52]   F6 pooling-w performance re-fit -> w=[0.6, 0.2, 0.2] ann-Sharpe=0.8955 E[R]=0.13955 n=2520
+[03:44:56]   F4 overlay ablation -> rule=path (fit clean {'sharpe': 0.89555, 'er': 0.13955, 'n': 2520, 'maxdd_pct': None} vs path {'sharpe': 1.1697, 'er': 0.09866, 'n': 2767, 'maxdd_pct': None})
+[03:44:56]   F5 stack u=0.1 Brier=0.24165
+[03:44:56] ===== STAGE causal policy fit on 2016-2022 (zero 2023-25 peeking) DONE in 199.5s =====
+[03:44:56] GATE G5.7_fit_causality: PASS | all policy fits used years 2016..2022 only; OOS [2023, 2024, 2025] never touched by any fit; fold predictions are themselves walk-forward (heads trained <=y-1)
+[03:44:56] ===== STAGE build candidates for all strategies START =====
+[03:44:56]   aurum_r1: 20,651 candidates
+[03:44:56]   aurum_r2: 20,502 candidates
+[03:44:56]   aurum_r3: 22,028 candidates
+[03:44:56]   aurum_r4: 22,828 candidates
+[03:44:56]   canon: 26,688 | flagship: 20,302
+[03:44:56]   stack: 38,611
+[03:44:57]   gbdt: 51,665 candidates
+[03:44:57]   knn: 52,165 candidates
+[03:44:57]   ema: 301 candidates
+[03:44:57]   donchian: 5,804 candidates
+[03:44:57]   buyhold: 2,437 candidates
+[03:44:57] ===== STAGE build candidates for all strategies DONE in 1.0s =====
+[03:44:57] ===== STAGE resolve (clean labels / path overlay + exit bars) START =====
+[03:44:57] ===== STAGE resolve (clean labels / path overlay + exit bars) DONE in 0.1s =====
+[03:44:57] GATE G5.6_walk_validation: PASS | H1 walk (conservative, adverse-first) vs p1 M1 labels on flagship trades: |dR|<=0.25 agreement=87.42%; corr=0.96087; mean|dR|=0.1621. Residual gap = intra-hour M1 sequencing (H1 cannot resolve TP-vs-SL order inside one hour; walk takes the adverse side) + weekend clock-vs-bar-count windows. Clean trades resolve from the labels themselves; the walk supplies exit bars for concurrency.
+[03:44:57] GATE G5.1_determinism: PASS | flagship trade-hash 34ea98f27ea95f7a == 34ea98f27ea95f7a; GBDT pL hash 946c06007d4a7410
+[03:45:01]   aurum_r1 cap1 c1.0: full n=3836 E[R]=0.1487 | oos n=1223 E[R]=0.2236 Sharpe_ann=2.1937
+[03:45:05]   aurum_r1 cap1 c1.5: full n=3836 E[R]=0.1237 | oos n=1223 E[R]=0.1986 Sharpe_ann=1.8758
+[03:45:09]   aurum_r1 cap1 c2.0: full n=3836 E[R]=0.0987 | oos n=1223 E[R]=0.1736 Sharpe_ann=1.5903
+[03:45:13]   aurum_r2 cap1 c1.0: full n=3831 E[R]=0.1148 | oos n=1194 E[R]=0.1447 Sharpe_ann=1.1056
+[03:45:17]   aurum_r2 cap1 c1.5: full n=3831 E[R]=0.0899 | oos n=1194 E[R]=0.1197 Sharpe_ann=0.6382
+[03:45:21]   aurum_r2 cap1 c2.0: full n=3831 E[R]=0.0649 | oos n=1194 E[R]=0.0947 Sharpe_ann=0.1839
+[03:45:25]   aurum_r3 cap1 c1.0: full n=4255 E[R]=0.1103 | oos n=1293 E[R]=0.1047 Sharpe_ann=0.6119
+[03:45:30]   aurum_r3 cap1 c1.5: full n=4255 E[R]=0.0853 | oos n=1293 E[R]=0.0797 Sharpe_ann=0.1806
+[03:45:34]   aurum_r3 cap1 c2.0: full n=4255 E[R]=0.0603 | oos n=1293 E[R]=0.0548 Sharpe_ann=-0.0035
+[03:45:39]   aurum_r4 cap1 c1.0: full n=4328 E[R]=0.0951 | oos n=1317 E[R]=0.0987 Sharpe_ann=0.4845
+[03:45:43]   aurum_r4 cap1 c1.5: full n=4328 E[R]=0.0701 | oos n=1317 E[R]=0.0737 Sharpe_ann=0.3058
+[03:45:48]   aurum_r4 cap1 c2.0: full n=4328 E[R]=0.0451 | oos n=1317 E[R]=0.0487 Sharpe_ann=0.1551
+[03:45:54]   canon cap1 c1.0: full n=5843 E[R]=-0.0338 | oos n=1531 E[R]=-0.0371 Sharpe_ann=0.1223
+[03:46:00]   canon cap1 c1.5: full n=5843 E[R]=-0.0588 | oos n=1531 E[R]=-0.0621 Sharpe_ann=-0.0489
+[03:46:06]   canon cap1 c2.0: full n=5843 E[R]=-0.0838 | oos n=1531 E[R]=-0.0871 Sharpe_ann=-0.2105
+[03:46:20]   canon cap3 c1.0: full n=13458 E[R]=-0.0263 | oos n=3494 E[R]=-0.0576 Sharpe_ann=-0.7039
+[03:46:35]   canon cap3 c1.5: full n=13458 E[R]=-0.0513 | oos n=3494 E[R]=-0.0826 Sharpe_ann=-0.8697
+[03:46:49]   canon cap3 c2.0: full n=13458 E[R]=-0.0763 | oos n=3494 E[R]=-0.1076 Sharpe_ann=-1.0335
+[03:46:54]   flagship cap1 c1.0: full n=4121 E[R]=0.1145 | oos n=1354 E[R]=0.1468 Sharpe_ann=2.3054
+[03:46:58]   flagship cap1 c1.5: full n=4121 E[R]=0.0895 | oos n=1354 E[R]=0.1218 Sharpe_ann=1.8573
+[03:47:02]   flagship cap1 c2.0: full n=4121 E[R]=0.0645 | oos n=1354 E[R]=0.0968 Sharpe_ann=1.3807
+[03:47:12]   flagship cap3 c1.0: full n=9819 E[R]=0.1182 | oos n=3341 E[R]=0.1478 Sharpe_ann=2.4443
+[03:47:23]   flagship cap3 c1.5: full n=9819 E[R]=0.0932 | oos n=3341 E[R]=0.1228 Sharpe_ann=2.0490
+[03:47:33]   flagship cap3 c2.0: full n=9819 E[R]=0.0682 | oos n=3341 E[R]=0.0978 Sharpe_ann=1.6083
+[03:47:43]   stack cap1 c1.0: full n=9876 E[R]=0.0075 | oos n=2767 E[R]=0.0166 Sharpe_ann=0.4529
+[03:47:54]   stack cap1 c1.5: full n=9876 E[R]=-0.0175 | oos n=2767 E[R]=-0.0084 Sharpe_ann=0.1021
+[03:48:04]   stack cap1 c2.0: full n=9876 E[R]=-0.0425 | oos n=2767 E[R]=-0.0334 Sharpe_ann=-0.0647
+[03:48:28]   stack cap3 c1.0: full n=22074 E[R]=0.0135 | oos n=6119 E[R]=0.0178 Sharpe_ann=0.6151
+[03:48:52]   stack cap3 c1.5: full n=22074 E[R]=-0.0115 | oos n=6119 E[R]=-0.0072 Sharpe_ann=0.2980
+[03:49:16]   stack cap3 c2.0: full n=22074 E[R]=-0.0365 | oos n=6119 E[R]=-0.0322 Sharpe_ann=0.0698
+[03:49:25]   gbdt cap1 c1.0: full n=8424 E[R]=0.0028 | oos n=2395 E[R]=0.0310 Sharpe_ann=0.3074
+[03:49:34]   gbdt cap1 c1.5: full n=8424 E[R]=-0.0222 | oos n=2395 E[R]=0.0060 Sharpe_ann=0.1799
+[03:49:43]   gbdt cap1 c2.0: full n=8424 E[R]=-0.0472 | oos n=2395 E[R]=-0.0190 Sharpe_ann=0.0233
+[03:49:52]   knn cap1 c1.0: full n=8428 E[R]=-0.0353 | oos n=2396 E[R]=-0.0155 Sharpe_ann=0.0419
+[03:50:01]   knn cap1 c1.5: full n=8428 E[R]=-0.0603 | oos n=2396 E[R]=-0.0405 Sharpe_ann=-0.1626
+[03:50:10]   knn cap1 c2.0: full n=8428 E[R]=-0.0853 | oos n=2396 E[R]=-0.0655 Sharpe_ann=-0.3852
+[03:50:10]   ema cap1 c1.0: full n=286 E[R]=-0.0485 | oos n=76 E[R]=0.1104 Sharpe_ann=0.6509
+[03:50:10]   ema cap1 c1.5: full n=286 E[R]=-0.0610 | oos n=76 E[R]=0.0979 Sharpe_ann=0.6011
+[03:50:10]   ema cap1 c2.0: full n=286 E[R]=-0.0735 | oos n=76 E[R]=0.0854 Sharpe_ann=0.5512
+[03:50:12]   donchian cap1 c1.0: full n=1962 E[R]=-0.0225 | oos n=564 E[R]=-0.0078 Sharpe_ann=-0.8782
+[03:50:14]   donchian cap1 c1.5: full n=1962 E[R]=-0.0350 | oos n=564 E[R]=-0.0203 Sharpe_ann=-0.9525
+[03:50:16]   donchian cap1 c2.0: full n=1962 E[R]=-0.0475 | oos n=564 E[R]=-0.0328 Sharpe_ann=-1.0192
+[03:50:19]   buyhold cap1 c1.0: full n=2437 E[R]=0.1219 | oos n=707 E[R]=0.2373 Sharpe_ann=1.9191
+[03:50:22]   buyhold cap1 c1.5: full n=2437 E[R]=0.1094 | oos n=707 E[R]=0.2248 Sharpe_ann=1.8095
+[03:50:24]   buyhold cap1 c2.0: full n=2437 E[R]=0.0969 | oos n=707 E[R]=0.2123 Sharpe_ann=1.6962
+[03:50:24] GATE G5.3_coverage: PASS | flagship EXECUTED (cap1) in 10/10 years [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]; OOS executed trades=1354
+[03:50:24] GATE G5.8_portfolio_realism: PASS | flagship MaxDD% < 20%% and concurrency respected: {"cap1": {"max_concurrent": 1, "overlap_violations": 0, "exposure": 0.6224, "max_dd_pct": 14.671530067167943}, "cap3": {"max_concurrent": 3, "overlap_violations": 0, "exposure": 0.6626, "max_dd_pct": 13.060412085157608}}
+[03:50:24] GATE G5.4_metrics_finite: PASS | all metrics finite (NaN-guarded) = True
+[03:50:24] GATE G5.9_postmortem_parity: PASS | fixed GBDT OOS E[R]=0.0310 vs postmortem 0.0599 (tol 0.06); k-NN -0.0155 vs 0.0078
+[03:50:24] ===== STAGE bootstrap x5000 (OOS, cost 1.0x) START =====
+[03:50:48] ===== STAGE bootstrap x5000 (OOS, cost 1.0x) DONE in 23.2s =====
+[03:50:48]   DSR daily: {"aurum_r1|cap1": 0.79129, "aurum_r2|cap1": 0.13747, "aurum_r3|cap1": 0.02608, "aurum_r4|cap1": 0.01537, "canon|cap1": 0.00253, "flagship|cap1": 0.84432, "stack|cap1": 0.0129, "gbdt|cap1": 0.00637, "knn|cap1": 0.00169, "ema|cap1": 0.03142, "donchian|cap1": 0.0, "buyhold|cap1": 0.62326, "flagship|cap3": 0.89535, "flagship|cap1|c1.5": 0.58317, "flagship|cap1|c2.0": 0.26828}
+[03:50:48] ===== STAGE export START =====
+[03:50:48] GATE G5.5_export: PASS | exported 7/7 files; trades=308,934 rows
+[03:50:48] ===== STAGE export DONE in 0.6s =====

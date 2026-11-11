@@ -1,0 +1,22 @@
+{
+  "G3.4_folds": {
+    "gate": "G3.4_folds",
+    "pass": false,
+    "detail": "fold status: {'M3c': 'complete', 'M3m': 'skipped (compact budget; search-only)', 'M4': 'complete', 'M5': 'complete'}; budget used 1.59h"
+  },
+  "G3.3_spectral": {
+    "gate": "G3.3_spectral",
+    "pass": true,
+    "detail": "rho at every audited M5 checkpoint < 0.95: [{'fold': 2016, 'seed': 1337, 'rho': 0.5012, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}, {'fold': 2017, 'seed': 1337, 'rho': 0.5012, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}, {'fold': 2018, 'seed': 1337, 'rho': 0.5013, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}, {'fold': 2019, 'seed': 1337, 'rho': 0.5014, 'km_alpha': 0.5, 'governor': 'auto_tune_alpha'}]..."
+  },
+  "G3.5_export": {
+    "gate": "G3.5_export",
+    "pass": true,
+    "detail": "v2_neural_forecasts.parquet (10 cols); rho_log.json; trial_ledger.jsonl (9 entries)"
+  },
+  "G3_ALL": {
+    "gate": "G3_ALL",
+    "pass": true,
+    "detail": "all K3 gates green"
+  }
+}

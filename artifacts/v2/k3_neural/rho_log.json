@@ -1,0 +1,72 @@
+[
+ {
+  "fold": 2016,
+  "seed": 1337,
+  "rho": 0.5012,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2017,
+  "seed": 1337,
+  "rho": 0.5012,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2018,
+  "seed": 1337,
+  "rho": 0.5013,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2019,
+  "seed": 1337,
+  "rho": 0.5014,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2020,
+  "seed": 1337,
+  "rho": 0.5015,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2021,
+  "seed": 1337,
+  "rho": 0.5012,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2022,
+  "seed": 1337,
+  "rho": 0.5023,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2023,
+  "seed": 1337,
+  "rho": 0.5014,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2024,
+  "seed": 1337,
+  "rho": 0.5015,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ },
+ {
+  "fold": 2025,
+  "seed": 1337,
+  "rho": 0.5017,
+  "km_alpha": 0.5,
+  "governor": "auto_tune_alpha"
+ }
+]

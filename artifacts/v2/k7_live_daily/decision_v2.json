@@ -1,0 +1,80 @@
+{
+ "as_of_bar": "2025-12-31 14:00:00+00:00",
+ "symbol": "XAUUSD",
+ "spec": "v2.0.2",
+ "v2_state": {
+  "model": "M1_GBDT_v2 (3-seed, walk-forward-consistent refit)",
+  "pred_y_ret24_norm": 0.1627,
+  "z_model_score": 0.31438,
+  "z_target_exposure": 0.03648,
+  "z_executed": 0.01935,
+  "regime": {
+   "vol_target_mult": 0.2532,
+   "vol_of_vol_mult": 0.5,
+   "dd_governor_scale": 1.0,
+   "ph_frozen": false
+  },
+  "carver_buffer": {
+   "band": 0.01713,
+   "avg_abs_z": 0.17133,
+   "inside_band": false,
+   "distance_to_edge": -0.0
+  },
+  "catastrophic_stop": {
+   "frame": "2.5 x ATR14",
+   "atr14": 20.876,
+   "long_stop_px": 4266.19,
+   "short_stop_px": 4370.57
+  },
+  "cost_budget": {
+   "cost_r": 5e-05,
+   "speed_limit": "annual cost <= 1/3 pre-cost SR",
+   "recent_turnover_py": 28.34
+  }
+ },
+ "v13_barrier_reference": {
+  "source": "tskdev/aurum-v13-artifacts (v1.3 flagship policy)",
+  "champion": "flagship cap=3, OOS Sharpe 2.444, MaxDD 13.06%, DSR 0.895"
+ },
+ "stack_context_v202": {
+  "spec": "v2.0.2",
+  "live_model": "M1_GBDT_v2 (only speed-limit-passing active CPU model)",
+  "m2_rff_v202": "de-saturated via causal trailing standardization (G4.8 producer-gated); active content measured as noise -- reference-only",
+  "m6_family": "fixed a-priori {M1_GBDT_v2, M2_RFF_Ridge}, 50/50 (Carver S24 SR-shrink 0.90 toward equal weights)",
+  "M7_Active_Grand_Hybrid": {
+   "oos_sharpe": 1.946,
+   "cost2x_sharpe": 1.6294,
+   "oos_dsr": 0.6502
+  },
+  "M7_Core_Satellite": {
+   "oos_sharpe": 2.6351,
+   "cost2x_sharpe": 2.5012,
+   "oos_dsr": 0.9407
+  },
+  "M0_Champ_v13": {
+   "oos_sharpe": 2.6112,
+   "cost2x_sharpe": 2.3391,
+   "oos_dsr": 0.9352
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "oos_sharpe": 0.7278,
+   "cost2x_sharpe": 0.4816,
+   "oos_dsr": 0.0465
+  },
+  "M2_RFF_Ridge": {
+   "oos_sharpe": -0.7438,
+   "cost2x_sharpe": -1.0355,
+   "oos_dsr": 0.0
+  },
+  "M1_GBDT_v2": {
+   "oos_sharpe": 0.938,
+   "cost2x_sharpe": 0.9365,
+   "oos_dsr": 0.0933
+  }
+ },
+ "provenance": {
+  "features": "tskdev/aurum-v2-featstore (frozen version)",
+  "engine": "v2.0 OnlineExecutionEngine components (river-exact PH, Moreira-Muir vol target, Carver buffer, AHL DD governor)",
+  "recomputable": true
+ }
+}

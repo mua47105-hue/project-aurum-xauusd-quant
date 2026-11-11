@@ -1,0 +1,19 @@
+[03:31:49] ENV: local=False pid=7
+[03:31:50] GATE G4.0_mounts: PASS | prev_tables=OK phase1-data=OK models-meta=OK
+[03:31:50] ===== STAGE load v2 tables START =====
+[03:31:52]   v2 parquet: 569,152 x 98; f_era NaN=15,684
+[03:31:52] ===== STAGE load v2 tables DONE in 2.6s =====
+[03:31:52] GATE G4.1_data: PASS | labeled states=87948 (expect 87948); mean tokens=330.9; pre-test=72241 OOS=15707 (expect 72241 / 15707)
+[03:31:52] GATE G4.2_depth_forwards: PASS | ro_h shapes {"1": [87948, 5, 1024], "2": [87948, 5, 1024], "3": [87948, 5, 1024], "4": [87948, 5, 1024]} | v3: CARRIED from the v2 GPU run (forward-dependent property); table re-validated below via r-column completeness
+[03:31:52]   r-completeness per variant: {'fold': 4, 'main': 4} -> True
+[03:31:52] GATE G4.3_heads_validated: PASS | fold-cal Brier matches training values for 10/10 folds (tol 0.01); main-head 2022 Brier 0.19697 vs training 0.19685374200344086 (tol 0.012); detail={"2016": {"brier_recomputed": 0.20311, "brier_ref": 0.20311354100704193, "match": true}, "2017": {"brier_recomputed": 0.20155, "brier_ref": 0.20155057311058044, "match": true}, "2018": {"brier_recomputed": 0.19876, "brier_ref": 0.19875593483448029, "match": true}, "2019": {"brier_recomputed": 0.19901, "brier_ref": 0.19900885224342346, "match": true}, "2020": {"brier_recomputed": 0.1984, "brier_ref": 0.19840200245380402, "match": true}, "2021": {"br | v3: CARRIED from the v2 GPU run (head-network property)
+[03:31:53] GATE G4.4_tables: PASS | parquet rows=569,152 (expect 569,152); 98 cols; 63.3 MB; h1 col-blocks with NaN=0.0000 (v3 re-derived)
+[03:31:53] ===== STAGE recompute loop divergence START =====
+[03:31:55] ===== STAGE recompute loop divergence DONE in 1.9s =====
+[03:31:55] GATE G4.5_ood: PASS | loop-divergence |p_r - p_3| (v3 re-derived from the parquet): {"r1": {"mean": 0.009623, "p95": 0.025146}, "r2": {"mean": 0.004529, "p95": 0.011719}, "r4": {"mean": 0.003211, "p95": 0.008301}, "table_ood_mean": {"mean": 0.004341, "p95": 0.012293}}
+[03:31:55] ===== STAGE era imputation (G4.6 fix) START =====
+[03:31:55] GATE G4.6_era_score: PASS | era_clf coverage=100.00% (imputed 15,684 warmup rows {2010: 15560, 2011: 124} with 0.5 = the value the neutralization pass already used for those rows; fold rows were 100% clean pre-fix)
+[03:31:55] ===== STAGE era imputation (G4.6 fix) DONE in 0.0s =====
+[03:31:55] ===== STAGE export v3 START =====
+[03:31:58] GATE G4.7_export_v3: PASS | exported 4/4 v3 artifacts
+[03:31:58] ===== STAGE export v3 DONE in 3.5s =====

@@ -1,0 +1,30 @@
+{
+ "fit_window": {
+  "clean": {
+   "sharpe": 0.89555,
+   "er": 0.13955,
+   "n": 2520,
+   "maxdd_pct": null
+  },
+  "path": {
+   "sharpe": 1.1697,
+   "er": 0.09866,
+   "n": 2767,
+   "maxdd_pct": null
+  }
+ },
+ "oos_report_only": {
+  "clean": {
+   "n": 1191,
+   "er": 0.22378,
+   "sharpe_ann": 1.99909
+  },
+  "path": {
+   "n": 1354,
+   "er": 0.14677,
+   "sharpe_ann": 2.30538
+  }
+ },
+ "chosen_rule": "path",
+ "decision_basis": "FIT_YEARS 2016-22 standalone cap=1 ann-Sharpe (tie-break E[R]); OOS numbers report-only"
+}

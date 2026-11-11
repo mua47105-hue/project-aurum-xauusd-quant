@@ -1,0 +1,19 @@
+{
+ "id": "tskdev/aurum-v2-backtest",
+ "title": "AURUM v2 Backtest",
+ "code_file": "kernel.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_internet": true,
+ "dataset_sources": [
+  "tskdev/aurum-v2-featstore",
+  "tskdev/aurum-v2-cpu-preds",
+  "tskdev/aurum-v2-neural-preds",
+  "tskdev/aurum-v13-artifacts",
+  "tskdev/aurum-phase1-data"
+ ],
+ "kernel_sources": [],
+ "competition_sources": []
+}

@@ -1,0 +1,15 @@
+{
+ "id": "ranigain/aurum-v2-cpu-models-rg",
+ "title": "AURUM v2 CPU Models RG",
+ "code_file": "kernel.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": false,
+ "enable_internet": true,
+ "dataset_sources": [
+  "ranigain/aurum-v2-featstore"
+ ],
+ "kernel_sources": [],
+ "competition_sources": []
+}

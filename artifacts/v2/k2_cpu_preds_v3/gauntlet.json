@@ -1,0 +1,15 @@
+{
+ "M1_GBDT_v2": {
+  "engine_beats_frozen": true,
+  "buffer_turnover_cut_pct": 32.0,
+  "decision": "engine+buffer on"
+ },
+ "M2_RFF_Ridge": {
+  "engine_fit_sharpe": -0.7356,
+  "frozen_fit_sharpe": -0.8394,
+  "engine_turnover": 226.11052459639458,
+  "frozen_turnover": 467.19275512969807,
+  "engine_shipped": true,
+  "rev": "k2-v2.0.2"
+ }
+}

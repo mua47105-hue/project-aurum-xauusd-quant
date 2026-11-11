@@ -1,0 +1,7 @@
+{
+  "G6.4_live_decision": {
+    "gate": "G6.4_live_decision",
+    "pass": true,
+    "detail": "v2.0 decision emitted at 2025-12-31 14:00:00+00:00: z_target=0.0365 z_exec=0.0193 regime=0.127 buffer_inside=False"
+  }
+}

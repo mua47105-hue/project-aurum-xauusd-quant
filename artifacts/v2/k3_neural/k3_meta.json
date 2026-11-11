@@ -1,0 +1,29 @@
+{
+ "fold_status": {
+  "M3c": "complete",
+  "M3m": "skipped (compact budget; search-only)",
+  "M4": "complete",
+  "M5": "complete"
+ },
+ "search": {
+  "M3c": {
+   "dropout": 0.2,
+   "lr": 0.001
+  },
+  "M3m": {
+   "dropout": 0.2,
+   "lr": 0.001
+  },
+  "M4": {
+   "dropout": 0.2,
+   "lr": 0.001,
+   "d_model": 32
+  },
+  "M5": {
+   "d_model": 64,
+   "lr": 0.0003
+  }
+ },
+ "ledger_entries": 9,
+ "wall_h": 1.59
+}
