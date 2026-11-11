@@ -231,10 +231,10 @@ def main():
         print(f"[get ] {key}: {a['file']} ({a['size_mb']} MB) -> {a['dest']}")
         ok = False
         # --- primary: GitHub Release asset
+        # NOTE: for PRIVATE repos browser_download_url 404s with token auth;
+        # the API asset URL + octet-stream Accept is the reliable path.
         if a["file"] in gh_map and gh_token():
-            url = gh_map[a["file"]].get("browser_download_url")
-            if not url:  # private repo: use the API asset URL with octet-stream
-                url = gh_map[a["file"]]["url"]
+            url = gh_map[a["file"]]["url"]  # https://api.github.com/.../assets/{id}
             try:
                 fetch(url, dest, headers={
                     "Authorization": f"Bearer {gh_token()}",
