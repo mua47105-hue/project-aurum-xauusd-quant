@@ -1093,8 +1093,10 @@ def main():
             Wednesday x3 (longs pay, shorts receive)."""
             zv = z_series.reindex(net_series.index).fillna(0.0)
             idxr = zv.index
-            at_roll = (idxr.hour == cfg["hour_utc"]).values
-            wed = (idxr.dayofweek == 2).values       # Wednesday
+            # defensive: pandas 2.x Index comparisons already return ndarrays —
+            # never call .values on them (the Nov-15 ndarray bug class, fixed)
+            at_roll = np.asarray(idxr.hour == cfg["hour_utc"])
+            wed = np.asarray(idxr.dayofweek == 2)    # Wednesday
             rate = np.where(zv.values > 0, cfg["long_annual"], cfg["short_annual"])
             mult = np.where(wed, 3.0 if cfg.get("wed_x3", True) else 1.0, 1.0)
             charge = np.abs(zv.values) * rate * mult / cfg.get("day_basis", 365)
