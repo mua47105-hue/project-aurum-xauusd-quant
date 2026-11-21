@@ -1,0 +1,1246 @@
+{
+ "strategies": {
+  "M1_GBDT_v2": {
+   "fit": {
+    "metrics": {
+     "n": 41079,
+     "sharpe_ann": -0.2402,
+     "ret_ann_volunits": -0.00719,
+     "maxdd_volunits": 0.13115,
+     "calmar": -0.0548,
+     "ulcer": 0.088432,
+     "win_rate": 0.494
+    },
+    "turnover_py": 73.51330800622584,
+    "diag": {
+     "ph_alarms": 27,
+     "mean_regime_mult": 0.6816,
+     "cost_drag_py": 0.007351
+    },
+    "cost1.5": {
+     "n": 41079,
+     "sharpe_ann": -0.2852,
+     "ret_ann_volunits": -0.00845,
+     "maxdd_volunits": 0.1363,
+     "calmar": -0.062,
+     "ulcer": 0.094638,
+     "win_rate": 0.4929
+    },
+    "cost2.0": {
+     "n": 41079,
+     "sharpe_ann": -0.3332,
+     "ret_ann_volunits": -0.00978,
+     "maxdd_volunits": 0.14103,
+     "calmar": -0.0694,
+     "ulcer": 0.100625,
+     "win_rate": 0.4914
+    },
+    "speed_limit_ok": null,
+    "cost_drag_sharpe": 0.279,
+    "pre_cost_sharpe": -0.017
+   },
+   "oos": {
+    "metrics": {
+     "n": 16805,
+     "sharpe_ann": 0.4077,
+     "ret_ann_volunits": 0.01879,
+     "maxdd_volunits": 0.07924,
+     "calmar": 0.2372,
+     "ulcer": 0.039204,
+     "win_rate": 0.504
+    },
+    "turnover_py": 98.02833623202426,
+    "diag": {
+     "ph_alarms": 10,
+     "mean_regime_mult": 0.9759,
+     "cost_drag_py": 0.009803
+    },
+    "cost1.5": {
+     "n": 16805,
+     "sharpe_ann": 0.3016,
+     "ret_ann_volunits": 0.01384,
+     "maxdd_volunits": 0.08509,
+     "calmar": 0.1626,
+     "ulcer": 0.042885,
+     "win_rate": 0.4997
+    },
+    "cost2.0": {
+     "n": 16805,
+     "sharpe_ann": 0.223,
+     "ret_ann_volunits": 0.01018,
+     "maxdd_volunits": 0.08801,
+     "calmar": 0.1157,
+     "ulcer": 0.045301,
+     "win_rate": 0.5006
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.19,
+    "pre_cost_sharpe": 0.354
+   }
+  },
+  "M2_RFF_Ridge": {
+   "fit": {
+    "metrics": {
+     "n": 41079,
+     "sharpe_ann": -0.7356,
+     "ret_ann_volunits": -0.02564,
+     "maxdd_volunits": 0.19713,
+     "calmar": -0.1301,
+     "ulcer": 0.153697,
+     "win_rate": 0.4809
+    },
+    "turnover_py": 226.11052459639458,
+    "diag": {
+     "ph_alarms": 27,
+     "mean_regime_mult": 0.5627,
+     "cost_drag_py": 0.022611
+    },
+    "cost1.5": {
+     "n": 41079,
+     "sharpe_ann": -0.9339,
+     "ret_ann_volunits": -0.02662,
+     "maxdd_volunits": 0.20788,
+     "calmar": -0.1281,
+     "ulcer": 0.176765,
+     "win_rate": 0.483
+    },
+    "cost2.0": {
+     "n": 41079,
+     "sharpe_ann": -0.9643,
+     "ret_ann_volunits": -0.02615,
+     "maxdd_volunits": 0.20334,
+     "calmar": -0.1286,
+     "ulcer": 0.177383,
+     "win_rate": 0.4916
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.884,
+    "pre_cost_sharpe": 0.045
+   },
+   "oos": {
+    "metrics": {
+     "n": 16805,
+     "sharpe_ann": -0.7438,
+     "ret_ann_volunits": -0.03149,
+     "maxdd_volunits": 0.14004,
+     "calmar": -0.2249,
+     "ulcer": 0.083595,
+     "win_rate": 0.4793
+    },
+    "turnover_py": 306.752774284901,
+    "diag": {
+     "ph_alarms": 10,
+     "mean_regime_mult": 0.6289,
+     "cost_drag_py": 0.030675
+    },
+    "cost1.5": {
+     "n": 16805,
+     "sharpe_ann": -0.79,
+     "ret_ann_volunits": -0.02998,
+     "maxdd_volunits": 0.13164,
+     "calmar": -0.2278,
+     "ulcer": 0.084377,
+     "win_rate": 0.4766
+    },
+    "cost2.0": {
+     "n": 16805,
+     "sharpe_ann": -1.0355,
+     "ret_ann_volunits": -0.03878,
+     "maxdd_volunits": 0.15378,
+     "calmar": -0.2522,
+     "ulcer": 0.097711,
+     "win_rate": 0.4738
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.914,
+    "pre_cost_sharpe": 0.359
+   }
+  },
+  "RLSBank": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": -1.1437,
+     "ret_ann_volunits": -0.0131,
+     "maxdd_volunits": 0.12245,
+     "calmar": -0.107,
+     "ulcer": 0.08484,
+     "win_rate": 0.4741
+    },
+    "turnover_py": 144.75979056534675,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 0.9232,
+     "cost_drag_py": 0.014476
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": -1.4961,
+     "ret_ann_volunits": -0.01648,
+     "maxdd_volunits": 0.1423,
+     "calmar": -0.1158,
+     "ulcer": 0.099218,
+     "win_rate": 0.467
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": -1.8689,
+     "ret_ann_volunits": -0.01909,
+     "maxdd_volunits": 0.15942,
+     "calmar": -0.1197,
+     "ulcer": 0.111639,
+     "win_rate": 0.4637
+    },
+    "speed_limit_ok": null,
+    "cost_drag_sharpe": 1.664,
+    "pre_cost_sharpe": -0.478
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 0.5996,
+     "ret_ann_volunits": 0.01009,
+     "maxdd_volunits": 0.01898,
+     "calmar": 0.5318,
+     "ulcer": 0.008266,
+     "win_rate": 0.4908
+    },
+    "turnover_py": 160.87264043464347,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.9756,
+     "cost_drag_py": 0.016087
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 0.2065,
+     "ret_ann_volunits": 0.00344,
+     "maxdd_volunits": 0.02461,
+     "calmar": 0.1396,
+     "ulcer": 0.01184,
+     "win_rate": 0.4832
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": -0.1571,
+     "ret_ann_volunits": -0.00258,
+     "maxdd_volunits": 0.03838,
+     "calmar": -0.0673,
+     "ulcer": 0.021941,
+     "win_rate": 0.4831
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 1.306,
+    "pre_cost_sharpe": 1.032
+   }
+  },
+  "M3c_DAE": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 0.6843,
+     "ret_ann_volunits": 0.04023,
+     "maxdd_volunits": 0.09274,
+     "calmar": 0.4338,
+     "ulcer": 0.042623,
+     "win_rate": 0.494
+    },
+    "turnover_py": 346.0811595357161,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 1.1546,
+     "cost_drag_py": 0.034608
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 0.3704,
+     "ret_ann_volunits": 0.01827,
+     "maxdd_volunits": 0.12377,
+     "calmar": 0.1476,
+     "ulcer": 0.060466,
+     "win_rate": 0.4878
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 0.1111,
+     "ret_ann_volunits": 0.00526,
+     "maxdd_volunits": 0.15591,
+     "calmar": 0.0338,
+     "ulcer": 0.078219,
+     "win_rate": 0.4839
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.816,
+    "pre_cost_sharpe": 1.432
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 0.9927,
+     "ret_ann_volunits": 0.07767,
+     "maxdd_volunits": 0.1387,
+     "calmar": 0.56,
+     "ulcer": 0.069362,
+     "win_rate": 0.4988
+    },
+    "turnover_py": 154.14234549148682,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.7854,
+     "cost_drag_py": 0.015414
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 0.9289,
+     "ret_ann_volunits": 0.07167,
+     "maxdd_volunits": 0.14404,
+     "calmar": 0.4975,
+     "ulcer": 0.072574,
+     "win_rate": 0.496
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 0.853,
+     "ret_ann_volunits": 0.06549,
+     "maxdd_volunits": 0.15067,
+     "calmar": 0.4346,
+     "ulcer": 0.075938,
+     "win_rate": 0.4957
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.253,
+    "pre_cost_sharpe": 1.674
+   }
+  },
+  "M5_ContinuumNet": {
+   "fit": {
+    "metrics": {
+     "n": 23801,
+     "sharpe_ann": 0.2519,
+     "ret_ann_volunits": 0.00589,
+     "maxdd_volunits": 0.05351,
+     "calmar": 0.11,
+     "ulcer": 0.019435,
+     "win_rate": 0.4834
+    },
+    "turnover_py": 230.25777299807353,
+    "cost1.5": {
+     "n": 23801,
+     "sharpe_ann": -0.4687,
+     "ret_ann_volunits": -0.01093,
+     "maxdd_volunits": 0.07517,
+     "calmar": -0.1454,
+     "ulcer": 0.037897,
+     "win_rate": 0.4711
+    },
+    "cost2.0": {
+     "n": 23801,
+     "sharpe_ann": -1.1914,
+     "ret_ann_volunits": -0.02775,
+     "maxdd_volunits": 0.11761,
+     "calmar": -0.2359,
+     "ulcer": 0.071721,
+     "win_rate": 0.4598
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 1.434,
+    "pre_cost_sharpe": 1.686
+   }
+  },
+  "Carver_EWMAC": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 0.3721,
+     "ret_ann_volunits": 0.02303,
+     "maxdd_volunits": 0.09274,
+     "calmar": 0.2483,
+     "ulcer": 0.038677,
+     "win_rate": 0.4928
+    },
+    "turnover_py": 127.49469981643527,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 1.1546,
+     "cost_drag_py": 0.012749
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 0.2832,
+     "ret_ann_volunits": 0.01734,
+     "maxdd_volunits": 0.10198,
+     "calmar": 0.1701,
+     "ulcer": 0.04186,
+     "win_rate": 0.4927
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 0.0864,
+     "ret_ann_volunits": 0.00504,
+     "maxdd_volunits": 0.10748,
+     "calmar": 0.0469,
+     "ulcer": 0.053291,
+     "win_rate": 0.4937
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.274,
+    "pre_cost_sharpe": 0.636
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 1.2283,
+     "ret_ann_volunits": 0.07995,
+     "maxdd_volunits": 0.09646,
+     "calmar": 0.8289,
+     "ulcer": 0.032447,
+     "win_rate": 0.5023
+    },
+    "turnover_py": 120.73024477310638,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.9756,
+     "cost_drag_py": 0.012073
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 1.1686,
+     "ret_ann_volunits": 0.07549,
+     "maxdd_volunits": 0.10109,
+     "calmar": 0.7467,
+     "ulcer": 0.03424,
+     "win_rate": 0.5008
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 1.1001,
+     "ret_ann_volunits": 0.07055,
+     "maxdd_volunits": 0.10327,
+     "calmar": 0.6832,
+     "ulcer": 0.035494,
+     "win_rate": 0.502
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.227,
+    "pre_cost_sharpe": 1.63
+   }
+  },
+  "Channel_A": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": -0.2248,
+     "ret_ann_volunits": -0.01034,
+     "maxdd_volunits": 0.16444,
+     "calmar": -0.0629,
+     "ulcer": 0.104035,
+     "win_rate": 0.4825
+    },
+    "turnover_py": 267.23071184169015,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 0.8253,
+     "cost_drag_py": 0.026723
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": -0.3782,
+     "ret_ann_volunits": -0.01645,
+     "maxdd_volunits": 0.18575,
+     "calmar": -0.0886,
+     "ulcer": 0.129171,
+     "win_rate": 0.4812
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": -0.7429,
+     "ret_ann_volunits": -0.02507,
+     "maxdd_volunits": 0.21853,
+     "calmar": -0.1147,
+     "ulcer": 0.169982,
+     "win_rate": 0.4821
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.671,
+    "pre_cost_sharpe": 0.163
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": -0.2124,
+     "ret_ann_volunits": -0.01057,
+     "maxdd_volunits": 0.10776,
+     "calmar": -0.0981,
+     "ulcer": 0.063129,
+     "win_rate": 0.4871
+    },
+    "turnover_py": 255.46650468988344,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.8104,
+     "cost_drag_py": 0.025547
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": -0.3648,
+     "ret_ann_volunits": -0.01796,
+     "maxdd_volunits": 0.11117,
+     "calmar": -0.1616,
+     "ulcer": 0.068406,
+     "win_rate": 0.4842
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": -0.5074,
+     "ret_ann_volunits": -0.02472,
+     "maxdd_volunits": 0.11623,
+     "calmar": -0.2127,
+     "ulcer": 0.073192,
+     "win_rate": 0.4821
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.559,
+    "pre_cost_sharpe": 0.432
+   }
+  },
+  "Channel_B": {
+   "fit": {
+    "metrics": {
+     "n": 39516,
+     "sharpe_ann": 0.0,
+     "ret_ann_volunits": 0.0,
+     "maxdd_volunits": -0.0,
+     "calmar": null,
+     "ulcer": 0.0,
+     "win_rate": 0.0
+    },
+    "turnover_py": 0.0,
+    "cost1.5": {
+     "n": 39516,
+     "sharpe_ann": 0.0,
+     "ret_ann_volunits": 0.0,
+     "maxdd_volunits": -0.0,
+     "calmar": null,
+     "ulcer": 0.0,
+     "win_rate": 0.0
+    },
+    "cost2.0": {
+     "n": 39516,
+     "sharpe_ann": 0.0,
+     "ret_ann_volunits": 0.0,
+     "maxdd_volunits": -0.0,
+     "calmar": null,
+     "ulcer": 0.0,
+     "win_rate": 0.0
+    },
+    "speed_limit_ok": null,
+    "cost_drag_sharpe": 0.0,
+    "pre_cost_sharpe": 0.0
+   },
+   "oos": {
+    "metrics": {
+     "n": 15004,
+     "sharpe_ann": 0.0,
+     "ret_ann_volunits": 0.0,
+     "maxdd_volunits": -0.0,
+     "calmar": null,
+     "ulcer": 0.0,
+     "win_rate": 0.0
+    },
+    "turnover_py": 0.0,
+    "cost1.5": {
+     "n": 15004,
+     "sharpe_ann": 0.0,
+     "ret_ann_volunits": 0.0,
+     "maxdd_volunits": -0.0,
+     "calmar": null,
+     "ulcer": 0.0,
+     "win_rate": 0.0
+    },
+    "cost2.0": {
+     "n": 15004,
+     "sharpe_ann": 0.0,
+     "ret_ann_volunits": 0.0,
+     "maxdd_volunits": -0.0,
+     "calmar": null,
+     "ulcer": 0.0,
+     "win_rate": 0.0
+    },
+    "speed_limit_ok": null,
+    "cost_drag_sharpe": 0.0,
+    "pre_cost_sharpe": 0.0
+   }
+  },
+  "BuyHold_Gold": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 0.6992,
+     "ret_ann_volunits": 0.11067,
+     "maxdd_volunits": 0.27909,
+     "calmar": 0.3966,
+     "ulcer": 0.119531,
+     "win_rate": 0.5044
+    },
+    "turnover_py": 0.0,
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 0.6844,
+     "ret_ann_volunits": 0.10833,
+     "maxdd_volunits": 0.28074,
+     "calmar": 0.3859,
+     "ulcer": 0.121281,
+     "win_rate": 0.5044
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 0.6696,
+     "ret_ann_volunits": 0.10598,
+     "maxdd_volunits": 0.2824,
+     "calmar": 0.3753,
+     "ulcer": 0.12304,
+     "win_rate": 0.5044
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.03,
+    "pre_cost_sharpe": 0.729
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 2.1604,
+     "ret_ann_volunits": 0.34078,
+     "maxdd_volunits": 0.17679,
+     "calmar": 1.9276,
+     "ulcer": 0.043915,
+     "win_rate": 0.517
+    },
+    "turnover_py": 0.0,
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 2.1475,
+     "ret_ann_volunits": 0.33874,
+     "maxdd_volunits": 0.17777,
+     "calmar": 1.9055,
+     "ulcer": 0.044185,
+     "win_rate": 0.517
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 2.1345,
+     "ret_ann_volunits": 0.3367,
+     "maxdd_volunits": 0.17875,
+     "calmar": 1.8836,
+     "ulcer": 0.044455,
+     "win_rate": 0.5169
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.026,
+    "pre_cost_sharpe": 2.186
+   }
+  },
+  "M0_Champ_v13": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 2.0126,
+     "ret_ann_volunits": 0.18525,
+     "maxdd_volunits": 0.08771,
+     "calmar": 2.1121,
+     "ulcer": 0.029084,
+     "win_rate": 0.3142
+    },
+    "turnover_py": 200.31427860217127,
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 1.8611,
+     "ret_ann_volunits": 0.17137,
+     "maxdd_volunits": 0.09063,
+     "calmar": 1.8908,
+     "ulcer": 0.031023,
+     "win_rate": 0.3136
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 1.7097,
+     "ret_ann_volunits": 0.15749,
+     "maxdd_volunits": 0.09361,
+     "calmar": 1.6823,
+     "ulcer": 0.033246,
+     "win_rate": 0.3128
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.303,
+    "pre_cost_sharpe": 2.316
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 2.6112,
+     "ret_ann_volunits": 0.27291,
+     "maxdd_volunits": 0.09575,
+     "calmar": 2.8501,
+     "ulcer": 0.027082,
+     "win_rate": 0.3744
+    },
+    "turnover_py": 232.7113988620757,
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 2.4751,
+     "ret_ann_volunits": 0.25882,
+     "maxdd_volunits": 0.10262,
+     "calmar": 2.5221,
+     "ulcer": 0.028962,
+     "win_rate": 0.3736
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 2.3391,
+     "ret_ann_volunits": 0.24474,
+     "maxdd_volunits": 0.10949,
+     "calmar": 2.2353,
+     "ulcer": 0.030935,
+     "win_rate": 0.3728
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.272,
+    "pre_cost_sharpe": 2.884
+   }
+  },
+  "M0_Champ_v13_cap1": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 1.7381,
+     "ret_ann_volunits": 0.20912,
+     "maxdd_volunits": 0.14623,
+     "calmar": 1.4301,
+     "ulcer": 0.044243,
+     "win_rate": 0.3025
+    },
+    "turnover_py": 217.08650510695702,
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 1.6092,
+     "ret_ann_volunits": 0.19374,
+     "maxdd_volunits": 0.15102,
+     "calmar": 1.2829,
+     "ulcer": 0.047047,
+     "win_rate": 0.3023
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 1.4804,
+     "ret_ann_volunits": 0.17836,
+     "maxdd_volunits": 0.1558,
+     "calmar": 1.1448,
+     "ulcer": 0.050216,
+     "win_rate": 0.3022
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.258,
+    "pre_cost_sharpe": 1.996
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 2.5442,
+     "ret_ann_volunits": 0.33566,
+     "maxdd_volunits": 0.12227,
+     "calmar": 2.7453,
+     "ulcer": 0.036035,
+     "win_rate": 0.3625
+    },
+    "turnover_py": 212.67551500882874,
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 2.4396,
+     "ret_ann_volunits": 0.32204,
+     "maxdd_volunits": 0.12619,
+     "calmar": 2.5521,
+     "ulcer": 0.037633,
+     "win_rate": 0.3624
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 2.335,
+     "ret_ann_volunits": 0.30842,
+     "maxdd_volunits": 0.13011,
+     "calmar": 2.3705,
+     "ulcer": 0.03938,
+     "win_rate": 0.3624
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.209,
+    "pre_cost_sharpe": 2.754
+   }
+  },
+  "M0_Champ_v13_E1": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 0.4065,
+     "ret_ann_volunits": 0.036,
+     "maxdd_volunits": 0.16831,
+     "calmar": 0.2139,
+     "ulcer": 0.080275,
+     "win_rate": 0.2901
+    },
+    "turnover_py": 259.5978271343226,
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 0.2065,
+     "ret_ann_volunits": 0.0183,
+     "maxdd_volunits": 0.19993,
+     "calmar": 0.0915,
+     "ulcer": 0.106165,
+     "win_rate": 0.2893
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 0.0068,
+     "ret_ann_volunits": 0.0006,
+     "maxdd_volunits": 0.28103,
+     "calmar": 0.0022,
+     "ulcer": 0.161738,
+     "win_rate": 0.2881
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.4,
+    "pre_cost_sharpe": 0.807
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 0.6748,
+     "ret_ann_volunits": 0.06797,
+     "maxdd_volunits": 0.17745,
+     "calmar": 0.383,
+     "ulcer": 0.078915,
+     "win_rate": 0.3456
+    },
+    "turnover_py": 319.04165195212875,
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 0.4874,
+     "ret_ann_volunits": 0.04913,
+     "maxdd_volunits": 0.19726,
+     "calmar": 0.2491,
+     "ulcer": 0.091816,
+     "win_rate": 0.3445
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 0.3003,
+     "ret_ann_volunits": 0.03029,
+     "maxdd_volunits": 0.21711,
+     "calmar": 0.1395,
+     "ulcer": 0.106217,
+     "win_rate": 0.3432
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.376,
+    "pre_cost_sharpe": 1.05
+   }
+  },
+  "M0_Champ_v13_E2": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 0.2011,
+     "ret_ann_volunits": 0.01513,
+     "maxdd_volunits": 0.15452,
+     "calmar": 0.0979,
+     "ulcer": 0.079997,
+     "win_rate": 0.2925
+    },
+    "turnover_py": 259.6094422496306,
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": -0.0319,
+     "ret_ann_volunits": -0.0024,
+     "maxdd_volunits": 0.22067,
+     "calmar": -0.0109,
+     "ulcer": 0.123577,
+     "win_rate": 0.2914
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": -0.2644,
+     "ret_ann_volunits": -0.01993,
+     "maxdd_volunits": 0.30012,
+     "calmar": -0.0664,
+     "ulcer": 0.182377,
+     "win_rate": 0.2898
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.467,
+    "pre_cost_sharpe": 0.668
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 0.5145,
+     "ret_ann_volunits": 0.04335,
+     "maxdd_volunits": 0.14156,
+     "calmar": 0.3062,
+     "ulcer": 0.067967,
+     "win_rate": 0.3489
+    },
+    "turnover_py": 320.94307435746515,
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 0.2917,
+     "ret_ann_volunits": 0.02461,
+     "maxdd_volunits": 0.16573,
+     "calmar": 0.1485,
+     "ulcer": 0.083305,
+     "win_rate": 0.3474
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 0.0695,
+     "ret_ann_volunits": 0.00587,
+     "maxdd_volunits": 0.19124,
+     "calmar": 0.0307,
+     "ulcer": 0.103633,
+     "win_rate": 0.3461
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.447,
+    "pre_cost_sharpe": 0.961
+   }
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": -0.451,
+     "ret_ann_volunits": -0.01286,
+     "maxdd_volunits": 0.13769,
+     "calmar": -0.0934,
+     "ulcer": 0.108768,
+     "win_rate": 0.4833
+    },
+    "turnover_py": 142.71920208956175,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 0.6256,
+     "cost_drag_py": 0.014272
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": -0.5748,
+     "ret_ann_volunits": -0.01623,
+     "maxdd_volunits": 0.15937,
+     "calmar": -0.1019,
+     "ulcer": 0.124371,
+     "win_rate": 0.4812
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": -0.6581,
+     "ret_ann_volunits": -0.0184,
+     "maxdd_volunits": 0.17548,
+     "calmar": -0.1049,
+     "ulcer": 0.135639,
+     "win_rate": 0.4804
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.725,
+    "pre_cost_sharpe": 0.08
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 0.1852,
+     "ret_ann_volunits": 0.00828,
+     "maxdd_volunits": 0.07253,
+     "calmar": 0.1142,
+     "ulcer": 0.037056,
+     "win_rate": 0.4888
+    },
+    "turnover_py": 262.30840843975204,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.9756,
+     "cost_drag_py": 0.026231
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": -0.0575,
+     "ret_ann_volunits": -0.00255,
+     "maxdd_volunits": 0.07783,
+     "calmar": -0.0327,
+     "ulcer": 0.04512,
+     "win_rate": 0.4873
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": -0.2814,
+     "ret_ann_volunits": -0.01237,
+     "maxdd_volunits": 0.08978,
+     "calmar": -0.1377,
+     "ulcer": 0.05505,
+     "win_rate": 0.4822
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.725,
+    "pre_cost_sharpe": 0.451
+   }
+  },
+  "M6b_Ensemble_EQW": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": -0.451,
+     "ret_ann_volunits": -0.01286,
+     "maxdd_volunits": 0.13769,
+     "calmar": -0.0934,
+     "ulcer": 0.108768,
+     "win_rate": 0.4833
+    },
+    "turnover_py": 142.71920208956175,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 0.6256,
+     "cost_drag_py": 0.014272
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": -0.5748,
+     "ret_ann_volunits": -0.01623,
+     "maxdd_volunits": 0.15937,
+     "calmar": -0.1019,
+     "ulcer": 0.124371,
+     "win_rate": 0.4812
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": -0.6581,
+     "ret_ann_volunits": -0.0184,
+     "maxdd_volunits": 0.17548,
+     "calmar": -0.1049,
+     "ulcer": 0.135639,
+     "win_rate": 0.4804
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.725,
+    "pre_cost_sharpe": 0.08
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 0.1852,
+     "ret_ann_volunits": 0.00828,
+     "maxdd_volunits": 0.07253,
+     "calmar": 0.1142,
+     "ulcer": 0.037056,
+     "win_rate": 0.4888
+    },
+    "turnover_py": 262.30840843975204,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.9756,
+     "cost_drag_py": 0.026231
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": -0.0575,
+     "ret_ann_volunits": -0.00255,
+     "maxdd_volunits": 0.07783,
+     "calmar": -0.0327,
+     "ulcer": 0.04512,
+     "win_rate": 0.4873
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": -0.2814,
+     "ret_ann_volunits": -0.01237,
+     "maxdd_volunits": 0.08978,
+     "calmar": -0.1377,
+     "ulcer": 0.05505,
+     "win_rate": 0.4822
+    },
+    "speed_limit_ok": false,
+    "cost_drag_sharpe": 0.725,
+    "pre_cost_sharpe": 0.451
+   }
+  },
+  "M7_Active_Grand_Hybrid": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 1.5258,
+     "ret_ann_volunits": 0.08378,
+     "maxdd_volunits": 0.05027,
+     "calmar": 1.6667,
+     "ulcer": 0.016191,
+     "win_rate": 0.4964
+    },
+    "turnover_py": 198.627370017396,
+    "diag": {
+     "ph_alarms": 26,
+     "mean_regime_mult": 1.1546,
+     "cost_drag_py": 0.019863
+    },
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 1.3924,
+     "ret_ann_volunits": 0.07571,
+     "maxdd_volunits": 0.05356,
+     "calmar": 1.4136,
+     "ulcer": 0.017535,
+     "win_rate": 0.4924
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 1.2753,
+     "ret_ann_volunits": 0.0686,
+     "maxdd_volunits": 0.05636,
+     "calmar": 1.2171,
+     "ulcer": 0.020043,
+     "win_rate": 0.4917
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.49,
+    "pre_cost_sharpe": 1.901
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 1.9599,
+     "ret_ann_volunits": 0.11301,
+     "maxdd_volunits": 0.0504,
+     "calmar": 2.2421,
+     "ulcer": 0.017839,
+     "win_rate": 0.5024
+    },
+    "turnover_py": 202.78719615277566,
+    "diag": {
+     "ph_alarms": 12,
+     "mean_regime_mult": 0.9756,
+     "cost_drag_py": 0.020279
+    },
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 1.7824,
+     "ret_ann_volunits": 0.10177,
+     "maxdd_volunits": 0.05359,
+     "calmar": 1.8989,
+     "ulcer": 0.019498,
+     "win_rate": 0.4997
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 1.6135,
+     "ret_ann_volunits": 0.09118,
+     "maxdd_volunits": 0.05882,
+     "calmar": 1.55,
+     "ulcer": 0.021021,
+     "win_rate": 0.4969
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.46,
+    "pre_cost_sharpe": 2.683
+   }
+  },
+  "M7_Core_Satellite": {
+   "fit": {
+    "metrics": {
+     "n": 41513,
+     "sharpe_ann": 1.4492,
+     "ret_ann_volunits": 0.14891,
+     "maxdd_volunits": 0.14754,
+     "calmar": 1.0093,
+     "ulcer": 0.051492,
+     "win_rate": 0.4816
+    },
+    "turnover_py": 100.15713930108559,
+    "cost1.5": {
+     "n": 41513,
+     "sharpe_ann": 1.3748,
+     "ret_ann_volunits": 0.14127,
+     "maxdd_volunits": 0.15288,
+     "calmar": 0.9241,
+     "ulcer": 0.054115,
+     "win_rate": 0.4811
+    },
+    "cost2.0": {
+     "n": 41513,
+     "sharpe_ann": 1.3003,
+     "ret_ann_volunits": 0.13363,
+     "maxdd_volunits": 0.15822,
+     "calmar": 0.8446,
+     "ulcer": 0.056861,
+     "win_rate": 0.4805
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.149,
+    "pre_cost_sharpe": 1.598
+   },
+   "oos": {
+    "metrics": {
+     "n": 16991,
+     "sharpe_ann": 2.6351,
+     "ret_ann_volunits": 0.30746,
+     "maxdd_volunits": 0.13097,
+     "calmar": 2.3476,
+     "ulcer": 0.030539,
+     "win_rate": 0.5027
+    },
+    "turnover_py": 116.35569943103785,
+    "cost1.5": {
+     "n": 16991,
+     "sharpe_ann": 2.5681,
+     "ret_ann_volunits": 0.29971,
+     "maxdd_volunits": 0.13465,
+     "calmar": 2.2259,
+     "ulcer": 0.031518,
+     "win_rate": 0.5024
+    },
+    "cost2.0": {
+     "n": 16991,
+     "sharpe_ann": 2.5012,
+     "ret_ann_volunits": 0.29195,
+     "maxdd_volunits": 0.13833,
+     "calmar": 2.1106,
+     "ulcer": 0.032517,
+     "win_rate": 0.5019
+    },
+    "speed_limit_ok": true,
+    "cost_drag_sharpe": 0.134,
+    "pre_cost_sharpe": 2.769
+   }
+  }
+ },
+ "v13_reference": {
+  "flagship_cap3": {
+   "sharpe_ann": 2.444,
+   "cagr_pct": 54.56,
+   "maxdd_pct": 13.06,
+   "er_per_trade": 0.1478,
+   "pf": 1.258,
+   "n_trades": 3341,
+   "dsr": 0.895
+  },
+  "flagship_cap1": {
+   "sharpe_ann": 2.305,
+   "cagr_pct": 53.18,
+   "maxdd_pct": 14.67
+  },
+  "aurum_r1_cap1": {
+   "sharpe_ann": 2.194
+  },
+  "gbdt_cap1_v13": {
+   "sharpe_ann": 0.307,
+   "er_per_trade": 0.031
+  },
+  "buyhold_cap1": {
+   "sharpe_ann": 1.919,
+   "cagr_pct": 23.61,
+   "maxdd_pct": 10.8
+  }
+ },
+ "code_rev": "k6-v2.0.2"
+}

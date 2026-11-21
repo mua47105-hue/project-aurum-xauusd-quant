@@ -1,0 +1,186 @@
+{
+ "sig": "9ce917bbe195",
+ "entry": {
+  "gauntlet_engine": true,
+  "fit": {
+   "metrics": {
+    "n": 41513,
+    "sharpe_ann": -1.1437,
+    "ret_ann_volunits": -0.0131,
+    "maxdd_volunits": 0.12245,
+    "calmar": -0.107,
+    "ulcer": 0.08484,
+    "win_rate": 0.4741
+   },
+   "turnover_py": 144.75979056534675,
+   "diag": {
+    "ph_alarms": 26,
+    "mean_regime_mult": 0.9232,
+    "cost_drag_py": 0.014476
+   },
+   "cost1.5": {
+    "n": 41513,
+    "sharpe_ann": -1.4961,
+    "ret_ann_volunits": -0.01648,
+    "maxdd_volunits": 0.1423,
+    "calmar": -0.1158,
+    "ulcer": 0.099218,
+    "win_rate": 0.467
+   },
+   "cost2.0": {
+    "n": 41513,
+    "sharpe_ann": -1.8689,
+    "ret_ann_volunits": -0.01909,
+    "maxdd_volunits": 0.15942,
+    "calmar": -0.1197,
+    "ulcer": 0.111639,
+    "win_rate": 0.4637
+   },
+   "speed_limit_ok": null,
+   "cost_drag_sharpe": 1.664,
+   "pre_cost_sharpe": -0.478,
+   "year_rows": [
+    {
+     "year": 2016,
+     "window": "FIT",
+     "sharpe_ann": 1.2975,
+     "ret_ann_volunits": 0.02077,
+     "maxdd_volunits": 0.00733,
+     "calmar": 2.8328,
+     "ulcer": 0.003285,
+     "win_rate": 0.4819
+    },
+    {
+     "year": 2017,
+     "window": "FIT",
+     "sharpe_ann": -2.3624,
+     "ret_ann_volunits": -0.03459,
+     "maxdd_volunits": 0.03942,
+     "calmar": -0.8776,
+     "ulcer": 0.024358,
+     "win_rate": 0.4615
+    },
+    {
+     "year": 2018,
+     "window": "FIT",
+     "sharpe_ann": -1.963,
+     "ret_ann_volunits": -0.03572,
+     "maxdd_volunits": 0.04416,
+     "calmar": -0.8087,
+     "ulcer": 0.023637,
+     "win_rate": 0.4575
+    },
+    {
+     "year": 2019,
+     "window": "FIT",
+     "sharpe_ann": -3.4231,
+     "ret_ann_volunits": -0.03239,
+     "maxdd_volunits": 0.03449,
+     "calmar": -0.9391,
+     "ulcer": 0.024441,
+     "win_rate": 0.4748
+    },
+    {
+     "year": 2020,
+     "window": "FIT",
+     "sharpe_ann": -0.197,
+     "ret_ann_volunits": -0.00401,
+     "maxdd_volunits": 0.02582,
+     "calmar": -0.1553,
+     "ulcer": 0.012908,
+     "win_rate": 0.4906
+    },
+    {
+     "year": 2021,
+     "window": "FIT",
+     "sharpe_ann": -1.8425,
+     "ret_ann_volunits": -0.04057,
+     "maxdd_volunits": 0.04716,
+     "calmar": -0.8602,
+     "ulcer": 0.025725,
+     "win_rate": 0.4626
+    },
+    {
+     "year": 2022,
+     "window": "FIT",
+     "sharpe_ann": -2.008,
+     "ret_ann_volunits": -0.02656,
+     "maxdd_volunits": 0.02792,
+     "calmar": -0.9513,
+     "ulcer": 0.017069,
+     "win_rate": 0.476
+    }
+   ]
+  },
+  "oos": {
+   "metrics": {
+    "n": 16991,
+    "sharpe_ann": 0.5996,
+    "ret_ann_volunits": 0.01009,
+    "maxdd_volunits": 0.01898,
+    "calmar": 0.5318,
+    "ulcer": 0.008266,
+    "win_rate": 0.4908
+   },
+   "turnover_py": 160.87264043464347,
+   "diag": {
+    "ph_alarms": 12,
+    "mean_regime_mult": 0.9756,
+    "cost_drag_py": 0.016087
+   },
+   "cost1.5": {
+    "n": 16991,
+    "sharpe_ann": 0.2065,
+    "ret_ann_volunits": 0.00344,
+    "maxdd_volunits": 0.02461,
+    "calmar": 0.1396,
+    "ulcer": 0.01184,
+    "win_rate": 0.4832
+   },
+   "cost2.0": {
+    "n": 16991,
+    "sharpe_ann": -0.1571,
+    "ret_ann_volunits": -0.00258,
+    "maxdd_volunits": 0.03838,
+    "calmar": -0.0673,
+    "ulcer": 0.021941,
+    "win_rate": 0.4831
+   },
+   "speed_limit_ok": false,
+   "cost_drag_sharpe": 1.306,
+   "pre_cost_sharpe": 1.032,
+   "year_rows": [
+    {
+     "year": 2023,
+     "window": "OOS",
+     "sharpe_ann": 0.792,
+     "ret_ann_volunits": 0.01745,
+     "maxdd_volunits": 0.01683,
+     "calmar": 1.0369,
+     "ulcer": 0.009665,
+     "win_rate": 0.4683
+    },
+    {
+     "year": 2024,
+     "window": "OOS",
+     "sharpe_ann": -1.2967,
+     "ret_ann_volunits": -0.01844,
+     "maxdd_volunits": 0.02097,
+     "calmar": -0.8793,
+     "ulcer": 0.012245,
+     "win_rate": 0.4971
+    },
+    {
+     "year": 2025,
+     "window": "OOS",
+     "sharpe_ann": 1.1213,
+     "ret_ann_volunits": 0.0193,
+     "maxdd_volunits": 0.01473,
+     "calmar": 1.3108,
+     "ulcer": 0.00607,
+     "win_rate": 0.5014
+    }
+   ]
+  }
+ }
+}

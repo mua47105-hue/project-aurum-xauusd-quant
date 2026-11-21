@@ -1,0 +1,495 @@
+{
+ "spec": "v2.1.0",
+ "native_reference_flagship_cap3_oos": 2.444,
+ "bridge_decomposition_E0_E1_E2": {
+  "E0": 2.6112,
+  "EE1": 0.6748,
+  "EE2": 0.5145
+ },
+ "capm_nw_hac5_vs_buyhold_gold": {
+  "M0_Champ_v13": {
+   "oos": {
+    "alpha_pct_yr": 16.91,
+    "alpha_t": 3.26,
+    "alpha_p": 0.00113,
+    "beta_xau": 0.342,
+    "IR": 45.23,
+    "up_capture": 0.459,
+    "down_capture": 0.297
+   },
+   "full": {
+    "alpha_pct_yr": 18.08,
+    "alpha_t": 6.13,
+    "alpha_p": 0.0,
+    "beta_xau": 0.231,
+    "IR": 39.0,
+    "up_capture": 0.358,
+    "down_capture": 0.163
+   }
+  },
+  "M0_Champ_v13_E1": {
+   "oos": {
+    "alpha_pct_yr": -2.57,
+    "alpha_t": -0.51,
+    "alpha_p": 0.61329,
+    "beta_xau": 0.321,
+    "IR": 11.71,
+    "up_capture": 0.345,
+    "down_capture": 0.384
+   },
+   "full": {
+    "alpha_pct_yr": 1.58,
+    "alpha_t": 0.55,
+    "alpha_p": 0.58188,
+    "beta_xau": 0.214,
+    "IR": 8.65,
+    "up_capture": 0.254,
+    "down_capture": 0.242
+   }
+  },
+  "M0_Champ_v13_E2": {
+   "oos": {
+    "alpha_pct_yr": -3.26,
+    "alpha_t": -0.76,
+    "alpha_p": 0.44866,
+    "beta_xau": 0.261,
+    "IR": 9.0,
+    "up_capture": 0.28,
+    "down_capture": 0.325
+   },
+   "full": {
+    "alpha_pct_yr": -0.1,
+    "alpha_t": -0.04,
+    "alpha_p": 0.96649,
+    "beta_xau": 0.175,
+    "IR": 5.29,
+    "up_capture": 0.2,
+    "down_capture": 0.206
+   }
+  },
+  "M0_Champ_v13_E2_carry": {
+   "oos": {
+    "alpha_pct_yr": -5.04,
+    "alpha_t": -1.17,
+    "alpha_p": 0.2435,
+    "beta_xau": 0.26,
+    "IR": 5.2,
+    "up_capture": 0.27,
+    "down_capture": 0.333
+   },
+   "full": {
+    "alpha_pct_yr": -1.36,
+    "alpha_t": -0.56,
+    "alpha_p": 0.57671,
+    "beta_xau": 0.174,
+    "IR": 2.44,
+    "up_capture": 0.191,
+    "down_capture": 0.211
+   }
+  },
+  "M0_Champ_v13_E2_carry_punitive": {
+   "oos": {
+    "alpha_pct_yr": -5.3,
+    "alpha_t": -1.23,
+    "alpha_p": 0.22006,
+    "beta_xau": 0.26,
+    "IR": 4.65,
+    "up_capture": 0.269,
+    "down_capture": 0.334
+   },
+   "full": {
+    "alpha_pct_yr": -1.6,
+    "alpha_t": -0.66,
+    "alpha_p": 0.5101,
+    "beta_xau": 0.174,
+    "IR": 1.9,
+    "up_capture": 0.19,
+    "down_capture": 0.212
+   }
+  },
+  "M1_GBDT_v2": {
+   "oos": {
+    "alpha_pct_yr": 1.26,
+    "alpha_t": 0.51,
+    "alpha_p": 0.6116,
+    "beta_xau": 0.02,
+    "IR": 7.22,
+    "up_capture": 0.027,
+    "down_capture": 0.014
+   },
+   "full": {
+    "alpha_pct_yr": -0.16,
+    "alpha_t": -0.16,
+    "alpha_p": 0.8763,
+    "beta_xau": 0.015,
+    "IR": 0.19,
+    "up_capture": 0.013,
+    "down_capture": 0.014
+   }
+  },
+  "M2_RFF_Ridge": {
+   "oos": {
+    "alpha_pct_yr": -3.37,
+    "alpha_t": -1.35,
+    "alpha_p": 0.17542,
+    "beta_xau": 0.011,
+    "IR": -12.73,
+    "up_capture": 0.013,
+    "down_capture": 0.054
+   },
+   "full": {
+    "alpha_pct_yr": -2.7,
+    "alpha_t": -2.19,
+    "alpha_p": 0.02858,
+    "beta_xau": -0.003,
+    "IR": -12.79,
+    "up_capture": -0.011,
+    "down_capture": 0.02
+   }
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "oos": {
+    "alpha_pct_yr": 0.31,
+    "alpha_t": 0.12,
+    "alpha_p": 0.90718,
+    "beta_xau": 0.018,
+    "IR": 3.22,
+    "up_capture": 0.035,
+    "down_capture": 0.038
+   },
+   "full": {
+    "alpha_pct_yr": -0.81,
+    "alpha_t": -0.74,
+    "alpha_p": 0.45853,
+    "beta_xau": 0.009,
+    "IR": -3.53,
+    "up_capture": 0.011,
+    "down_capture": 0.021
+   }
+  },
+  "M7_Core_Satellite": {
+   "oos": {
+    "alpha_pct_yr": 11.59,
+    "alpha_t": 3.33,
+    "alpha_p": 0.00087,
+    "beta_xau": 0.644,
+    "IR": 46.45,
+    "up_capture": 0.766,
+    "down_capture": 0.67
+   },
+   "full": {
+    "alpha_pct_yr": 10.89,
+    "alpha_t": 5.66,
+    "alpha_p": 0.0,
+    "beta_xau": 0.629,
+    "IR": 32.51,
+    "up_capture": 0.768,
+    "down_capture": 0.661
+   }
+  },
+  "M7_Active_Grand_Hybrid": {
+   "oos": {
+    "alpha_pct_yr": 7.75,
+    "alpha_t": 2.54,
+    "alpha_p": 0.01119,
+    "beta_xau": 0.116,
+    "IR": 34.12,
+    "up_capture": 0.186,
+    "down_capture": 0.118
+   },
+   "full": {
+    "alpha_pct_yr": 8.2,
+    "alpha_t": 4.71,
+    "alpha_p": 0.0,
+    "beta_xau": 0.081,
+    "IR": 29.24,
+    "up_capture": 0.146,
+    "down_capture": 0.059
+   }
+  },
+  "BuyHold_Gold": {
+   "oos": {
+    "alpha_pct_yr": 6.15,
+    "alpha_t": 1.78,
+    "alpha_p": 0.07507,
+    "beta_xau": 0.947,
+    "IR": 37.94,
+    "up_capture": 1.073,
+    "down_capture": 1.043
+   },
+   "full": {
+    "alpha_pct_yr": 3.51,
+    "alpha_t": 1.73,
+    "alpha_p": 0.08391,
+    "beta_xau": 1.029,
+    "IR": 19.94,
+    "up_capture": 1.177,
+    "down_capture": 1.159
+   }
+  },
+  "Carver_EWMAC": {
+   "oos": {
+    "alpha_pct_yr": 3.33,
+    "alpha_t": 0.89,
+    "alpha_p": 0.37505,
+    "beta_xau": 0.157,
+    "IR": 21.16,
+    "up_capture": 0.177,
+    "down_capture": 0.144
+   },
+   "full": {
+    "alpha_pct_yr": 2.85,
+    "alpha_t": 1.4,
+    "alpha_p": 0.16215,
+    "beta_xau": 0.082,
+    "IR": 11.09,
+    "up_capture": 0.102,
+    "down_capture": 0.071
+   }
+  }
+ },
+ "long_short_attribution_oos": {
+  "M0_Champ_v13": {
+   "window": "oos",
+   "long_hrs_pct": 58.8,
+   "short_hrs_pct": 13.2,
+   "flat_hrs_pct": 28.0,
+   "pnl_long": 1.0062,
+   "pnl_short": 0.1214,
+   "short_share_pct": 10.8,
+   "n_bars": 16991
+  },
+  "M0_Champ_v13_E1": {
+   "window": "oos",
+   "long_hrs_pct": 55.6,
+   "short_hrs_pct": 12.3,
+   "flat_hrs_pct": 32.0,
+   "pnl_long": 0.9146,
+   "pnl_short": 0.0845,
+   "short_share_pct": 8.5,
+   "n_bars": 16991
+  },
+  "M0_Champ_v13_E2": {
+   "window": "oos",
+   "long_hrs_pct": 55.8,
+   "short_hrs_pct": 12.6,
+   "flat_hrs_pct": 31.6,
+   "pnl_long": 0.8047,
+   "pnl_short": 0.0831,
+   "short_share_pct": 9.4,
+   "n_bars": 16991
+  },
+  "M0_Champ_v13_E2_carry": {
+   "window": "oos",
+   "long_hrs_pct": 55.8,
+   "short_hrs_pct": 12.6,
+   "flat_hrs_pct": 31.6,
+   "pnl_long": 0.7461,
+   "pnl_short": 0.0879,
+   "short_share_pct": 10.5,
+   "n_bars": 16991
+  },
+  "M0_Champ_v13_E2_carry_punitive": {
+   "window": "oos",
+   "long_hrs_pct": 55.8,
+   "short_hrs_pct": 12.6,
+   "flat_hrs_pct": 31.6,
+   "pnl_long": 0.7403,
+   "pnl_short": 0.086,
+   "short_share_pct": 10.4,
+   "n_bars": 16991
+  },
+  "M1_GBDT_v2": {
+   "window": "oos",
+   "long_hrs_pct": 49.7,
+   "short_hrs_pct": 50.3,
+   "flat_hrs_pct": 0.0,
+   "pnl_long": 0.1331,
+   "pnl_short": -0.0785,
+   "short_share_pct": -143.9,
+   "n_bars": 16805
+  },
+  "M2_RFF_Ridge": {
+   "window": "oos",
+   "long_hrs_pct": 53.5,
+   "short_hrs_pct": 46.5,
+   "flat_hrs_pct": 0.0,
+   "pnl_long": 0.1257,
+   "pnl_short": -0.2172,
+   "short_share_pct": 237.4,
+   "n_bars": 16805
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "window": "oos",
+   "long_hrs_pct": 51.7,
+   "short_hrs_pct": 48.3,
+   "flat_hrs_pct": 0.0,
+   "pnl_long": 0.1837,
+   "pnl_short": -0.1594,
+   "short_share_pct": -655.6,
+   "n_bars": 16991
+  },
+  "M7_Core_Satellite": {
+   "window": "oos",
+   "long_hrs_pct": 97.2,
+   "short_hrs_pct": 0.0,
+   "flat_hrs_pct": 2.8,
+   "pnl_long": 0.908,
+   "pnl_short": 0.0,
+   "short_share_pct": 0.0,
+   "n_bars": 16991
+  },
+  "M7_Active_Grand_Hybrid": {
+   "window": "oos",
+   "long_hrs_pct": 70.5,
+   "short_hrs_pct": 29.5,
+   "flat_hrs_pct": 0.0,
+   "pnl_long": 0.4038,
+   "pnl_short": -0.0719,
+   "short_share_pct": -21.7,
+   "n_bars": 16991
+  },
+  "BuyHold_Gold": {
+   "window": "oos",
+   "long_hrs_pct": 100.0,
+   "short_hrs_pct": 0.0,
+   "flat_hrs_pct": 0.0,
+   "pnl_long": 1.0007,
+   "pnl_short": 0.0,
+   "short_share_pct": 0.0,
+   "n_bars": 16991
+  },
+  "Carver_EWMAC": {
+   "window": "oos",
+   "long_hrs_pct": 69.1,
+   "short_hrs_pct": 30.9,
+   "flat_hrs_pct": 0.0,
+   "pnl_long": 0.2581,
+   "pnl_short": -0.0233,
+   "short_share_pct": -9.9,
+   "n_bars": 16991
+  }
+ },
+ "regime_torture_5": {
+  "M0_Champ_v13": {
+   "2016-19 range": 1.764,
+   "2020 COVID": 1.192,
+   "2021-22 bear": 3.016,
+   "2023 degraded/chop": 1.1,
+   "2024-25 parabolic": 3.281
+  },
+  "M0_Champ_v13_E1": {
+   "2016-19 range": 0.08,
+   "2020 COVID": -0.421,
+   "2021-22 bear": 1.443,
+   "2023 degraded/chop": -0.351,
+   "2024-25 parabolic": 1.162
+  },
+  "M0_Champ_v13_E2": {
+   "2016-19 range": -0.03,
+   "2020 COVID": -0.646,
+   "2021-22 bear": 1.051,
+   "2023 degraded/chop": -0.318,
+   "2024-25 parabolic": 0.926
+  },
+  "M0_Champ_v13_E2_carry": {
+   "2016-19 range": -0.165,
+   "2020 COVID": -0.767,
+   "2021-22 bear": 0.905,
+   "2023 degraded/chop": -0.548,
+   "2024-25 parabolic": 0.718
+  },
+  "M0_Champ_v13_E2_carry_punitive": {
+   "2016-19 range": -0.196,
+   "2020 COVID": -0.799,
+   "2021-22 bear": 0.875,
+   "2023 degraded/chop": -0.583,
+   "2024-25 parabolic": 0.689
+  },
+  "M1_GBDT_v2": {
+   "2016-19 range": -0.72,
+   "2020 COVID": 1.471,
+   "2021-22 bear": 0.319,
+   "2023 degraded/chop": -1.001,
+   "2024-25 parabolic": 1.047
+  },
+  "M2_RFF_Ridge": {
+   "2016-19 range": -0.905,
+   "2020 COVID": -0.43,
+   "2021-22 bear": -0.42,
+   "2023 degraded/chop": -0.877,
+   "2024-25 parabolic": -0.632
+  },
+  "M6_AURUM_v2_Ensemble": {
+   "2016-19 range": -0.841,
+   "2020 COVID": 1.22,
+   "2021-22 bear": -0.015,
+   "2023 degraded/chop": -0.399,
+   "2024-25 parabolic": 0.422
+  },
+  "M7_Core_Satellite": {
+   "2016-19 range": 1.441,
+   "2020 COVID": 1.942,
+   "2021-22 bear": 1.293,
+   "2023 degraded/chop": 1.121,
+   "2024-25 parabolic": 3.388
+  },
+  "M7_Active_Grand_Hybrid": {
+   "2016-19 range": 1.228,
+   "2020 COVID": 1.406,
+   "2021-22 bear": 2.398,
+   "2023 degraded/chop": 0.71,
+   "2024-25 parabolic": 2.523
+  },
+  "BuyHold_Gold": {
+   "2016-19 range": 0.811,
+   "2020 COVID": 1.855,
+   "2021-22 bear": -0.12,
+   "2023 degraded/chop": 0.951,
+   "2024-25 parabolic": 2.716
+  },
+  "Carver_EWMAC": {
+   "2016-19 range": 0.308,
+   "2020 COVID": 1.797,
+   "2021-22 bear": -0.139,
+   "2023 degraded/chop": 0.789,
+   "2024-25 parabolic": 1.404
+  }
+ },
+ "dsr_panel_project_wide_N": {
+  "M0_Champ_v13_E2": {
+   "N=12": 0.0332,
+   "N=50": 0.0023,
+   "N=100": 0.0004,
+   "N=170": 0.0001,
+   "N=200": 0.0001,
+   "N=500": 0.0
+  },
+  "M0_Champ_v13_E2_carry": {
+   "N=12": 0.0136,
+   "N=50": 0.0007,
+   "N=100": 0.0001,
+   "N=170": 0.0,
+   "N=200": 0.0,
+   "N=500": 0.0
+  }
+ },
+ "carry_model": {
+  "base": {
+   "long_annual": -0.05,
+   "short_annual": 0.025,
+   "hour_utc": 22,
+   "wed_x3": true,
+   "day_basis": 365
+  },
+  "punitive": {
+   "long_annual": -0.055,
+   "short_annual": 0.015,
+   "hour_utc": 22,
+   "wed_x3": true,
+   "day_basis": 365
+  },
+  "applied": "rate*|z|/365 at each 22:00 UTC bar, Wed x3 (longs pay, shorts receive; audit s6.4)"
+ },
+ "notes": "champion faithful frame = E2; alpha in %/yr of the vol-targeted continuous frame; regimes are annualized Sharpe of daily net within each window"
+}

@@ -1,0 +1,283 @@
+{
+ "M1_GBDT_v2": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.728,
+    1.533
+   ],
+   "sharpe_p05": -0.562,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0149,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0105
+ },
+ "M2_RFF_Ridge": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -1.91,
+    0.446
+   ],
+   "sharpe_p05": -1.721,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0
+ },
+ "RLSBank": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.453,
+    1.639
+   ],
+   "sharpe_p05": -0.288,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0312,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0226
+ },
+ "M3c_DAE": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.058,
+    2.109
+   ],
+   "sharpe_p05": 0.109,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.1195,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0941
+ },
+ "Carver_EWMAC": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    0.097,
+    2.353
+   ],
+   "sharpe_p05": 0.254,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.2182,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.1796
+ },
+ "Channel_A": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -1.341,
+    0.915
+   ],
+   "sharpe_p05": -1.159,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0006,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0004
+ },
+ "Channel_B": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    0.0,
+    0.0
+   ],
+   "sharpe_p05": 0.0,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0034,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0023
+ },
+ "BuyHold_Gold": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.012,
+    3.295
+   ],
+   "sharpe_p05": 1.195,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.7931,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.7515
+ },
+ "M0_Champ_v13": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.448,
+    3.777
+   ],
+   "sharpe_p05": 1.635,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.9418,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.9242
+ },
+ "M0_Champ_v13_cap1": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.363,
+    3.726
+   ],
+   "sharpe_p05": 1.546,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.9281,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.9073
+ },
+ "M0_Champ_v13_E1": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.48,
+    1.83
+   ],
+   "sharpe_p05": -0.3,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0427,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0316
+ },
+ "M0_Champ_v13_E2": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.658,
+    1.687
+   ],
+   "sharpe_p05": -0.459,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0228,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0163
+ },
+ "M6_AURUM_v2_Ensemble": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.978,
+    1.318
+   ],
+   "sharpe_p05": -0.795,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0051,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0034
+ },
+ "M6b_Ensemble_EQW": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    -0.978,
+    1.318
+   ],
+   "sharpe_p05": -0.795,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.0051,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.0034
+ },
+ "M7_Active_Grand_Hybrid": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    0.789,
+    3.114
+   ],
+   "sharpe_p05": 0.983,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.6806,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.6302
+ },
+ "M7_Core_Satellite": {
+  "oos_bootstrap": {
+   "sharpe_ci": [
+    1.486,
+    3.765
+   ],
+   "sharpe_p05": 1.688,
+   "n_boot": 5000,
+   "block": 24
+  },
+  "oos_dsr": 0.947,
+  "dsr_passes_95": false,
+  "oos_dsr_conservative": 0.9304
+ },
+ "_meta": {
+  "N_trials_ledger": 52,
+  "ledger_rows": 78,
+  "pbo_cscv": 0.0834,
+  "code_rev": "k6-v2.0.2",
+  "dsr_family": "K6 v2.0.2 tournament selection panel, effective-independent families (Bailey-LdP: correlated siblings are not independent trials; frozen FIT Sharpes under causal accounting). Primary = signal families + ONE blend slot (fixed a-priori portfolio constructions over counted members are correlated re-weightings, counted once at their best-FIT variant -- the v2.0.1 pre-registered convention, applied consistently)",
+  "dsr_family_N": 13,
+  "dsr_family_sharpes": [
+   -2.1423,
+   -0.8394,
+   -0.5086,
+   -0.2957,
+   0.0,
+   0.2011,
+   0.2519,
+   0.3614,
+   0.4065,
+   0.6158,
+   0.6992,
+   2.0126,
+   1.4492
+  ],
+  "dsr_family_conservative_N": 15,
+  "dsr_family_conservative_sharpes": [
+   -2.1423,
+   -0.8394,
+   -0.645,
+   -0.5086,
+   -0.2957,
+   0.0,
+   0.2011,
+   0.2519,
+   0.3614,
+   0.4065,
+   0.6158,
+   0.6992,
+   1.4109,
+   1.4492,
+   2.0126
+  ],
+  "dsr_conservative_note": "conservative accounting: every distinct (deduped) blend stream counts as a trial; flagship DSR under this vintage is exported per strategy as oos_dsr_conservative",
+  "trial_sharpe_units": "per-bar (annualized / sqrt(5786))",
+  "dsr_sensitivity_m7": {
+   "primary": 0.947,
+   "conservative": 0.9304,
+   "with_m7_grid": 0.7603,
+   "with_k2_prefix": 0.7603,
+   "all_ledger_mixed_units": 0.0,
+   "family_N": {
+    "primary": 13,
+    "conservative": 15,
+    "with_grid": 38,
+    "with_k2": 38,
+    "all": 48
+   }
+  }
+ }
+}
