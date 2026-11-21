@@ -1,0 +1,51 @@
+{
+ "spec": "v2.1.0",
+ "method": "audit s5.3 no-retraining: rff_z_v202(pred_gbdt) on the shipped K2 parquet; producer-side fix patched in k2_cpu_models.py (Kaggle re-run Step 6)",
+ "before": {
+  "strict_g48": {
+   "fit": {
+    "n": 41513,
+    "std": 0.5208,
+    "frac_gt_0p99": 0.05271,
+    "frac_gt_0p90": 0.10503,
+    "abs_mean": 0.0325
+   },
+   "oos": {
+    "n": 16991,
+    "std": 0.4645,
+    "frac_gt_0p99": 0.30287,
+    "frac_gt_0p90": 0.40645,
+    "abs_mean": 0.6038
+   }
+  },
+  "oos_2023_mean_z": 0.9541,
+  "oos_sharpe_foldlocal": 1.2534
+ },
+ "after": {
+  "strict_g48": {
+   "fit": {
+    "n": 41079,
+    "std": 0.395,
+    "frac_gt_0p99": 0.00129,
+    "frac_gt_0p90": 0.01256,
+    "abs_mean": 0.0021
+   },
+   "oos": {
+    "n": 16805,
+    "std": 0.3902,
+    "frac_gt_0p99": 0.00196,
+    "frac_gt_0p90": 0.01214,
+    "abs_mean": 0.0058
+   }
+  },
+  "oos_2023_mean_z": 0.0006,
+  "oos_sharpe_fixed": 0.1611,
+  "oos_sharpe_fixed_by_year": {
+   "2023": -1.58,
+   "2024": 0.002,
+   "2025": 1.692
+  },
+  "mean_oos_exposure": -0.0058,
+  "strict_g48_pass": true
+ }
+}

@@ -227,22 +227,30 @@ def main():
                                           "best_iter": booster.best_iteration},
                            stage="fit", kernel="K2")
             p = np.mean(preds, axis=0)
-            # fold-local scale normalization: z = tanh(pred / std(in-sample pred))
-            # (predictions of vol-normalized 24h returns are tiny; without
-            #  normalization the position collapses to zero and costs dominate)
-            es_pred = booster.predict(Xes, num_iteration=booster.best_iteration)
-            scale = float(np.std(es_pred)) + 1e-9
-            z_gbdt.iloc[test_pos] = np.tanh(p / scale)
             pred_gbdt.iloc[test_pos] = p
             fold_log.append({"fold": yy, "best_iter": booster.best_iteration,
                              "pred_std": float(np.std(p))})
             log(f"  fold {yy}: best_iter={booster.best_iteration} "
                 f"pred_std={np.std(p):.4f}")
+        # v2.1 (U2 / Flaw #9): the fold-local transform tanh(pred/std(es_pred))
+        # is REMOVED. It collapsed DIRECTIONALLY in OOS 2023 (mean z +0.954,
+        # 100% of bars |z|>0.9 — a constant long-gold position, the Flaw-#8
+        # disease through a different producer path) and inflated M1_GBDT_v2's
+        # OOS Sharpe to +1.253. The program's own Flaw-#8 fix — causal trailing
+        # standardization, re-anchored per fold year — is applied to pred_gbdt.
+        # Audit-verified consequence (no retraining): OOS Sharpe collapses to
+        # +0.161 (2023: -1.58, 2024: +0.00, 2025: +1.69), mean OOS exposure
+        # +0.604 -> -0.006. The model is QUARANTINED (U3 block below).
+        z_gbdt = rff_z_v202(pred_gbdt)
         pre_2016 = int((feats.index < pd.Timestamp("2016-01-01", tz="UTC")).sum())
         n_missing = int(z_gbdt.isna().sum())
-        ok21 = gate("G2.1_folds", len(fold_log) == 10 and n_missing == pre_2016,
+        n_folds = len(fold_log)
+        ok21 = gate("G2.1_folds",
+                    n_folds == 10 and n_missing == pre_2016 + (RFF_Z_MINP - 1) * n_folds,
                     f"10/10 folds predicted; NaN z rows={n_missing} "
-                    f"(= pre-2016 warmup {pre_2016}: 2010-2015 excluded by design)")
+                    f"(= pre-2016 warmup {pre_2016} + {RFF_Z_MINP - 1}-bar "
+                    f"trailing-standardization warmup x {n_folds} folds; "
+                    f"2010-2015 excluded by design)")
 
     # ---------------- 3) M2_RFF_Ridge walk-forward ---------------------------
     # v2.0.2: the model fit itself is UNCHANGED (same seeds, same ridge
@@ -336,6 +344,67 @@ def main():
                      + json.dumps(audit48)
                      + " -- negative control (fold-mean-retained IQR variant, "
                        "expected saturated): " + json.dumps(neg))
+
+        # ---- v2.1 strict G4.8 on ALL continuous z producers (Flaw #9) --------
+        # The v2.0.2 gate above was applied only to z_rff; the Red-Team audit
+        # (s5.3) showed it is structurally blind to directional near-
+        # saturation of continuous tanh outputs (z_gbdt OOS 2023: mean +0.954,
+        # 100% of bars |z|>0.9).  v2.1 enforces, per window (FIT + OOS), on
+        # EVERY continuous producer:
+        #   std(z) > 0.05, frac(|z|>0.99) < 0.05, frac(|z|>0.90) < 0.25,
+        #   |mean(z)| < 0.35.
+        def _strict_z_audit(z):
+            aud, okz = {}, True
+            for wname, mask in (("fit", fit_mask), ("oos", oos_mask)):
+                sel = z.dropna().index
+                sel = sel[mask.reindex(sel).fillna(False)]
+                if len(sel) < 500:
+                    continue
+                v = z[sel].values
+                a = {"n": int(len(v)), "std": round(float(np.std(v)), 5),
+                     "frac_gt_0p99": round(float((np.abs(v) > 0.99).mean()), 6),
+                     "frac_gt_0p90": round(float((np.abs(v) > 0.90).mean()), 6),
+                     "abs_mean": round(float(np.abs(np.mean(v))), 5)}
+                aud[wname] = a
+                okz = okz and a["std"] > 0.05 and a["frac_gt_0p99"] < 0.05 \
+                    and a["frac_gt_0p90"] < 0.25 and a["abs_mean"] < 0.35
+            return aud, okz
+        aud_rff_s, okz_rff = _strict_z_audit(z_rff)
+        aud_gbm_s, okz_gbm = _strict_z_audit(z_gbdt)
+        ledger.add("G4.8_v21", {"z_rff": aud_rff_s, "z_gbdt": aud_gbm_s},
+                   stage="zquality", kernel="K2",
+                   notes="v2.1 strict all-producer z-quality (Flaw #9 fix)")
+        gate("G4.8_v21_strict_all_producers", okz_rff and okz_gbm,
+             f"strict z-quality on ALL continuous producers "
+             f"(std>0.05, P(|z|>0.99)<5%, P(|z|>0.90)<25%, |mean|<0.35): "
+             f"z_rff={json.dumps(aud_rff_s)} z_gbdt={json.dumps(aud_gbm_s)}")
+
+        # ---- v2.1 U3: formal quarantine of the v2 active regression stack ----
+        # Audit verdict (s5.3/s5.4/s6.1, Stage-7 U2/U3): with the honest
+        # transform M1_GBDT_v2's OOS Sharpe is +0.161; alpha <= 0 for EVERY
+        # v2-native model (NW t-stats: M1 -0.14, M2 -0.63, M3c -0.08,
+        # M3m -1.58, M4 -1.19, M5 -1.04); the M7 hybrids add nothing beyond
+        # their champion legs.  U3 top-60 feature-pruning evidence (FIT-IC
+        # stable, non-collinear): -0.215 OOS with the fixed transform —
+        # pruning does not wake the model; the SNR is simply absent.
+        # DECISION: the production registry is the v1.3/v1.4 Barrier Engine
+        # (see v1_3/config/frozen_policy.json, AURUM_r1_* strategies) alone;
+        # the v2 active stack is QUARANTINED until it demonstrates positive
+        # alpha net of the s5.3 fix in a NEW OOS period (audit s8.4).
+        ledger.add("QUARANTINE_V21", {
+            "quarantined": ["M1_GBDT_v2", "M2_RFF_Ridge", "M3c_DAE", "M3m_DAE",
+                            "M4_DMN", "M5_ContinuumNet", "M6_Ensemble",
+                            "M7_Active_Grand_Hybrid_active_arm"],
+            "reason": "zero OOS alpha (audit s5.3/s5.4/s6.1); M1 z-saturation "
+                      "artifact collapses 1.253 -> 0.161 under the honest transform",
+            "u3_top60_pruning_evidence": {
+                "oos_sharpe_top60_fixed_transform": -0.215,
+                "verdict": "REJECT pruning as a rescue — the SNR is absent",
+                "source": "Red-Team audit s8 (U3), verified 2026-11-11"},
+            "release_condition": "positive alpha net of the s5.3 fix in a NEW OOS period"},
+            None, stage="quarantine", kernel="K2",
+            notes="v2.1 production registry: AURUM v1.3 Barrier Engine "
+                  "(frozen policy) + AURUM_r1_Fast_Flagship / AURUM_r1_Clean_EV")
 
     # ---------------- 4) RLSBank standalone floor ----------------------------
     with stage("RLSBank standalone floor"):
