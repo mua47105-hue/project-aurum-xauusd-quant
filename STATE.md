@@ -9,10 +9,26 @@
 > ```
 
 ## Current position
-- **Branch:** `v2.1-remediation` (base `6ae2565` = shipped v2.0.2 archive)
-- **Step:** 1 COMPLETE (repro gaps #1–#3 + frozen policy) → next: STEP 2 (p4 v2.1 patch)
-- **Last verified commit:** see `git log -1` (this file is committed together with each step)
+- **Branch:** `v2.1-remediation` (pushed through `3bb400e` / later — see `git log -1`)
+- **Step:** 2 COMPLETE+PUSHED (`18317b1`) · 3 IN FLIGHT (k2 patch + U2 verified + k6 patch COMMITTED/PUSHED `3bb400e`; **k6 v2.1 run launched 2026-11-21 16:28 UTC, in background at turn cutoff**) → resume by re-running k6 (command below), then harvest + commit
+- **Steps 4–7 NOT STARTED** (live-daily fast-r1, red-team CI suite, Kaggle kernel pushes, charts/report/release)
 - **Date:** 2026-11-21
+
+## 10-second resume (Step 3 completion)
+```bash
+cd /home/z/my-project/github_repo && git pull
+bash scripts/install_secret_hook.sh   # hook lives in .git/hooks (not cloned)
+mkdir -p artifacts/v2_1/k6_out
+AURUM_V2F=data AURUM_DS=data/phase1 AURUM_K2DIR=artifacts/v2_1/k2_fixed \
+AURUM_K3DIR=/home/z/my-project/kaggle_work/v21_restore/aurum-v2-forecasts-neural \
+AURUM_V13DIR=artifacts/v2_1/p4_out AURUM_K6OUT=artifacts/v2_1/k6_out \
+python3 aurum_v2/kernels/k6_backtest.py
+# then: verify G5.10/G5.12/G6_ALL in artifacts/v2_1/k6_out/gates.json +
+# attribution_v21.json (bridge E0/E1/E2, CAPM, L/S, regimes, DSR panel);
+# commit + push as step3 part 2. If data/ is missing (sandbox recycled):
+# python3 scripts/download_heavy_assets.py prob_tables phase1_data core_fp16
+# && tar xzf data/phase1/*.tar.gz -C data/phase1 && cp <p3 gates.json p3_cell_meta.json>
+# (see step log below for the Kaggle pulls if needed)
 
 ## Verified numbers vs. regression targets (updated per step)
 | Item | Target (audit / honest work report) | Status |
@@ -31,15 +47,19 @@
 | K2 CPU forecasts | Kaggle `tskdev/aurum-v2-cpu-preds` | ✅ downloaded |
 | K3 neural forecasts | Kaggle `tskdev/aurum-v2-forecasts-neural` (== local survivor, hash `5741a86a…`) | ✅ downloaded |
 | v1.3 artifacts (trades_all 4.5 MB) | Kaggle `tskdev/aurum-v13-artifacts` | ✅ downloaded |
-| p4 flagship cap=3 (Step 2) | n=3,341, E[R]=+0.1478, SR **2.4443**, CAGR 54.56%, MaxDD 13.06% (bit-exact) | ⏳ pending |
-| Un-throttled MaxDD | 23.92% | ⏳ |
-| Pilot 0.5% un-throttled MaxDD | ~12.54% | ⏳ |
-| Base-carry Sharpe | ~2.09 | ⏳ |
-| r1 Fast Flagship cap=3 | +0.1466R, SR ~2.478 | ⏳ |
-| r1 Clean EV cap=3 | ~+0.232R, SR ~2.611 | ⏳ |
-| k6 bridge E0/E1/E2 | 2.6112 / ≈2.36–2.38 / partial-TP-halved (G5.10 honest spread) | ⏳ |
-| U7 attribution (G5.12) | NW HAC(5) CAPM + L/S + 5-regime + DSR N=12..500, all finite | ⏳ |
-| Red-team CI 7/7 | all executed with JSON verdicts | ⏳ |
+| p4 flagship cap=3 (Step 2) | n=3,341, E[R]=+0.1478, SR **2.4443**, CAGR 54.56%, MaxDD 13.06% (bit-exact) | ✅ EXACT (frozen policy; baseline 308,934 rows bit-exact vs shipped archive) |
+| Un-throttled MaxDD | 23.92% | ✅ EXACT |
+| Pilot 0.5% un-throttled MaxDD | ~12.54% | ✅ EXACT |
+| Base-carry Sharpe | ~2.09 | ✅ 2.1555 (drag −0.29; audit est. −0.3) |
+| r1 Fast Flagship cap=3 | +0.1466R, SR ~2.478 | ✅ EXACT (total R 499.7 == audit) |
+| r1 Clean EV cap=3 | ~+0.232R, SR ~2.611 | ✅ EXACT (0.2321/2.6114/718.6R) |
+| M1 friction matrix (U6) | audit s4.1/s6.5 family | ✅ pure +0.1576, delay +0.0095, spreads 0.1149/0.0978, slip −0.0292 (convention spread documented) |
+| U2 z_gbdt collapse | 1.253 → 0.161 | ✅ EXACT (0.1611; by-year −1.58/0.002/1.692 == audit) |
+| G1.7 coverage 2023 | 5,153 bars, −13.1% | ✅ EXACT, flagged DEGRADED |
+| p4 gates | 13/13 | ✅ GREEN |
+| k6 bridge E0/E1/E2 | 2.6112 / ≈2.36–2.38 / partial-TP-halved (G5.10 honest spread) | ⏳ k6 in flight at cutoff |
+| U7 attribution (G5.12) | NW HAC(5) CAPM + L/S + 5-regime + DSR N=12..500, all finite | ⏳ k6 in flight at cutoff |
+| Red-team CI 7/7 | all executed with JSON verdicts | ⏳ Step 5 not started |
 
 ## Open items / blockers
 - None for Steps 1–7 (GitHub PAT supplied 2026-11-21; stored outside repo at `/tmp/.creds/`; pushes verified).
@@ -52,4 +72,6 @@
 
 ## Step log
 - **Step 0 (2026-11-21):** clone @6ae2565 ✅ · branch `v2.1-remediation` pushed ✅ · pre-commit secret-blocker installed + self-tested (KGAT dummy → FATAL abort) ✅ · `.gitignore` extended for >25 MB v2.1 outputs ✅ · pinned env installed & recorded ✅ · all heavy assets restored & SHA-256 verified ✅ (features/prob_tables/phase1/core_fp16 + Kaggle K2/K3/v13). Push verified `29ece2e`.
+- **Step 2 (2026-11-21, PUSHED `18317b1`):** p4 v2.1 patch (frozen-policy branch + G5.11, r1 strategies, i_part, carry/tiers, M1 walker + friction matrix, G1.7) · 13/13 gates GREEN · flagship BIT-EXACT 2.4443 under frozen policy · all regression targets hit (see artifacts/v2_1/step2_p4_verification.json) · defects D2/D3 self-caught + fixed.
+- **Step 3 (2026-11-21, part 1 PUSHED `3bb400e`):** k2 U2/U3 patch + strict G4.8 all producers + quarantine; U2 collapse verified EXACT vs audit (1.2534→0.1611, by-year exact) via the no-retraining path (3GB sandbox cannot run the RFF stage — producer-side re-run on Kaggle in Step 6); k6 U1 bridge + G5.10 + U7 attribution patches applied; **k6 run launched 16:28 UTC, in flight at turn cutoff** — resume via the command above.
 - **Step 1 (2026-11-21):** repro gap #1 fixed (both test files resolve from repo root; `env -u PYTHONPATH`: v13 16/16 PASS, v2 all self-tests PASS) ✅ · repro gap #3 fixed (k2 standalone: `import sys as _sys`, sibling-path fallback, explicit imports, explicit FIT/OOS/ALL_FOLD years; pyflakes 0 undefined; smoke run reaches walk-forward) ✅ · Flaw #11 freeze `v1_3/config/frozen_policy.json` ✅ · downloader/README public-token docs ✅ · evidence `artifacts/v2_1/step1_tests.json` ✅.
