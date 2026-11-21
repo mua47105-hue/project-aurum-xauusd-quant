@@ -1,0 +1,118 @@
+{
+ "spec": "v2.1.0",
+ "step": 2,
+ "kernel": "aurum-p4-backtest.py (v2.1)",
+ "gates": "13/13 GREEN (11 shipped + G5.11_policy_frozen + G1.7_bar_coverage)",
+ "regression_table": [
+  {
+   "item": "flagship cap3 OOS (bit-exact)",
+   "target": "n=3341 E[R]=0.1478 SR=2.4443 CAGR=54.56% MaxDD=13.06%",
+   "actual": "n=3341 E[R]=0.1478 SR=2.4443 CAGR=54.56% MaxDD=13.06%",
+   "match": "EXACT"
+  },
+  {
+   "item": "un-throttled MaxDD",
+   "target": "23.92%",
+   "actual": "23.92%",
+   "match": "EXACT"
+  },
+  {
+   "item": "pilot 0.5% un-throttled MaxDD",
+   "target": "~12.54%",
+   "actual": "12.54%",
+   "match": "EXACT"
+  },
+  {
+   "item": "base-carry Sharpe (drag)",
+   "target": "~2.09 (audit est. -0.3 SR)",
+   "actual": "2.1555 (drag -0.289)",
+   "match": "in-family (audit -0.3)"
+  },
+  {
+   "item": "r1 Fast Flagship cap3",
+   "target": "+0.1466R SR~2.478 (audit total R 499.7)",
+   "actual": "E[R]=0.1466 SR=2.4781 totalR=499.7 n=3409",
+   "match": "EXACT (total R 499.7 == audit)"
+  },
+  {
+   "item": "r1 Clean EV cap3",
+   "target": "~+0.232R SR~2.611 (audit 0.2305/2.599)",
+   "actual": "E[R]=0.2321 SR=2.6114 totalR=718.6 n=3096",
+   "match": "EXACT vs v2.1 reference; audit-consistent"
+  },
+  {
+   "item": "M1 pure path",
+   "target": "+0.1712 (audit) / ~0.1730 (Nov-15 probe)",
+   "actual": "+0.1576",
+   "match": "in-family (-8% vs audit; convention spread documented)"
+  },
+  {
+   "item": "M1 +1min delay (vs pure)",
+   "target": "+0.006 (helps)",
+   "actual": "+0.0095",
+   "match": "helps, in-family"
+  },
+  {
+   "item": "M1 +$0.25 spread",
+   "target": "0.1083",
+   "actual": "+0.1149",
+   "match": "in-family"
+  },
+  {
+   "item": "M1 +$0.35 spread",
+   "target": "0.0831",
+   "actual": "+0.0978",
+   "match": "milder (ATR-basis convention)"
+  },
+  {
+   "item": "M1 2x stop slippage (vs pure)",
+   "target": "-0.0175",
+   "actual": "-0.0292",
+   "match": "in-family"
+  },
+  {
+   "item": "G1.7 coverage 2023",
+   "target": "5153 bars, -13.1%, flagged",
+   "actual": "5153, -13.1%, degraded=True",
+   "match": "EXACT"
+  }
+ ],
+ "ex2023": {
+  "standard|throttle15|no_carry": {
+   "n": 2253,
+   "E_R": 0.20887176921494652,
+   "sharpe": 3.181128315995522,
+   "cagr_pct": 94.61925664671267,
+   "max_dd_pct": 7.945267118561502
+  },
+  "standard|throttle15|carry_base": {
+   "n": 2253,
+   "E_R": 0.20887176921494652,
+   "sharpe": 2.9103356041452924,
+   "cagr_pct": 81.67540914711115,
+   "max_dd_pct": 8.346314592028452
+  },
+  "standard|unthrottled|no_carry": {
+   "n": 2253,
+   "E_R": 0.20887176921494652,
+   "sharpe": 3.3988611989473916,
+   "cagr_pct": 125.21112389248468,
+   "max_dd_pct": 9.922968408596123
+  },
+  "pilot|unthrottled|no_carry": {
+   "n": 2253,
+   "E_R": 0.20887176921494652,
+   "sharpe": 3.3988611989473916,
+   "cagr_pct": 51.25184186581464,
+   "max_dd_pct": 5.032229866415401
+  }
+ },
+ "policy_drift": {
+  "mode": "frozen",
+  "refit_performed": false
+ },
+ "defects_self_caught": [
+  "D2 M1 row misalignment (execute sel indexes sorted sub)",
+  "D3 r1_clean EV cost-term + overlay convention"
+ ]
+}

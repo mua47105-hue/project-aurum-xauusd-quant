@@ -47,6 +47,8 @@
 
 ## Defect log (self-caught, Appendix-C culture)
 - **D1 (Step 0, fixed):** hook self-test piped `git commit` through `tail`, masking the blocked-commit exit code; the `&&` chain then ran `git reset --soft HEAD~1` from `6ae2565`, silently regressing the branch to `07f1fd8`. Caught by push non-fast-forward + `git ls-remote` cross-check; fixed by `git rebase 6ae2565`. **Rule: never gate an `&&` chain on a piped `git commit`; check exit status directly.**
+- **D2 (Step 2, fixed):** the M1 friction matrix passed the UNSORTED resolve frame with `execute()`'s row indices (which index its SORTED sub) — every M1 row paired with the wrong trade (E[R] 0.121 vs audit 0.171; per-trade trace arithmetic could not close). Caught by tracing one trade end-to-end against raw M1 prices; fixed by passing `exo3["sub"]`. **Rule: `execute()`'s `sel` indexes into `ex["sub"]`, never into the resolve frame.**
+- **D3 (Step 2, fixed pre-emptively):** r1_clean initially (a) subtracted cost inside the EV argmax — the repo's v1.2 convention (`aurum48_candidates`) has NO cost term — and (b) used the flagship's path overlay instead of the v1.2 clean-label resolution. Both fixed; verified E[R]=0.2321, SR=2.6114, total R=718.6, n=3,096 (audit: 0.2305/2.599/712.8). **Rule: derive strategy conventions from the repo's own reference implementations, not from memory.**
 
 ## Step log
 - **Step 0 (2026-11-21):** clone @6ae2565 ✅ · branch `v2.1-remediation` pushed ✅ · pre-commit secret-blocker installed + self-tested (KGAT dummy → FATAL abort) ✅ · `.gitignore` extended for >25 MB v2.1 outputs ✅ · pinned env installed & recorded ✅ · all heavy assets restored & SHA-256 verified ✅ (features/prob_tables/phase1/core_fp16 + Kaggle K2/K3/v13). Push verified `29ece2e`.

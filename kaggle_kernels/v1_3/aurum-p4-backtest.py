@@ -130,6 +130,48 @@ DAY_BLOCK = 10                     # daily-bootstrap block length (days)
 POSTMORTEM = {"gbdt": 0.0599, "knn": 0.0078}
 POSTMORTEM_TOL = 0.06
 
+# ==================== v2.1 config (Spec v2.1 — Red-Team Remediation) ====================
+# U4: first-class r=1 strategies (audit s4.2: r=1 alone matches/beats the pooled
+#     flagship OOS with 3x cheaper inference; U4 adopted).
+# U5: carry-aware accounting + risk tiers (audit s6.4: champion costs ~0.3 SR
+#     in unmodeled overnight swap; pilot tier 0.5% recommended, s8.3).
+# U6: M1 path resolution inside the shipped backtest (audit s4.1: the H1 walk
+#     UNDERSTATES expectancy by ~15%; strictly-more-accurate re-resolution).
+# G1.7: OOS bar-coverage gate (audit s2.6/Flaw #12: 2023 is 12.6-13.1% thin).
+# G5.11: policy frozen (Flaw #11: FIT-grid margins are razor-thin; the archive
+#     must pin and load, not re-derive).
+V21_FROZEN_POLICY = os.environ.get(
+    "AURUM_FROZEN_POLICY",
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__)))), "v1_3", "config", "frozen_policy.json"))
+
+CARRY_BASE = {"long_annual": -0.05, "short_annual": 0.025, "hour_utc": 22,
+              "wed_x3": True, "day_basis": 365}          # audit s6.4 base
+CARRY_PUNITIVE = {"long_annual": -0.055, "short_annual": 0.015, "hour_utc": 22,
+                  "wed_x3": True, "day_basis": 365}       # audit s6.4 punitive
+RISK_TIERS = {"standard": 0.01, "institutional_pilot": 0.005}   # U5 pilot = 0.167%/slot @cap3
+V21_FRICTION_SPREADS_USD = [0.25, 0.35]   # round-turn $/oz stress (audit s6.5)
+M1_SLIP_ATR = 0.25                        # adverse stop slippage in top-decile RV bars
+COVERAGE_FLAG_RATIO = 0.90                # G1.7: year flagged if bars < 90% of 2016-22 mean
+
+
+def load_frozen_policy(path=V21_FROZEN_POLICY):
+    """Flaw #11 fix: load the frozen flagship policy instead of re-deriving it
+    from near-tied FIT grids (F6 margin was 1.27%). Returns (fp, drift) where
+    drift is filled later by refit telemetry."""
+    with open(path) as f:
+        fp = json.load(f)
+    need = ("flagship_policy", "engine_constants", "v21_production_registry")
+    ok = all(k in fp for k in need)
+    p = fp["flagship_policy"] if ok else {}
+    ok = ok and p.get("w_pooled_r123") == [0.6, 0.2, 0.2] \
+        and p.get("kappa") == 0.0 and p.get("lambda_var") == 0.5 \
+        and p.get("ev_min") == 0.0 and p.get("overlay_rule") == "path" \
+        and p.get("stack_u") == 0.1
+    if not ok:
+        raise RuntimeError(f"frozen policy at {path} failed integrity check")
+    return fp
+
 # ==================== mounts (kaggle + local dev) ====================
 _LOCAL = bool(os.environ.get("AURUM_LOCAL"))
 _LOCAL_ROOT = os.environ.get("AURUM_LOCAL_ROOT",
@@ -507,7 +549,7 @@ def _walk_core(px_i, cell_m, cell_t, cell_h, is_long,
     e = o[px_i + 1]
     a = atr[px_i]
     if a <= 0.0 or not (a == a) or not (e == e):
-        return (np.nan, -1, 0)
+        return (np.nan, -1, 0, -1)
     ma = cell_m * a
     ta = cell_t * a
     if is_long:
@@ -532,6 +574,7 @@ def _walk_core(px_i, cell_m, cell_t, cell_h, is_long,
     half_banked = 0.0            # R banked by the partial fill (0 if none)
     partial_done = False
     ov_code = 0                   # 0 clean, 1 partial, 2 tighten
+    i_part = -1                   # v2.1: H1 bar index of the partial fill (-1 none)
     R = np.nan
     exit_bar = end
     for j in range(px_i + 1, end):
@@ -556,6 +599,7 @@ def _walk_core(px_i, cell_m, cell_t, cell_h, is_long,
                     partial_done = True
                     half_banked = 0.5 * q50 / cell_m
                     ov_code = 1
+                    i_part = j
                 # original TP (also covers part_on with q50>=t case)
                 if hj >= tp_lvl:
                     if partial_done:
@@ -589,6 +633,7 @@ def _walk_core(px_i, cell_m, cell_t, cell_h, is_long,
                     partial_done = True
                     half_banked = 0.5 * q50 / cell_m
                     ov_code = 1
+                    i_part = j
                 if lj <= tp_lvl:
                     if partial_done:
                         R = half_banked + 0.5 * (cell_t / cell_m)
@@ -612,7 +657,7 @@ def _walk_core(px_i, cell_m, cell_t, cell_h, is_long,
         else:
             R = (o[px_i + 1] - c[jend]) / (cell_m * a)
         exit_bar = jend
-    return (R, exit_bar, ov_code)
+    return (R, exit_bar, ov_code, i_part)
 
 
 @njit(cache=True)
@@ -623,13 +668,14 @@ def walk_batch(px_i_arr, cell_m_arr, cell_t_arr, cell_h_arr, is_long_arr,
     R = np.full(n, np.nan, np.float64)
     eb = np.full(n, -1, np.int64)
     ov = np.zeros(n, np.int8)
+    ip = np.full(n, -1, np.int64)          # v2.1: partial-fill bar (−1 = none)
     for i in range(n):
-        r, e_, v_ = _walk_core(px_i_arr[i], cell_m_arr[i], cell_t_arr[i],
-                               cell_h_arr[i], is_long_arr[i],
-                               use_ov_arr[i], q25_arr[i], q50_arr[i],
-                               o, hi, lo, c, atr, n_bars)
-        R[i] = r; eb[i] = e_; ov[i] = v_
-    return R, eb, ov
+        r, e_, v_, p_ = _walk_core(px_i_arr[i], cell_m_arr[i], cell_t_arr[i],
+                                   cell_h_arr[i], is_long_arr[i],
+                                   use_ov_arr[i], q25_arr[i], q50_arr[i],
+                                   o, hi, lo, c, atr, n_bars)
+        R[i] = r; eb[i] = e_; ov[i] = v_; ip[i] = p_
+    return R, eb, ov, ip
 
 
 @njit(cache=True)
@@ -744,6 +790,251 @@ def mtm_batch(px_i_arr, cell_m_arr, cell_t_arr, cell_h_arr, is_long_arr,
     return V, KL
 
 
+# ==================== v2.1: M1 path resolution (U6) ====================
+# Audit s4.1: re-resolving the flagship OOS trades on the raw 1-minute path
+# (same overlay semantics, stop-first tie at minute level, entry at the next
+# H1 bar's open = first M1 open, entry-minute INACTIVE) lifts E[R] by ~15.8%
+# (+0.1478 -> +0.1712): the H1 walk UNDERSTATES expectancy.  U6 adopts the M1
+# path as the strictly-more-accurate resolution; the H1 walk remains the
+# shipped accounting frame (bit-exact flagship) and the M1/friction matrix is
+# exported alongside as the survival panel.
+
+def load_m1(bundle):
+    """Load the 1-minute XAUUSD feed and index the first M1 bar of every hour
+    bucket. Returns None if the feed is absent (M1 stage is then skipped)."""
+    ds = bundle["DS"]
+    path = os.path.join(ds, "m1_xauusd.parquet")
+    if not os.path.isfile(path):
+        return None
+    m1 = pd.read_parquet(path)
+    m1 = m1[~m1.index.duplicated()].sort_index()
+    m1_ts = m1.index.asi8
+    hour_ids, first_idx = np.unique(m1_ts // 3_600_000_000_000, return_index=True)
+    return dict(o=m1["o"].values.astype(np.float64),
+                h=m1["h"].values.astype(np.float64),
+                l=m1["l"].values.astype(np.float64),
+                c=m1["c"].values.astype(np.float64),
+                ts=m1_ts, hour_ids=hour_ids, hour_first=first_idx,
+                n=len(m1_ts))
+
+
+@njit(cache=True)
+def m1_walk_core(start, cell_m, cell_t, is_long, q25, q50, a,
+                 use_ov, delay_fill, end_ns,
+                 m1_o, m1_h, m1_l, m1_c, m1_ts, n_m1):
+    """Resolve one trade on the raw M1 path.  `start` = first M1 bar of the
+    entry hour; entry = that minute's OPEN (delay_fill=1 -> its CLOSE); the
+    entry minute itself is INACTIVE (barriers checked from the next minute);
+    stop-first tie-break within a minute (adverse-first, H1-conservative);
+    barriers from the DECISION-bar ATR; `end_ns` = the window close in ns —
+    computed by the CALLER from the H1 BAR-COUNT window (px_ts[px_i+h] + 1h),
+    so weekend/holiday gaps are spanned exactly like the H1 walk (a clock-
+    time h*3600s window would incorrectly time weekend trades out at the
+    Friday close); timeout marks at the last in-window minute's close.
+    Returns (R, exit_minute, ov_code, i_part_minute, reason)
+    reason: 0=SL, 1=TP, 2=tight-stop, 3=timeout."""
+    e = m1_c[start] if delay_fill else m1_o[start]
+    if a <= 0.0 or not (a == a) or not (e == e):
+        return (np.nan, -1, 0, -1, 3)
+    ma = cell_m * a
+    ta = cell_t * a
+    if is_long:
+        stop_lvl = e - ma; tp_lvl = e + ta
+    else:
+        stop_lvl = e + ma; tp_lvl = e - ta
+    ov_ok = use_ov and (q25 == q25) and (q50 == q50)
+    tight_on = ov_ok and (q25 > 0.0) and (q25 < cell_m)
+    part_on = ov_ok and (q50 > 0.0) and (q50 < cell_t)
+    if is_long:
+        tight_lvl = e - q25 * a if tight_on else 0.0
+        part_lvl = e + q50 * a if part_on else 0.0
+    else:
+        tight_lvl = e + q25 * a if tight_on else 0.0
+        part_lvl = e - q50 * a if part_on else 0.0
+    end_ts = end_ns                                # caller: H1 bar-count window
+    half_banked = 0.0
+    partial_done = False
+    ov_code = 0
+    i_part = -1
+    R = np.nan
+    exit_m = -1
+    reason = 3
+    j = start + 1                                  # entry minute inactive
+    while j < n_m1 and m1_ts[j] < end_ts:
+        hj = m1_h[j]; lj = m1_l[j]
+        if is_long:
+            if not partial_done:
+                if tight_on and lj <= tight_lvl:
+                    R = -(q25 / cell_m); ov_code = 2; exit_m = j; reason = 2
+                    break
+                if lj <= stop_lvl:
+                    R = -1.0; exit_m = j; reason = 0
+                    break
+                if part_on and hj >= part_lvl:
+                    partial_done = True
+                    half_banked = 0.5 * q50 / cell_m
+                    ov_code = 1
+                    i_part = j
+                if hj >= tp_lvl:
+                    R = half_banked + 0.5 * (cell_t / cell_m) if partial_done \
+                        else cell_t / cell_m
+                    exit_m = j; reason = 1
+                    break
+            else:
+                if lj <= stop_lvl:
+                    R = half_banked - 0.5; exit_m = j; reason = 0
+                    break
+                if hj >= tp_lvl:
+                    R = half_banked + 0.5 * (cell_t / cell_m); exit_m = j; reason = 1
+                    break
+        else:
+            if not partial_done:
+                if tight_on and hj >= tight_lvl:
+                    R = -(q25 / cell_m); ov_code = 2; exit_m = j; reason = 2
+                    break
+                if hj >= stop_lvl:
+                    R = -1.0; exit_m = j; reason = 0
+                    break
+                if part_on and lj <= part_lvl:
+                    partial_done = True
+                    half_banked = 0.5 * q50 / cell_m
+                    ov_code = 1
+                    i_part = j
+                if lj <= tp_lvl:
+                    R = half_banked + 0.5 * (cell_t / cell_m) if partial_done \
+                        else cell_t / cell_m
+                    exit_m = j; reason = 1
+                    break
+            else:
+                if hj >= stop_lvl:
+                    R = half_banked - 0.5; exit_m = j; reason = 0
+                    break
+                if lj <= tp_lvl:
+                    R = half_banked + 0.5 * (cell_t / cell_m); exit_m = j; reason = 1
+                    break
+        j += 1
+    if not (R == R):                               # timeout (no touch)
+        jend = j - 1
+        if jend < start + 1:
+            jend = start + 1
+        if is_long:
+            R = (m1_c[jend] - e) / (cell_m * a)
+        else:
+            R = (e - m1_c[jend]) / (cell_m * a)
+        exit_m = jend
+        reason = 3
+    return (R, exit_m, ov_code, i_part, reason)
+
+
+@njit(cache=True)
+def m1_walk_batch(start_arr, cell_m_arr, cell_t_arr, is_long_arr,
+                  q25_arr, q50_arr, atr_arr, use_ov_arr, delay_fill,
+                  end_ns_arr,
+                  m1_o, m1_h, m1_l, m1_c, m1_ts, n_m1):
+    n = start_arr.shape[0]
+    R = np.full(n, np.nan, np.float64)
+    ex = np.full(n, -1, np.int64)
+    ov = np.zeros(n, np.int8)
+    ip = np.full(n, -1, np.int64)
+    rs = np.full(n, 3, np.int8)
+    for i in range(n):
+        r, e_, v_, p_, rr = m1_walk_core(
+            start_arr[i], cell_m_arr[i], cell_t_arr[i],
+            is_long_arr[i], q25_arr[i], q50_arr[i], atr_arr[i],
+            use_ov_arr[i], delay_fill, end_ns_arr[i],
+            m1_o, m1_h, m1_l, m1_c, m1_ts, n_m1)
+        R[i] = r; ex[i] = e_; ov[i] = v_; ip[i] = p_; rs[i] = rr
+    return R, ex, ov, ip, rs
+
+
+def m1_resolve_matrix(bundle, m1d, res, sel, gbdt_rv_top_decile):
+    """U6 friction survival matrix for the SELECTED trades of one strategy
+    frame (e.g. OOS flagship cap3).  Variants:
+      m1_pure    — M1 path, entry-minute inactive, fill at first-minute open
+      m1_delay1  — +1-minute execution delay (fill at first-minute CLOSE)
+      m1_spread25 / m1_spread35 — pure M1 + $0.25/$0.35 per oz round-turn
+      m1_slip2x  — pure M1 + 0.25-ATR adverse stop slippage when the decision
+                   bar is in the top decile of TR/ATR realized vol
+    Returns {variant: {n, E[R], total_R, vs_h1, vs_m1_pure}} plus per-trade
+    arrays for the bridge (R, i_part at minute level)."""
+    b = bundle
+    px_ts = b["px_ts"]
+    px_pos_of_lab = b["px_pos_of_lab"]
+    out = {}
+    n_tr = len(sel)
+    if n_tr == 0:
+        return out
+    px_i = px_pos_of_lab[res["pos"][sel]]
+    entry_hour = px_ts[px_i + 1] // 3_600_000_000_000
+    # map entry hour -> first M1 bar of that hour
+    hi = np.searchsorted(m1d["hour_ids"], entry_hour)
+    ok = (hi < len(m1d["hour_ids"])) & (m1d["hour_ids"][np.minimum(hi, len(m1d["hour_ids"]) - 1)] == entry_hour)
+    start_arr = np.full(n_tr, -1, np.int64)
+    start_arr[ok] = m1d["hour_first"][hi[ok]]
+    n_ok = int(ok.sum())
+    m_arr = res["m"][sel].astype(np.float64)
+    t_arr = res["t"][sel].astype(np.float64)
+    h_arr = res["h"][sel].astype(np.int64)
+    isL = res["is_long"][sel].astype(np.bool_)
+    q25 = res["q25"][sel].astype(np.float64)
+    q50 = res["q50"][sel].astype(np.float64)
+    atr_arr = b["atr"][px_i].astype(np.float64)
+    use_ov = res["use_ov"][sel].astype(np.bool_) if "use_ov" in res \
+        else np.ones(n_tr, np.bool_)
+    # window close per trade = the H1 BAR-COUNT window mapped to clock time:
+    # last H1 bar of the window is px_i+h (the walk's `end-1`); its close is
+    # one hour past its (open-stamped) timestamp. Weekend/holiday gaps are
+    # thereby spanned exactly like the H1 walk.
+    n_bars_px = len(px_ts)
+    end_bar = np.minimum(px_i + h_arr, n_bars_px - 1)
+    end_ns = px_ts[end_bar] + 3_600_000_000_000
+    atr_px = b["atr"][px_i]                       # $/oz ATR for spread->R
+    R_h1 = res["R_gross"][sel].astype(np.float64) - \
+        res["cost_base"][sel]                      # H1-walk net (1.0x cost)
+    cost_r = res["cost_base"][sel].astype(np.float64)
+    rv = (b["hi"][px_i] - b["lo"][px_i]) / np.maximum(atr_px, 1e-9)
+    slip_mask = (rv >= gbdt_rv_top_decile)
+    variants = {}
+    # pure M1 and delay share the walk with different entry fills
+    for name, delay in (("m1_pure", 0), ("m1_delay1", 1)):
+        R = np.full(n_tr, np.nan, np.float64)
+        ip = np.full(n_tr, -1, np.int64)
+        rs = np.full(n_tr, 3, np.int8)
+        if n_ok:
+            Rk, exk, ovk, ipk, rsk = m1_walk_batch(
+                start_arr[ok], m_arr[ok], t_arr[ok], isL[ok],
+                q25[ok], q50[ok], atr_arr[ok], use_ov[ok], delay,
+                end_ns[ok],
+                m1d["o"], m1d["h"], m1d["l"], m1d["c"], m1d["ts"], m1d["n"])
+            R[ok] = Rk - cost_r[ok]                # same 1.0x cost convention
+            ip[ok] = ipk; rs[ok] = rsk
+        variants[name] = (R, ip, rs)
+    base = variants["m1_pure"][0]
+    for spread in V21_FRICTION_SPREADS_USD:
+        R = base.copy()
+        R[ok] -= spread / (m_arr[ok] * atr_px[ok])  # $/oz -> R units
+        variants[f"m1_spread{int(spread * 100):02d}"] = (R, variants["m1_pure"][1], variants["m1_pure"][2])
+    # 2x stop slippage: top-decile-RV decision bars, 0.25 ATR adverse on stop exits
+    R = base.copy()
+    _, _, rs_pure = variants["m1_pure"]
+    slip = slip_mask & np.isin(rs_pure, (0, 2))
+    R[slip] -= M1_SLIP_ATR / m_arr[slip]
+    variants["m1_slip2x"] = (R, variants["m1_pure"][1], variants["m1_pure"][2])
+    fin = np.isfinite(base)
+    for name, (R, ip, rs) in variants.items():
+        m = np.isfinite(R)
+        out[name] = {
+            "n": int(m.sum()), "n_m1_resolved": int((m & fin).sum()),
+            "E_R": float(R[m].mean()) if m.sum() else float("nan"),
+            "total_R": float(R[m].sum()) if m.sum() else float("nan"),
+            "vs_h1_ER": float(R[m].mean() - R_h1[m].mean()) if m.sum() else float("nan"),
+            "vs_m1_pure_ER": float(R[m].mean() - base[m].mean()) if m.sum() else float("nan"),
+            "_R": R, "_i_part_m1": ip, "_reason": rs,
+        }
+    out["_n_hour_mapped"] = n_ok
+    return out
+
+
 # ==================== non-overlapping selector ====================
 
 @njit(cache=True)
@@ -809,14 +1100,22 @@ def bh_marks_batch(px_i_arr, atr, o, c, n_bars, max_life):
 THROTTLE_DD_LIMIT = 0.15        # de-risk linearly to 0 at 15%% equity drawdown
 
 
-def simulate_portfolio(trades, keep, cost_mult, cap, bundle):
+def simulate_portfolio(trades, keep, cost_mult, cap, bundle,
+                       risk_cap=HARD_EQUITY_RISK_CAP, throttle_dd=THROTTLE_DD_LIMIT,
+                       carry=None):
     """Sequential day-by-day portfolio simulation with a causal drawdown
-    throttle.  Per-trade risk f_eff = min(quarter-Kelly, 1%/cap) x
-    max(0, 1 - DD/DD_LIMIT), where DD is the strategy's own equity drawdown
+    throttle.  Per-trade risk f_eff = min(quarter-Kelly, risk_cap/cap) x
+    max(0, 1 - DD/throttle_dd), where DD is the strategy's own equity drawdown
     at the PREVIOUS day's close (strictly past information at the entry
-    decision bar).  Guarantees bounded drawdown: as DD -> 15%% new-trade risk
-    -> 0, so the equity cannot compound deeply beyond the last-admitted
-    position's residual mark (<~1-2%% overshoot).  Returns (daily, f_eff)."""
+    decision bar).  Guarantees bounded drawdown: as DD -> throttle_dd new-trade
+    risk -> 0, so the equity cannot compound deeply beyond the last-admitted
+    position's residual mark (<~1-2%% overshoot).  Returns (daily, f_eff).
+
+    v2.1 (U5): `risk_cap` parametrizes the tier (1.0% standard / 0.5%
+    institutional pilot); `throttle_dd` <= 0 disables the throttle; `carry`
+    (dict with long_annual/short_annual/hour_utc/wed_x3/day_basis) charges
+    overnight swap on the ACTUAL held notional (halved after the i_part
+    partial-TP fill) through 22:00 UTC, Wednesday x3."""
     sel = np.flatnonzero(keep)
     if len(sel) == 0:
         return None, None
@@ -825,6 +1124,15 @@ def simulate_portfolio(trades, keep, cost_mult, cap, bundle):
     px_pos_of_lab = b["px_pos_of_lab"]
     o, hi_, lo_, c_ = b["o"], b["hi"], b["lo"], b["c"]
     atr = b["atr"]; n_bars = len(o)
+    px_ts_arr = b["px_ts"]
+    # carry configuration (None -> off)
+    carry_on = carry is not None
+    c_long = float(carry["long_annual"]) if carry_on else 0.0
+    c_short = float(carry["short_annual"]) if carry_on else 0.0
+    c_basis = float(carry.get("day_basis", 365)) if carry_on else 365.0
+    c_wed3 = 3.0 if (carry_on and carry.get("wed_x3", True)) else 1.0
+    carry_hour = int(carry.get("hour_utc", 22)) if carry_on else 22
+    tdd = float(throttle_dd) if (throttle_dd and throttle_dd > 0) else 1e18
     max_life = int(48)
     px_i = px_pos_of_lab[trades["pos"][sel]]
     is_bh = trades.get("bh") is not None and bool(trades["bh"][sel].any())
@@ -836,10 +1144,23 @@ def simulate_portfolio(trades, keep, cost_mult, cap, bundle):
                           trades["is_long"][sel],
                           trades["use_ov"][sel], trades["q25"][sel], trades["q50"][sel],
                           o, hi_, lo_, c_, atr, n_bars, max_life)
-    f_nom = np.minimum(trades["f_kelly"][sel], HARD_EQUITY_RISK_CAP / cap)
+    f_nom = np.minimum(trades["f_kelly"][sel], risk_cap / cap)
     cost = trades["cost_base"][sel] * cost_mult
     entry_day = day_id[px_i + 1]
     exit_day = day_id[trades["exit_bar"][sel]]
+    # v2.1 carry accounting arrays (U5): per-trade entry/exit timestamps and
+    # notional-per-unit-risk (units = entry / (m*ATR)); held notional halves
+    # after the i_part partial-TP fill bar.
+    exit_bar_sel = trades["exit_bar"][sel]
+    entry_ts = px_ts_arr[px_i + 1]
+    exit_ts = px_ts_arr[exit_bar_sel]
+    m_sel = trades["m"][sel]
+    a_sel = atr[px_i]
+    e_sel = o[px_i + 1]
+    notional_frac = e_sel / (m_sel * a_sel)
+    ip_arr = np.asarray(trades["i_part"][sel], np.int64) if "i_part" in trades \
+        else np.full(len(sel), -1, np.int64)
+    is_long_arr = trades["is_long"][sel]
     # per-trade map: day -> mark value at the last bar of that day in its life
     day_mark = []
     for k in range(len(sel)):
@@ -873,7 +1194,7 @@ def simulate_portfolio(trades, keep, cost_mult, cap, bundle):
         dd = 1.0 - eq / peak if peak > 0 else 0.0
         # -- entries decided today use yesterday's close equity (causal) ----
         for k in enter_idx[int(d)]:
-            thr = max(0.0, 1.0 - dd / THROTTLE_DD_LIMIT)
+            thr = max(0.0, 1.0 - dd / tdd)
             f_eff[k] = f_nom[k] * thr
             last_v[k] = 0.0
             active[k] = True     # position opens regardless (f_eff may be ~0 -> near-flat)
@@ -892,6 +1213,23 @@ def simulate_portfolio(trades, keep, cost_mult, cap, bundle):
             if active[k] and int(exit_day[k]) == d:
                 contrib -= f_eff[k] * cost[k]
                 active[k] = False
+        # -- overnight swap/carry on actual held notional (U5) ----------------
+        # charged at the 22:00 UTC roll of day d for every position open
+        # through the roll (entry_ts < T_d < exit_ts); Wednesday x3
+        # (settlement covers the weekend); notional halves after i_part.
+        if carry_on:
+            T_d = (int(d) * 86400 + carry_hour * 3600) * 1_000_000_000
+            wed = ((int(d) + 3) % 7) == 2   # epoch Thu(3): Wed==2, Mon=0
+            xw = c_wed3 if wed else 1.0
+            for k in range(len(sel)):
+                if not active[k]:
+                    continue
+                if entry_ts[k] < T_d < exit_ts[k]:
+                    frac = 1.0
+                    if ip_arr[k] >= 0 and T_d > px_ts_arr[ip_arr[k]]:
+                        frac = 0.5
+                    rate = c_long if is_long_arr[k] else c_short
+                    contrib += rate / c_basis * notional_frac[k] * f_eff[k] * frac * xw
         # a trade whose life ended without touching today's marks still
         # resolves on its exit day (e.g., resolved before the day's last bar)
         eq *= (1.0 + contrib)
@@ -992,12 +1330,12 @@ def resolve_candidates(bundle, cand, overlay_rule):
     use_ov = np.ones(len(cand["pos"]), np.bool_) if overlay_rule == "path" \
         else np.zeros(len(cand["pos"]), np.bool_)
     # causal overlay walk (always computed; used when rule == path)
-    R_path, eb_path, ov_code = walk_batch(
+    R_path, eb_path, ov_code, ip_path = walk_batch(
         px_i, m, t, h, is_long, use_ov,
         cand["q25"].astype(np.float64), cand["q50"].astype(np.float64),
         o, hi_, lo_, c_, atr, n_bars)
     # clean reference walk (validation gate G5.6)
-    R_walk_clean, _, _ = walk_batch(
+    R_walk_clean, _, _, _ = walk_batch(
         px_i, m, t, h, is_long, np.zeros(len(px_i), np.bool_),
         cand["q25"].astype(np.float64), cand["q50"].astype(np.float64),
         o, hi_, lo_, c_, atr, n_bars)
@@ -1010,29 +1348,39 @@ def resolve_candidates(bundle, cand, overlay_rule):
         R_gross = R_path
         exit_bar = np.where(eb_path >= 0, eb_path, eb_clean)
         overlay = ov_code
+        i_part = ip_path
     else:
         R_gross = cand["R_label"].astype(np.float64)
         exit_bar = eb_clean
         overlay = np.zeros(len(px_i), np.int8)
+        i_part = np.full(len(px_i), -1, np.int64)
     out = dict(cand)
     out.update(px_i=px_i, R_gross=R_gross, exit_bar=exit_bar.astype(np.int64),
                overlay=overlay.astype(np.int8), R_walk_clean=R_walk_clean,
-               use_ov=use_ov)
+               use_ov=use_ov, i_part=i_part.astype(np.int64))
     return out
 
 
-def execute(bundle, res, cap, year_mask=None, cost_mult=1.0):
+def execute(bundle, res, cap, year_mask=None, cost_mult=1.0,
+            risk_cap=HARD_EQUITY_RISK_CAP, throttle_dd=THROTTLE_DD_LIMIT,
+            carry=None):
     """Concurrency selection + per-trade clipping + daily MTM portfolio.
-    year_mask: boolean over res rows (already chronological)."""
+    year_mask: boolean over res rows (already chronological).
+    v2.1: risk_cap tier / throttle on-off / carry cfg pass through to
+    simulate_portfolio (defaults reproduce the v1.3 shipped accounting)."""
     rows = np.arange(len(res["pos"]))
     if year_mask is not None:
         rows = rows[year_mask]
     sub = {k: v[rows] for k, v in res.items() if isinstance(v, np.ndarray)}
     order = np.argsort(sub["pos"], kind="stable")     # chronological
     sub = {k: v[order] for k, v in sub.items() if isinstance(v, np.ndarray)}
+    if "i_part" not in sub:
+        sub["i_part"] = np.full(len(sub["pos"]), -1, np.int64)
     keep = apply_concurrency(sub, cap)
     sel = np.flatnonzero(keep)
-    daily, f = simulate_portfolio(sub, keep, cost_mult, cap, bundle)
+    daily, f = simulate_portfolio(sub, keep, cost_mult, cap, bundle,
+                                  risk_cap=risk_cap, throttle_dd=throttle_dd,
+                                  carry=carry)
     Rn = sub["R_gross"][sel] - sub["cost_base"][sel] * cost_mult
     return dict(sub=sub, keep=keep, sel=sel, f=f, daily=daily, R_net=Rn,
                 ts=sub["ts"][sel], year=sub["year"][sel],
@@ -1261,6 +1609,58 @@ def flagship_candidates(bundle, params, gbdt_dir, overlay_rule):
                       ev_lcb[keep].astype(np.float32), q50, q25)
     cand["p_bar"] = p_bar[keep].astype(np.float32)
     cand["sigma_loop"] = sig_sel[keep].astype(np.float32)
+    cand["ood"] = ood[keep]
+    return cand
+
+
+def clean_ev_r1_candidates(bundle, gbdt_dir, overlay_rule):
+    """AURUM_r1_Clean_EV (U4, audit s4.2): raw v1.2-style r=1 EV-argmax — the
+    r=1 posterior alone, NO LCB penalty, NO base-rate shrinkage, NO depth
+    pool — plus the GBDT agreement gate.  Audit re-run reference (identical
+    machinery, r=1 only): OOS cap3 E[R]=+0.2305, Sharpe 2.599, total R 712.8;
+    the pooled flagship's decision layer improves FIT Sharpe but delivers
+    nothing OOS while costing +44% total R (fit-improvement/OOS-flat
+    overfitting signature — Flaw #14 evidence)."""
+    b = bundle
+    piv = b["_piv"]
+    yr = piv["year"]; pos = piv["pos"]
+    P1 = piv["P"][1]                                    # r=1 posterior (n,48)
+    bgeo = b["_B_GEO"]
+    # v1.2-style raw EV (aurum48 convention: NO cost term inside the argmax —
+    # costs are charged at execution like every other strategy)
+    EV = P1 * bgeo[None, :] - (1.0 - P1)
+    cell = np.nanargmax(np.where(np.isfinite(EV), EV, -1e9),
+                        axis=1).astype(np.int16)
+    nrow = np.arange(len(pos))
+    p_bar = P1[nrow, cell]
+    ev = EV[nrow, cell]
+    d_ax = b["_DIRS"][cell]
+    nfp = nfp_blackout(piv["ts"]); shock = shock_blackout(b["feat"], pos)
+    ood = piv["ood"]
+    g = gbdt_dir[pos]
+    agree = (g == np.where(d_ax == "L", "L", "S"))
+    ok = (ev > EV_TH) & np.isfinite(p_bar) & (p_bar > 0.01) & (p_bar < 0.99) \
+        & (ood <= OOD_TH) & (~nfp) & (~shock) & agree \
+        & np.isfinite(b["R_mat"][pos, cell]) & (p_bar > 0)
+    keep = np.flatnonzero(ok)
+    pos_k = pos[keep]; cell_k = cell[keep]
+    h3rows = piv["h3"][keep]
+    d_k = b["_DIRS"][cell_k]; h_k = b["_HRS"][cell_k]; yr_k = yr[keep]
+    emp = b["_emp_q"]
+    q50 = np.empty(len(keep)); q25 = np.empty(len(keep))
+    for d in ("L", "S"):
+        for hh in (24, 48):
+            msk = (d_k == d) & (h_k == hh)
+            if msk.any():
+                if hh == 48:
+                    q50[msk] = np.where(d == "L", h3rows[msk, 1], h3rows[msk, 7])
+                    q25[msk] = np.where(d == "L", h3rows[msk, 3], h3rows[msk, 9])
+                else:
+                    q50[msk] = [emp[yy][f"mfe_{d}24"] for yy in yr_k[msk]]
+                    q25[msk] = [emp[yy][f"mae_{d}24"] for yy in yr_k[msk]]
+    cand = _base_cand(bundle, pos_k, cell_k, p_bar[keep].astype(np.float32),
+                      ev[keep].astype(np.float32), q50, q25)
+    cand["p_bar"] = p_bar[keep].astype(np.float32)
     cand["ood"] = ood[keep]
     return cand
 
@@ -1870,73 +2270,149 @@ def main(WORK):
          f"({aud['excluded_neighbours']} neighbours dropped by the mask)")
 
     # ---------- causal policy fitting (<=2022) ------------------------------
-    with stage("causal policy fit on 2016-2022 (zero 2023-25 peeking)"):
-        w, br_w, grid_w = fit_pool_weights(b)
-        log(f"  F1 pool weights w={w.tolist()} Brier={br_w:.5f}")
-        kappa, br_k, grid_k = fit_kappa(b, w)
-        log(f"  F2 kappa={kappa} Brier={br_k:.5f}")
-        params0 = {"w": w, "kappa": kappa}
-        (kap3, lam, ev_min), f3best, grid_le = fit_lambda_evmin(b, params0, gbdt_dir)
-        params = {"w": w, "kappa": kap3, "lam": lam, "ev_min": ev_min}
-        log(f"  F3 (kappa, lambda_var, EV_min)=({kap3}, {lam}, {ev_min}) "
-            f"ann-Sharpe={f3best['sharpe']:.4f} E[R]={f3best['er']:.5f} n={f3best['n']}"
-            f" (kappa_Brier from F2 was {kappa})")
-        # F6: performance re-fit of the pooling weights at the F3 params
-        # (greedy coordinate ascent: the posterior pool is a decision-layer
-        # input for the flagship; the stack keeps the Brier-calibrated w)
-        w_cands = ([1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0],
-                   [1 / 3, 1 / 3, 1 / 3], [0.5, 0.25, 0.25],
-                   [0.5, 0.0, 0.5], [0.25, 0.25, 0.5], [0.6, 0.2, 0.2],
-                   [0.2, 0.2, 0.6], [0.4, 0.2, 0.4])
-        best_w, best_r = list(params["w"]), None
-        grid_w_perf = []
-        for wc in w_cands:
-            p6 = dict(params); p6["w"] = np.array(wc, np.float64)
-            r6 = _ann_sharpe_of(b, p6, gbdt_dir, "clean",
-                                params["lam"], params["ev_min"], params["kappa"])
-            grid_w_perf.append({"w": wc, **{k: (round(v, 5) if isinstance(v, float) else v)
-                                            for k, v in r6.items()}})
-            if best_r is None or (round(r6["sharpe"], 6), round(r6["er"], 6)) > \
-                    (round(best_r["sharpe"], 6), round(best_r["er"], 6)):
-                best_w, best_r = list(wc), r6
-        params["w"] = np.array(best_w, np.float64)
-        log(f"  F6 pooling-w performance re-fit -> w={best_w} "
-            f"ann-Sharpe={best_r['sharpe']:.4f} E[R]={best_r['er']:.5f} n={best_r['n']}")
-        rule, ablation = ablate_overlay(b, params, gbdt_dir)
-        params["overlay_rule"] = rule
-        log(f"  F4 overlay ablation -> rule={rule} "
-            f"(fit clean {ablation['fit_window']['clean']} vs "
-            f"path {ablation['fit_window']['path']})")
-        u, br_u, grid_u = fit_stack_u(b, params, pL_full, pS_full)
-        stack_params = dict(params); stack_params["u"] = u
-        log(f"  F5 stack u={u} Brier={br_u:.5f}")
-    fit_record = {
-        "fit_window_years": FIT_YEARS,
-        "max_year_used": max(FIT_YEARS),
-        "oos_years_never_touched_by_fits": OOS_YEARS,
-        "protocol": "F1 w (Brier, 48 cells) -> F2 kappa (Brier of shrunk) -> "
-                    "F3 3-D grid (kappa, lambda_var, EV_min) by FIT-window cap1 "
-                    "ann-Sharpe (clean default) -> F6 pooling-w performance "
-                    "re-fit -> F4 overlay ablation (FIT window; choice made on "
-                    "FIT only, OOS report-only) -> F5 stack u (Brier at "
-                    "canonical cells). Stack uses Brier-w/Brier-kappa; flagship "
-                    "uses performance-w/perf-kappa.",
-        "w": {"value_brier_F1": w.tolist(), "brier": round(br_w, 6),
-              "grid": grid_w,
-              "value_perf_F6_flagship": params["w"].tolist()},
-        "kappa": {"value_brier_F2": kappa, "brier": round(br_k, 6), "grid": grid_k,
-                   "value_perf_F3": kap3},
-        "lambda_var": {"value": lam, "grid": grid_le},
-        "ev_min": {"value": ev_min},
-        "overlay_rule": {"value": rule, "ablation": ablation},
-        "stack_u": {"value": u, "brier": round(br_u, 6), "grid": grid_u},
-        "f6_w_perf_grid": grid_w_perf,
-        "f3_best": {k: (round(v, 5) if isinstance(v, float) else v)
-                    for k, v in f3best.items()}}
-    gate("G5.7_fit_causality", max(FIT_YEARS) == 2022,
-         f"all policy fits used years {min(FIT_YEARS)}..{max(FIT_YEARS)} only; "
-         f"OOS {OOS_YEARS} never touched by any fit; "
-         f"fold predictions are themselves walk-forward (heads trained <=y-1)")
+    # ---------- policy: FROZEN (v2.1 default, Flaw #11) or refit ----------
+    if POLICY_MODE == "frozen":
+        # v2.1 (Flaw #11): the DECISION policy is loaded from the frozen
+        # config (v1_3/config/frozen_policy.json) instead of being re-derived
+        # at run time from near-tied FIT grids (F6 margin was 1.27%; an
+        # unpinned xgboost flips the selection). No grid is evaluated.
+        with stage("policy: FROZEN load (Flaw #11; zero grid re-derivation)"):
+            fp = load_frozen_policy()
+            fpol = fp["flagship_policy"]
+            w = np.array(fpol["w_brier_F1_for_stack"], np.float64)
+            kappa = fpol["kappa_brier_F2_for_stack"]
+            kap3 = fpol["kappa"]; lam = fpol["lambda_var"]; ev_min = fpol["ev_min"]
+            params = {"w": np.array(fpol["w_pooled_r123"], np.float64),
+                      "kappa": kap3, "lam": lam, "ev_min": ev_min}
+            rule = fpol["overlay_rule"]
+            u = fpol["stack_u"]
+            stack_params = dict(params); stack_params["u"] = u
+            br_w = br_k = br_u = None
+            grid_w = grid_k = grid_le = grid_w_perf = None
+            ablation = {"chosen_rule": rule, "frozen": True}
+            f3best = fp["fit_provenance"]["f3_best_clean"]
+            log(f"  frozen policy loaded: w={fpol['w_pooled_r123']} kappa={kap3} "
+                f"lam={lam} ev_min={ev_min} overlay={rule} u={u}")
+            log(f"  frozen provenance: F6 margin "
+                f"{fp['fit_provenance']['f6_margin']['winner']['fit_ann_sharpe']} vs "
+                f"{fp['fit_provenance']['f6_margin']['runner_up']['fit_ann_sharpe']} "
+                f"(razor-thin -> the policy is frozen, the env pinned)")
+        fit_record = {
+            "mode": "frozen", "frozen_source": os.path.basename(V21_FROZEN_POLICY),
+            "fit_window_years": FIT_YEARS, "max_year_used": max(FIT_YEARS),
+            "oos_years_never_touched_by_fits": OOS_YEARS,
+            "protocol": fp["fit_provenance"]["protocol"],
+            "w": {"value_brier_F1": w.tolist(),
+                  "value_perf_F6_flagship": params["w"].tolist()},
+            "kappa": {"value_brier_F2": kappa, "value_perf_F3": kap3},
+            "lambda_var": {"value": lam},
+            "ev_min": {"value": ev_min},
+            "overlay_rule": {"value": rule, "ablation": ablation},
+            "stack_u": {"value": u},
+            "f6_w_perf_grid": fp["fit_provenance"]["f6_margin"],
+            "f3_best": f3best}
+        gate("G5.7_fit_causality", max(FIT_YEARS) == 2022,
+             f"policy FROZEN from {os.path.basename(V21_FROZEN_POLICY)} "
+             f"(originally fitted on {min(FIT_YEARS)}..{max(FIT_YEARS)} only; "
+             f"OOS {OOS_YEARS} never touched by any fit)")
+        gate("G5.11_policy_frozen", True,
+             f"decision policy loaded from frozen config (Flaw #11 fix): "
+             f"w={fpol['w_pooled_r123']} kappa={kap3} lambda_var={lam} "
+             f"ev_min={ev_min} overlay={rule} stack_u={u}; integrity check passed")
+        POLICY_DRIFT = {"mode": "frozen", "refit_performed": False}
+    else:
+        # --refit-policy: run the original causal fit machinery for DRIFT
+        # TELEMETRY against the frozen registry. The decisions still use the
+        # REFIT values ONLY in this diagnostic mode (never in production).
+        with stage("causal policy REFIT on 2016-2022 (drift telemetry; not the production path)"):
+            w, br_w, grid_w = fit_pool_weights(b)
+            log(f"  F1 pool weights w={w.tolist()} Brier={br_w:.5f}")
+            kappa, br_k, grid_k = fit_kappa(b, w)
+            log(f"  F2 kappa={kappa} Brier={br_k:.5f}")
+            params0 = {"w": w, "kappa": kappa}
+            (kap3, lam, ev_min), f3best, grid_le = fit_lambda_evmin(b, params0, gbdt_dir)
+            params = {"w": w, "kappa": kap3, "lam": lam, "ev_min": ev_min}
+            log(f"  F3 (kappa, lambda_var, EV_min)=({kap3}, {lam}, {ev_min}) "
+                f"ann-Sharpe={f3best['sharpe']:.4f} E[R]={f3best['er']:.5f} n={f3best['n']}"
+                f" (kappa_Brier from F2 was {kappa})")
+            # F6: performance re-fit of the pooling weights at the F3 params
+            # (greedy coordinate ascent: the posterior pool is a decision-layer
+            # input for the flagship; the stack keeps the Brier-calibrated w)
+            w_cands = ([1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0],
+                       [1 / 3, 1 / 3, 1 / 3], [0.5, 0.25, 0.25],
+                       [0.5, 0.0, 0.5], [0.25, 0.25, 0.5], [0.6, 0.2, 0.2],
+                       [0.2, 0.2, 0.6], [0.4, 0.2, 0.4])
+            best_w, best_r = list(params["w"]), None
+            grid_w_perf = []
+            for wc in w_cands:
+                p6 = dict(params); p6["w"] = np.array(wc, np.float64)
+                r6 = _ann_sharpe_of(b, p6, gbdt_dir, "clean",
+                                    params["lam"], params["ev_min"], params["kappa"])
+                grid_w_perf.append({"w": wc, **{k: (round(v, 5) if isinstance(v, float) else v)
+                                                for k, v in r6.items()}})
+                if best_r is None or (round(r6["sharpe"], 6), round(r6["er"], 6)) > \
+                        (round(best_r["sharpe"], 6), round(best_r["er"], 6)):
+                    best_w, best_r = list(wc), r6
+            params["w"] = np.array(best_w, np.float64)
+            log(f"  F6 pooling-w performance re-fit -> w={best_w} "
+                f"ann-Sharpe={best_r['sharpe']:.4f} E[R]={best_r['er']:.5f} n={best_r['n']}")
+            rule, ablation = ablate_overlay(b, params, gbdt_dir)
+            params["overlay_rule"] = rule
+            log(f"  F4 overlay ablation -> rule={rule} "
+                f"(fit clean {ablation['fit_window']['clean']} vs "
+                f"path {ablation['fit_window']['path']})")
+            u, br_u, grid_u = fit_stack_u(b, params, pL_full, pS_full)
+            stack_params = dict(params); stack_params["u"] = u
+            log(f"  F5 stack u={u} Brier={br_u:.5f}")
+        fit_record = {
+            "fit_window_years": FIT_YEARS,
+            "max_year_used": max(FIT_YEARS),
+            "oos_years_never_touched_by_fits": OOS_YEARS,
+            "protocol": "F1 w (Brier, 48 cells) -> F2 kappa (Brier of shrunk) -> "
+                        "F3 3-D grid (kappa, lambda_var, EV_min) by FIT-window cap1 "
+                        "ann-Sharpe (clean default) -> F6 pooling-w performance "
+                        "re-fit -> F4 overlay ablation (FIT window; choice made on "
+                        "FIT only, OOS report-only) -> F5 stack u (Brier at "
+                        "canonical cells). Stack uses Brier-w/Brier-kappa; flagship "
+                        "uses performance-w/perf-kappa.",
+            "w": {"value_brier_F1": w.tolist(), "brier": round(br_w, 6),
+                  "grid": grid_w,
+                  "value_perf_F6_flagship": params["w"].tolist()},
+            "kappa": {"value_brier_F2": kappa, "brier": round(br_k, 6), "grid": grid_k,
+                       "value_perf_F3": kap3},
+            "lambda_var": {"value": lam, "grid": grid_le},
+            "ev_min": {"value": ev_min},
+            "overlay_rule": {"value": rule, "ablation": ablation},
+            "stack_u": {"value": u, "brier": round(br_u, 6), "grid": grid_u},
+            "f6_w_perf_grid": grid_w_perf,
+            "f3_best": {k: (round(v, 5) if isinstance(v, float) else v)
+                        for k, v in f3best.items()}}
+        gate("G5.7_fit_causality", max(FIT_YEARS) == 2022,
+             f"all policy fits used years {min(FIT_YEARS)}..{max(FIT_YEARS)} only; "
+             f"OOS {OOS_YEARS} never touched by any fit; "
+             f"fold predictions are themselves walk-forward (heads trained <=y-1)")
+
+        # v2.1 drift telemetry: compare the refit against the frozen registry
+        fp = load_frozen_policy()
+        fpol = fp["flagship_policy"]
+        POLICY_DRIFT = {
+            "mode": "refit",
+            "w_refit": params["w"].tolist(), "w_frozen": fpol["w_pooled_r123"],
+            "kappa_refit": kap3, "kappa_frozen": fpol["kappa"],
+            "lambda_refit": lam, "lambda_frozen": fpol["lambda_var"],
+            "ev_min_refit": ev_min, "ev_min_frozen": fpol["ev_min"],
+            "overlay_refit": rule, "overlay_frozen": fpol["overlay_rule"],
+            "u_refit": u, "u_frozen": fpol["stack_u"]}
+        drift_zero = (params["w"].tolist() == fpol["w_pooled_r123"]
+                      and kap3 == fpol["kappa"] and lam == fpol["lambda_var"]
+                      and ev_min == fpol["ev_min"] and rule == fpol["overlay_rule"]
+                      and u == fpol["stack_u"])
+        POLICY_DRIFT["drift_zero_under_pinned_env"] = bool(drift_zero)
+        gate("G5.11_policy_frozen", drift_zero,
+             f"REFIT drift telemetry vs frozen registry: "
+             f"{'ZERO drift (pinned env reproduces the frozen policy)' if drift_zero else 'DRIFT DETECTED — investigate environment pin'} "
+             + json.dumps({k: v for k, v in POLICY_DRIFT.items() if k != 'mode'}))
+
 
     # ---------- build all strategies ---------------------------------------
     with stage("build candidates for all strategies"):
@@ -1950,6 +2426,18 @@ def main(WORK):
         log(f"  canon: {len(C['canon']['pos']):,} | flagship: {len(C['flagship']['pos']):,}")
         C["stack"] = stack_candidates(b, stack_params, pL_full, pS_full, rule)
         log(f"  stack: {len(C['stack']['pos']):,}")
+        # v2.1 (U4): first-class r=1 strategies — audit s4.2: r=1 alone matches
+        # or beats the pooled flagship OOS (2.486/2.599 vs 2.453) with 3x
+        # cheaper inference and +44% more total R under the raw rule.
+        C["r1_fast"] = flagship_candidates(
+            b, {**params, "w": np.array([1.0, 0.0, 0.0])}, gbdt_dir, rule)
+        C["r1_fast"]["policy"] = ("r=1-only flagship machinery (w=[1,0,0]; "
+                                  "LCB-EV + shrinkage + EV_min + GBDT gate)")
+        log(f"  r1_fast: {len(C['r1_fast']['pos']):,}")
+        C["r1_clean"] = clean_ev_r1_candidates(b, gbdt_dir, rule)
+        C["r1_clean"]["policy"] = ("raw r=1 EV-argmax + GBDT gate "
+                                   "(no LCB, no shrinkage, no depth pool)")
+        log(f"  r1_clean: {len(C['r1_clean']['pos']):,}")
         C["gbdt"] = baseline_candidates(b, pL_full, pS_full)
         C["knn"] = baseline_candidates(b, pL_cfull, pS_cfull)
         C["ema"] = ema_donchian_candidates(b, "ema")
@@ -1968,9 +2456,16 @@ def main(WORK):
                 # the ablation-chosen overlay rule applies to the v1.3 DECISION
                 # LAYER (flagship + stack); comparators (aurum_r*, canon and
                 # all baselines) resolve from clean barrier labels.
-                R[k] = resolve_candidates(b, cand,
-                                          rule if k in ("flagship", "stack")
-                                          else "clean")
+                R[k] = resolve_candidates(
+                    b, cand,
+                    # v2.1 (U4): r1_fast runs the flagship machinery (chosen
+                    # overlay rule); r1_clean is the v1.2-style rule and pairs
+                    # with the v1.2 CLEAN-label resolution (aurum48 convention
+                    # — "fixed: clean labels"), matching the audit s4.2 re-run
+                    # (E[R]=+0.2305 / SR 2.599 at cap3) and the shipped
+                    # aurum_r1 cap1 reference (2.194).
+                    rule if k in ("flagship", "stack", "r1_fast")
+                    else "clean")
     # walk validation gate (flagship, clean walk vs labels)
     fw = R["flagship"]["R_walk_clean"] - R["flagship"]["R_label"]
     agree = float((np.abs(fw) <= 0.25).mean())
@@ -2015,8 +2510,9 @@ def main(WORK):
         "blackouts": "NFP first-Friday 12:00-14:59 UTC + |mi_vix_d20z|>=2.5",
         "postmortem_refs": POSTMORTEM}}
     strat_caps = {k: [1] for k in C}
-    for k in ("flagship", "stack", "canon"):
+    for k in ("flagship", "stack", "canon", "r1_fast"):
         strat_caps[k] = [1, 3]
+    strat_caps["r1_clean"] = [3]          # U4: Clean EV is a cap=3 strategy
     EX = {}
     for k in C:
         EX[k] = {}
@@ -2096,6 +2592,8 @@ def main(WORK):
     with stage(f"bootstrap x{BOOT_N} (OOS, cost 1.0x)"):
         boot_pt, boot_d = {}, {}
         for k in C:
+            if 1 not in EX[k]:          # v2.1: cap-3-only strategies (r1_clean)
+                continue
             exo = EX[k][1][1.0]["oos"]
             T = {"R_net": exo["R_net"], "ts": exo["ts"], "p": exo["sub"]["p"][exo["sel"]],
                  "R_label": exo["sub"]["R_label"][exo["sel"]]}
@@ -2107,6 +2605,8 @@ def main(WORK):
 
     fam_daily, fam_trade = {}, {}
     for k in C:
+        if 1 not in EX[k]:              # v2.1: cap-3-only strategies (r1_clean)
+            continue
         exo = EX[k][1][1.0]["oos"]
         if exo["daily"] is not None and exo["daily"]["n_days"] >= 30:
             fam_daily[f"{k}|cap1"] = exo["daily"]["daily_ret"]
@@ -2116,6 +2616,11 @@ def main(WORK):
         exo = EX["flagship"][cap][1.0]["oos"]
         if exo["daily"] is not None:
             fam_daily[f"flagship|cap{cap}"] = exo["daily"]["daily_ret"]
+    # v2.1: cap-3 r=1 strategies join the daily family panel
+    for k in ("r1_fast", "r1_clean"):
+        exo = EX[k][3][1.0]["oos"]
+        if exo["daily"] is not None:
+            fam_daily[f"{k}|cap3"] = exo["daily"]["daily_ret"]
     for mult in (1.5, 2.0):
         exo = EX["flagship"][1][mult]["oos"]
         if exo["daily"] is not None:
@@ -2125,6 +2630,111 @@ def main(WORK):
     log("  DSR daily: " + json.dumps(
         {k: v.get("dsr") for k, v in
          summary["dsr_daily_nonoverlapping"].get("members", {}).items()})[:600])
+
+    # ---------- v2.1 remediation panel (U4/U5/U6 + G1.7) ---------------------
+    v21 = {"spec": "v2.1.0", "policy_drift": POLICY_DRIFT}
+    with stage("v2.1 risk-tier x throttle x carry matrix (flagship cap3, OOS)"):
+        res_fl = R["flagship"]
+        oos_m = np.isin(res_fl["year"], OOS_YEARS)
+        ex23_m = np.isin(res_fl["year"], [2024, 2025])   # ex-2023 sensitivity
+        tier_rows = {}
+        for tier_name, rc in RISK_TIERS.items():
+            for thr_name, tdd in (("throttle15", THROTTLE_DD_LIMIT),
+                                  ("unthrottled", -1.0)):
+                for cr_name, cc in (("no_carry", None),
+                                    ("carry_base", CARRY_BASE),
+                                    ("carry_punitive", CARRY_PUNITIVE)):
+                    ex = execute(b, res_fl, 3, oos_m, 1.0, risk_cap=rc,
+                                 throttle_dd=tdd, carry=cc)
+                    blk = portfolio_block(ex, 1.0)
+                    pr = blk.get("portfolio") or {}
+                    tier_rows[f"{tier_name}|{thr_name}|{cr_name}"] = {
+                        "risk_cap": rc, "n": blk.get("n_trades", 0),
+                        "E_R": blk.get("expectancy_R"),
+                        "sharpe": pr.get("sharpe_annualized"),
+                        "cagr_pct": pr.get("cagr_pct"),
+                        "max_dd_pct": pr.get("max_dd_pct")}
+                    log(f"  {tier_name}|{thr_name}|{cr_name}: "
+                        f"n={blk.get('n_trades', 0)} "
+                        f"SR={pr.get('sharpe_annualized', float('nan')):.4f} "
+                        f"MaxDD={pr.get('max_dd_pct', float('nan')):.2f}%")
+        v21["tier_matrix_flagship_cap3_oos"] = tier_rows
+        # ex-2023 sensitivity (2024-25 only), with and without carry (Flaw #12)
+        ex23 = {}
+        for combo, (rc, tdd, cc) in {
+                "standard|throttle15|no_carry": (RISK_TIERS["standard"], THROTTLE_DD_LIMIT, None),
+                "standard|throttle15|carry_base": (RISK_TIERS["standard"], THROTTLE_DD_LIMIT, CARRY_BASE),
+                "standard|unthrottled|no_carry": (RISK_TIERS["standard"], -1.0, None),
+                "pilot|unthrottled|no_carry": (RISK_TIERS["institutional_pilot"], -1.0, None)}.items():
+            ex = execute(b, res_fl, 3, ex23_m, 1.0, risk_cap=rc,
+                         throttle_dd=tdd, carry=cc)
+            blk = portfolio_block(ex, 1.0)
+            pr = blk.get("portfolio") or {}
+            ex23[combo] = {"n": blk.get("n_trades", 0),
+                           "E_R": blk.get("expectancy_R"),
+                           "sharpe": pr.get("sharpe_annualized"),
+                           "cagr_pct": pr.get("cagr_pct"),
+                           "max_dd_pct": pr.get("max_dd_pct")}
+        v21["ex2023_sensitivity_2024_25"] = ex23
+
+    with stage("v2.1 M1 path resolution + friction survival matrix (U6)"):
+        m1d = load_m1(b)
+        if m1d is not None:
+            log(f"  M1 feed: {m1d['n']:,} bars "
+                f"({pd.DatetimeIndex([m1d['ts'][0]]).tz_localize('UTC')[0]} .. "
+                f"{pd.DatetimeIndex([m1d['ts'][-1]]).tz_localize('UTC')[0]})")
+            atr_all = b["atr"]
+            ok_atr = np.isfinite(atr_all) & (atr_all > 0)
+            rv_all = (b["hi"] - b["lo"]) / np.where(ok_atr, atr_all, np.nan)
+            rv_thr = float(np.nanquantile(rv_all, 0.9))
+            exo3 = EX["flagship"][3][1.0]["oos"]
+            # NOTE: exo3["sel"] indexes into exo3["sub"] (execute() sorts by
+            # pos) — pass the SORTED sub, NOT the unsorted resolve frame, or
+            # every M1 row pairs with the wrong trade (self-caught D2).
+            fr = m1_resolve_matrix(b, m1d, exo3["sub"], exo3["sel"], rv_thr)
+            v21["m1_friction_matrix_flagship_cap3_oos"] = {
+                k: {kk: vv for kk, vv in v.items() if not kk.startswith("_")}
+                for k, v in fr.items() if not k.startswith("_")}
+            v21["m1_friction_matrix_flagship_cap3_oos"]["n_hour_mapped"] = fr.get("_n_hour_mapped")
+            v21["m1_top_decile_rv_threshold"] = rv_thr
+            for k, v in v21["m1_friction_matrix_flagship_cap3_oos"].items():
+                if isinstance(v, dict) and "E_R" in v:
+                    log(f"  {k}: n={v['n']} E[R]={v['E_R']:.4f} "
+                        f"(vs H1 walk {v['vs_h1_ER']:+.4f})")
+            # keep minute-level arrays for the k6 faithful bridge (U1)
+            np.save(os.path.join(WORK, "v21_m1_R_flagship_cap3_oos.npy"),
+                    fr["m1_pure"]["_R"])
+            np.save(os.path.join(WORK, "v21_m1_i_part_flagship_cap3_oos.npy"),
+                    fr["m1_pure"]["_i_part_m1"])
+        else:
+            log("  [warn] M1 feed not found — friction matrix skipped")
+            v21["m1_friction_matrix_flagship_cap3_oos"] = None
+
+    with stage("v2.1 OOS bar-coverage audit (Flaw #12 -> G1.7)"):
+        px_years = pd.DatetimeIndex(b["px"].index).year
+        ycnt = pd.Series(px_years).value_counts().sort_index()
+        base_years = [y for y in ycnt.index if 2016 <= y <= 2022]
+        base_mean = float(ycnt[base_years].mean())
+        cov = {}
+        for y in OOS_YEARS:
+            n_y = int(ycnt.get(y, 0))
+            ratio = n_y / base_mean
+            cov[int(y)] = {"h1_bars": n_y, "vs_2016_22_mean_pct": round((ratio - 1) * 100, 1),
+                           "degraded": bool(ratio < COVERAGE_FLAG_RATIO)}
+        v21["oos_bar_coverage"] = {
+            "baseline_2016_22_mean_h1_bars": round(base_mean, 1),
+            "per_year": cov}
+        degraded = [y for y, d in cov.items() if d["degraded"]]
+        g17_ok = len(cov) == len(OOS_YEARS) and (2023 in degraded)
+        gate("G1.7_bar_coverage", g17_ok,
+             f"OOS H1 bar coverage vs 2016-22 mean ({base_mean:.0f}): "
+             + "; ".join(f"{y}: {d['h1_bars']} ({d['vs_2016_22_mean_pct']:+.1f}%)"
+                         + (" DEGRADED" if d["degraded"] else "")
+                         for y, d in cov.items())
+             + f" — flagged years {degraded}; ex-2023 sensitivity exported "
+               f"(2023 is thin: the entire v2 feature store is built on "
+               f"~18%-gappy 2023 M1 data, audit s2.6)")
+    summary["v21"] = v21
 
     # ---------- export ----------------------------------------------------------
     with stage("export"):
@@ -2152,6 +2762,7 @@ def main(WORK):
                         "R_label": sub["R_label"][sel].astype(np.float32),
                         "R_gross": sub["R_gross"][sel].astype(np.float32),
                         "exit_bar": sub["exit_bar"][sel].astype(np.int64),
+                        "i_part": sub["i_part"][sel].astype(np.int64),
                         "cost_base": sub["cost_base"][sel].astype(np.float32),
                         "R_net": ex["R_net"].astype(np.float32)}))
                     d = ex["daily"]
@@ -2208,17 +2819,21 @@ def main(WORK):
             f.write("\nCost sensitivity (OOS E[R], cap1):\n\n")
             f.write("| strategy | 1.0x | 1.5x | 2.0x |\n|---|---|---|---|\n")
             for k in C:
-                o1 = summary[k]["cap1"]["cost_1.0"]["oos"].get("expectancy_R", float('nan'))
-                o15 = summary[k]["cap1"]["cost_1.5"]["oos"].get("expectancy_R", float('nan'))
-                o2 = summary[k]["cap1"]["cost_2.0"]["oos"].get("expectancy_R", float('nan'))
-                f.write(f"| {k} | {o1:.4f} | {o15:.4f} | {o2:.4f} |\n")
+                caprow = 1 if 1 in strat_caps[k] else strat_caps[k][0]
+                o1 = summary[k][f"cap{caprow}"]["cost_1.0"]["oos"].get("expectancy_R", float('nan'))
+                o15 = summary[k][f"cap{caprow}"]["cost_1.5"]["oos"].get("expectancy_R", float('nan'))
+                o2 = summary[k][f"cap{caprow}"]["cost_2.0"]["oos"].get("expectancy_R", float('nan'))
+                f.write(f"| {k} (cap{caprow}) | {o1:.4f} | {o15:.4f} | {o2:.4f} |\n")
+        with open(os.path.join(WORK, "v21_summary.json"), "w") as f:
+            json.dump(v21, f, indent=1, default=float)
         n_files = sum(os.path.isfile(os.path.join(WORK, f_)) for f_ in
                       ("trades_all.parquet", "equity_curves.parquet",
                        "backtest_main.json", "policy_fit.json",
                        "overlay_ablation.json", "gbdt_audit.json",
-                       "backtest_summary.md"))
-        gate("G5.5_export", n_files == 7,
-             f"exported {n_files}/7 files; trades={len(trades):,} rows")
+                       "backtest_summary.md", "v21_summary.json"))
+        gate("G5.5_export", n_files == 8,
+             f"exported {n_files}/8 files (v2.1 adds v21_summary.json); "
+             f"trades={len(trades):,} rows")
 
     save_gates(os.path.join(WORK, "gates.json"))
     log("P4 BACKTEST v1.3 COMPLETE. GATES: "
@@ -2227,7 +2842,21 @@ def main(WORK):
     return summary
 
 
+POLICY_MODE = "frozen"          # v2.1 default (Flaw #11); "refit" = telemetry
+
+
 if __name__ == "__main__":
+    import argparse
+    _ap = argparse.ArgumentParser(description="AURUM v1.3/v2.1 p4 backtest")
+    _ap.add_argument("--use-frozen-policy", dest="frozen", action="store_true",
+                     default=True,
+                     help="load the frozen policy (v2.1 default, Flaw #11)")
+    _ap.add_argument("--refit-policy", dest="frozen", action="store_false",
+                     help="re-run the causal FIT grids (drift telemetry only)")
+    _args, _unknown = _ap.parse_known_args()
+    if not _args.frozen:
+        POLICY_MODE = "refit"
+    print(f"[p4] POLICY_MODE={POLICY_MODE}", flush=True)
     WORK = os.environ.get("AURUM_WORK",
                           "/kaggle/working" if os.path.exists("/kaggle/working")
                           else os.path.join(os.getcwd(), "p4_out"))
