@@ -1,0 +1,32 @@
+{
+  "spec": "v2.1.0",
+  "purpose": "Exact environment pin for bit-exact reproduction of the v1.3 flagship and all v2.1 remediation numbers (Flaw #11: unpinned libs flip the FIT grid: xgboost 2.1.3 selects w=[0.5,0,0.5]/lambda_var=0.25 and flagship cap1 OOS Sharpe swings 2.305->2.665).",
+  "recorded_utc": "2026-11-21",
+  "reference_kaggle_env": {
+    "python": "3.13.18",
+    "xgboost": "3.4.1",
+    "pandas": "2.3.3",
+    "source": "p4 run_log.txt headers (Kaggle, Spec v1.3)"
+  },
+  "this_archival_run": {
+    "python": "3.12.16",
+    "xgboost": "3.4.1",
+    "lightgbm": "4.5.0",
+    "pandas": "2.3.3",
+    "numpy": "2.1.3",
+    "scipy": "1.14.1",
+    "scikit-learn": "1.6.1",
+    "numba": "0.61.2",
+    "pyarrow": "26.0.1",
+    "torch": "2.11.0+cpu",
+    "transformers": "4.57.1",
+    "kaggle": "2.2.5",
+    "note": "Sandbox python minor differs from Kaggle (3.12.16 vs 3.13.18); all critical numerics (xgboost/pandas/numpy) are exact-match pins. v1.3 flagship reproduced bit-exactly under this set: see STATE.md."
+  },
+  "critical_versions": {
+    "xgboost": "3.4.1 (REQUIRED - FIT-grid parity gates G5.4/G5.9 depend on it)",
+    "pandas": "2.3.3 (REQUIRED - accounting frame)",
+    "numpy": "2.1.3 (REQUIRED - bit-exact R_gross arithmetic)"
+  },
+  "torch_install": "pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu"
+}

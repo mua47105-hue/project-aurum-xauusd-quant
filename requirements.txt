@@ -1,0 +1,21 @@
+# AURUM v2.1 pinned environment — Spec v2.1 (Flaw #11 fix: institutional archive must pin)
+#
+# Reference Kaggle env (recovered from p4 run_log.txt headers): python 3.13.18,
+# xgboost 3.4.1, pandas 2.3.3.  The FIT-grid flagship selection sits on razor-thin
+# margins (0.89555 vs 0.88429); an unpinned xgboost (e.g. 2.1.3) flips the pooled
+# weights to [0.5, 0.0, 0.5] and lambda_var to 0.25 — EVERY number in the v2.1
+# remediation assumes these exact versions.
+#
+# torch: install the CPU build with
+#   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+xgboost==3.4.1
+lightgbm==4.5.0
+pandas==2.3.3
+numpy==2.1.3
+scipy==1.14.1
+scikit-learn==1.6.1
+numba==0.61.2
+pyarrow==26.0.1
+torch==2.11.0
+transformers==4.57.1
+kaggle==2.2.5

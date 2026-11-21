@@ -15,3 +15,10 @@ data/aurum_v2_features.parquet
 data/phase1/
 models/
 backup/
+
+# v2.1 heavy binary outputs (>25MB) — GitHub Release v2.1.0 / Kaggle only;
+# SHA-256 manifest for every heavy asset lives in scripts/download_heavy_assets.py
+artifacts/v2_1/**/*.parquet
+artifacts/v2_1/**/*.pt
+artifacts/v2_1/**/*.tar.gz
+*.parquet.tmp
