@@ -6,13 +6,19 @@ base price data, workspace backup) that lives in GitHub Release `v2.0.2` (primar
 or on Kaggle (fallback) into its exact expected local path, verifying SHA-256.
 
 Usage:
-    export GITHUB_TOKEN=<your-PAT>          # fine-grained PAT, Contents:read
-    python3 scripts/download_heavy_assets.py            # all assets
+    # PUBLIC repo: no token needed — anonymous release downloads work.
+    python3 scripts/download_heavy_assets.py                    # all assets
     python3 scripts/download_heavy_assets.py features core_fp16
     python3 scripts/download_heavy_assets.py --list
 
-Kaggle fallback (used automatically when GITHUB_TOKEN is absent or the GitHub
-download fails, for the assets that exist on Kaggle):
+    # Optional GITHUB_TOKEN (fine-grained PAT, Contents:read): raises the API
+    # rate limit (60/h anonymous -> 5000/h) and is required only for PRIVATE
+    # forks of this archive. NOTE (Spec v2.1 doc fix): earlier READMEs claimed
+    # the repo was private and the token mandatory — it is public; the token
+    # is optional.
+
+Kaggle fallback (used automatically when the GitHub download fails or the
+release lookup is rate-limited, for the assets that exist on Kaggle):
     export KAGGLE_API_TOKEN=...            # tskdev token (Bearer-auth)
 """
 import argparse
@@ -125,13 +131,20 @@ def fetch(url, dest, headers=None, timeout=3600):
 
 
 def github_asset_url(session_file):
-    """Resolve {filename: browser_download_url} for release RELEASE_TAG."""
+    """Resolve {filename: asset dict} for release RELEASE_TAG.
+
+    Anonymous for this PUBLIC repo (Spec v2.1 doc fix); a token, when present,
+    is attached to lift the API rate limit. 403/404 => private fork or bad
+    tag, and the caller falls back to Kaggle.
+    """
     tok = gh_token()
+    headers = {"Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+    if tok:
+        headers["Authorization"] = f"Bearer {tok}"
     req = urllib.request.Request(
         f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/releases/tags/{RELEASE_TAG}",
-        headers={"Authorization": f"Bearer {tok}",
-                 "Accept": "application/vnd.github+json",
-                 "X-GitHub-Api-Version": "2022-11-28"})
+        headers=headers)
     with urllib.request.urlopen(req, timeout=60) as r:
         rel = json.load(r)
     with open(session_file, "w") as f:
@@ -207,16 +220,15 @@ def main():
 
     session_file = tempfile.mktemp(prefix=".gh_assets_")
     gh_map = {}
-    if gh_token():
-        try:
-            rel = github_asset_url(session_file)
-            print(f"GitHub release '{rel.get('name', RELEASE_TAG)}': "
-                  f"{len(rel.get('assets', []))} assets visible")
-            gh_map = json.load(open(session_file))
-        except Exception as e:
-            print(f"[warn] GitHub release lookup failed ({e}); will try Kaggle fallback")
-    else:
-        print("[info] GITHUB_TOKEN not set — Kaggle fallback only")
+    # PUBLIC repo: try the release lookup anonymously too (Spec v2.1 doc fix).
+    try:
+        rel = github_asset_url(session_file)
+        print(f"GitHub release '{rel.get('name', RELEASE_TAG)}': "
+              f"{len(rel.get('assets', []))} assets visible"
+              + (" (authenticated)" if gh_token() else " (anonymous — public repo)"))
+        gh_map = json.load(open(session_file))
+    except Exception as e:
+        print(f"[warn] GitHub release lookup failed ({e}); will try Kaggle fallback")
 
     failures = []
     for key in keys:
@@ -230,15 +242,16 @@ def main():
             print(f"[warn]  {key}: exists but hash mismatch — re-downloading")
         print(f"[get ] {key}: {a['file']} ({a['size_mb']} MB) -> {a['dest']}")
         ok = False
-        # --- primary: GitHub Release asset
+        # --- primary: GitHub Release asset (public repo: works anonymously) ---
         # NOTE: for PRIVATE repos browser_download_url 404s with token auth;
         # the API asset URL + octet-stream Accept is the reliable path.
-        if a["file"] in gh_map and gh_token():
+        if a["file"] in gh_map:
             url = gh_map[a["file"]]["url"]  # https://api.github.com/.../assets/{id}
+            hdrs = {"Accept": "application/octet-stream"}
+            if gh_token():
+                hdrs["Authorization"] = f"Bearer {gh_token()}"
             try:
-                fetch(url, dest, headers={
-                    "Authorization": f"Bearer {gh_token()}",
-                    "Accept": "application/octet-stream"})
+                fetch(url, dest, headers=hdrs)
                 ok = True
             except Exception as e:
                 print(f"[warn]  GitHub download failed: {e}")

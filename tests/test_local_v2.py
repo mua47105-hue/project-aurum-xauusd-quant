@@ -1,6 +1,11 @@
 import os, sys
-H = os.path.dirname(os.path.abspath(__file__))
-for p in (H, os.path.join(H, "aurum_features"), os.path.join(H, "model")):
+# Repro gap #1 fix (Spec v2.1): resolve module dirs from the REPO ROOT, not tests/.
+# The module packages live at aurum_v2/aurum_features and aurum_v2/model; the
+# pre-v2.1 version pointed at tests/aurum_features and tests/model, which do not
+# exist, and required an external PYTHONPATH=aurum_v2/aurum_features:aurum_v2/model.
+R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for p in (os.path.join(R, "aurum_v2", "aurum_features"),
+          os.path.join(R, "aurum_v2", "model")):
     if p not in sys.path: sys.path.insert(0, p)
 import f1_clock, f2_realized, f3_signatures, f4_toxicity, f5_residual, f6_trend
 f1_clock.f1_self_test(); f2_realized.f2_self_test(); f3_signatures.f3_self_test()

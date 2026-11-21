@@ -188,7 +188,7 @@ folds 2016-2025) → `aurum-p3-tables` (569k-row OOS probability tables) → `au
 
 ```bash
 # 0) restore heavy assets (features parquet, core weights, prob tables, base data)
-python3 scripts/download_heavy_assets.py          # needs GITHUB_TOKEN env var (repo is private)
+python3 scripts/download_heavy_assets.py          # public repo: works anonymously; GITHUB_TOKEN optional (rate-limit lift)
 
 # 1) v2 features already built? verify integrity
 python3 - <<'PY'

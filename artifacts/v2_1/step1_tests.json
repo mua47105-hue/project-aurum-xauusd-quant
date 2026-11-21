@@ -1,0 +1,78 @@
+{
+  "step": 1,
+  "spec": "v2.1.0",
+  "date": "2026-11-21",
+  "repro_gap_1_tests": {
+    "test_local_v13_quick": {
+      "command": "env -u PYTHONPATH python3 tests/test_local_v13.py quick",
+      "pass_count": 16,
+      "fail_count": 0,
+      "failures_line": [
+        "==== 0 failures ===="
+      ],
+      "exit": 0,
+      "log_sha256_16": "217ed0eace146ca2",
+      "notable": [
+        "[PASS] scale_invariance_features maxdiff=7.28e-08",
+        "[PASS] labeler_scale_invariance dR=4.88e-14 dMFE=1.44e-13",
+        "[PASS] cohort_gap_respected"
+      ]
+    },
+    "test_local_v2_selftests": {
+      "command": "env -u PYTHONPATH python3 tests/test_local_v2.py",
+      "all_pass": true,
+      "exit": 0,
+      "log_sha256_16": "1cfd4ed5894f9082",
+      "modules": [
+        "f1_clock",
+        "f2_realized",
+        "f3_signatures",
+        "f4_toxicity",
+        "f5_residual",
+        "f6_trend",
+        "losses",
+        "continuum",
+        "ae_mlp_dmn",
+        "purge",
+        "online_engine",
+        "rff_ridge",
+        "v2_common",
+        "train_continuum"
+      ]
+    }
+  },
+  "repro_gap_3_k2_standalone": {
+    "command": "env -u PYTHONPATH AURUM_V2F=data AURUM_DS=data/phase1 python3 aurum_v2/kernels/k2_cpu_models.py (60s smoke)",
+    "pyflakes_undefined_names": 0,
+    "data_load": "features: 95008 bars x 378 cols (2010..2025); model matrix 95008x372",
+    "walk_forward_reached": "M1_GBDT fold 2016..2021+ running",
+    "audit_diagnostic_reproduced": "LightGBM best_iter=1 on most folds (audit s2.5)",
+    "fixes": [
+      "import sys as _sys",
+      "sibling-path fallback",
+      "explicit v2_common/rff_ridge/online_engine imports",
+      "explicit FIT_YEARS/OOS_YEARS/ALL_FOLD_YEARS definitions"
+    ]
+  },
+  "repro_gap_2_note": "resolved by requirements.txt + environment.lock.json (Step 0) + frozen_policy.json (this step); bit-exact p4 verification is Step 2's gate",
+  "flaw_11_freeze": {
+    "file": "v1_3/config/frozen_policy.json",
+    "w": [
+      0.6,
+      0.2,
+      0.2
+    ],
+    "kappa": 0.0,
+    "lambda_var": 0.5,
+    "ev_min": 0.0,
+    "overlay": "path",
+    "stack_u": 0.1,
+    "f6_margin": "0.89555 vs 0.88429 (1.27%)",
+    "v21_registry": [
+      "AURUM_v13_Flagship",
+      "AURUM_r1_Fast_Flagship",
+      "AURUM_r1_Clean_EV"
+    ]
+  },
+  "downloader_docs": "public repo: anonymous release downloads; GitHub PAT optional (rate-limit lift) \u2014 README.md + docstring fixed"
+}

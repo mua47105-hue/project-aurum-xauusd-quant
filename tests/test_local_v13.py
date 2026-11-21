@@ -5,9 +5,12 @@ import os, sys, time
 import numpy as np
 import pandas as pd
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(ROOT, "lib"))
-sys.path.insert(0, ROOT)
+# Repro gap #1 fix (Spec v2.1): resolve the v1.3 library from the REPO ROOT.
+# The pre-v2.1 version pointed at tests/lib, which does not exist, and required
+# an external PYTHONPATH=v1_3/lib.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "v1_3", "lib"))
+sys.path.insert(0, os.path.join(ROOT, "v1_3"))
 
 FAIL = []
 def check(name, ok, detail=""):

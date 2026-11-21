@@ -26,11 +26,40 @@ import glob as _glob
 import json
 import math
 import os
+import sys as _sys  # repro gap #3 fix (Spec v2.1): was undefined in the modular
+                    # source (only the Kaggle bundle imported it), so
+                    # `python3 aurum_v2/kernels/k2_cpu_models.py` crashed at exit.
 import time
 import traceback
 
 import numpy as np
 import pandas as pd
+
+# Repro gap #3 fix (Spec v2.1): sibling-path fallback so this modular source runs
+# standalone from anywhere. main() references TrialLedger / load_v2_data /
+# fold_indices / run_online_engine / frozen_net, which live in
+# aurum_v2/model/v2_common.py (the Kaggle bundle stitches them in; standalone we
+# import them explicitly). The try/except keeps the embedded copy inside the
+# Kaggle bundle working when v2_common is not importable there.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+for _p in (os.path.join(_HERE, os.pardir, "model"), os.path.join(_HERE, os.pardir)):
+    _p = os.path.normpath(_p)
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
+try:
+    from v2_common import (TrialLedger, load_v2_data, fold_indices,
+                           run_online_engine, frozen_net)
+    from rff_ridge import RFFRidgeTimingModel
+    from online_engine import RLSBank
+except ImportError:  # Kaggle bundle: symbols are stitched inline below
+    pass
+
+# v2 fold/selection windows (identical to the Kaggle bundle definitions —
+# repro gap #3 fix: the modular source previously relied on the bundle to
+# define these; now they are explicit and single-sourced here for standalone).
+FIT_YEARS = list(range(2016, 2023))     # 2016-2022: selection / stacking window
+OOS_YEARS = [2023, 2024, 2025]          # untouched OOS
+ALL_FOLD_YEARS = list(range(2016, 2026))  # walk-forward fold years
 
 GATES = {}
 LOG_LINES = []
