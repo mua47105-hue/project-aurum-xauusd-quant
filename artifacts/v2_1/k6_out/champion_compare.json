@@ -25,8 +25,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.6806,
-  "oos_dsr_conservative": 0.6302,
+  "oos_dsr": 0.6466,
+  "oos_dsr_conservative": 0.5941,
   "cost2x_sharpe": 1.6135
  },
  "M7_Core_Satellite": {
@@ -41,8 +41,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.947,
-  "oos_dsr_conservative": 0.9304,
+  "oos_dsr": 0.9361,
+  "oos_dsr_conservative": 0.9168,
   "cost2x_sharpe": 2.5012
  },
  "M6_AURUM_v2_Ensemble": {
@@ -57,8 +57,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0051,
-  "oos_dsr_conservative": 0.0034,
+  "oos_dsr": 0.0039,
+  "oos_dsr_conservative": 0.0026,
   "cost2x_sharpe": -0.2814
  },
  "M6b_Ensemble_EQW": {
@@ -73,8 +73,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0051,
-  "oos_dsr_conservative": 0.0034,
+  "oos_dsr": 0.0039,
+  "oos_dsr_conservative": 0.0026,
   "cost2x_sharpe": -0.2814
  },
  "M0_Champ_v13": {
@@ -89,8 +89,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.9418,
-  "oos_dsr_conservative": 0.9242,
+  "oos_dsr": 0.9302,
+  "oos_dsr_conservative": 0.9098,
   "cost2x_sharpe": 2.3391
  },
  "M0_Champ_v13_cap1": {
@@ -105,44 +105,28 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.9281,
-  "oos_dsr_conservative": 0.9073,
+  "oos_dsr": 0.9144,
+  "oos_dsr_conservative": 0.8906,
   "cost2x_sharpe": 2.335
  },
  "M0_Champ_v13_E1": {
-  "sharpe_ann": 0.6748,
-  "maxdd_volunits": 0.17745,
-  "oos_bootstrap": {
-   "sharpe_ci": [
-    -0.48,
-    1.83
-   ],
-   "sharpe_p05": -0.3,
-   "n_boot": 5000,
-   "block": 24
-  },
-  "oos_dsr": 0.0427,
-  "oos_dsr_conservative": 0.0316,
-  "cost2x_sharpe": 0.3003
+  "sharpe_ann": 2.3949968821959624,
+  "maxdd_volunits": null,
+  "oos_bootstrap": null,
+  "oos_dsr": null,
+  "oos_dsr_conservative": null,
+  "cost2x_sharpe": null
  },
  "M0_Champ_v13_E2": {
-  "sharpe_ann": 0.5145,
-  "maxdd_volunits": 0.14156,
-  "oos_bootstrap": {
-   "sharpe_ci": [
-    -0.658,
-    1.687
-   ],
-   "sharpe_p05": -0.459,
-   "n_boot": 5000,
-   "block": 24
-  },
-  "oos_dsr": 0.0228,
-  "oos_dsr_conservative": 0.0163,
-  "cost2x_sharpe": 0.0695
+  "sharpe_ann": 2.587294419860205,
+  "maxdd_volunits": null,
+  "oos_bootstrap": null,
+  "oos_dsr": null,
+  "oos_dsr_conservative": null,
+  "cost2x_sharpe": null
  },
  "M0_Champ_v13_E2_carry": {
-  "sharpe_ann": 0.29728525887156243,
+  "sharpe_ann": 2.3601717271325016,
   "maxdd_volunits": null,
   "oos_bootstrap": null,
   "oos_dsr": null,
@@ -150,7 +134,7 @@
   "cost2x_sharpe": null
  },
  "M0_Champ_v13_E2_carry_punitive": {
-  "sharpe_ann": 0.2658073499676076,
+  "sharpe_ann": 2.3273125739701928,
   "maxdd_volunits": null,
   "oos_bootstrap": null,
   "oos_dsr": null,
@@ -185,8 +169,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0149,
-  "oos_dsr_conservative": 0.0105,
+  "oos_dsr": 0.0117,
+  "oos_dsr_conservative": 0.0081,
   "cost2x_sharpe": 0.223
  },
  "BuyHold_Gold": {
@@ -201,8 +185,8 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.7931,
-  "oos_dsr_conservative": 0.7515,
+  "oos_dsr": 0.7652,
+  "oos_dsr_conservative": 0.7202,
   "cost2x_sharpe": 2.1345
  }
 }

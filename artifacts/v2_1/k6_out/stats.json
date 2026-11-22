@@ -9,9 +9,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0149,
+  "oos_dsr": 0.0117,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0105
+  "oos_dsr_conservative": 0.0081
  },
  "M2_RFF_Ridge": {
   "oos_bootstrap": {
@@ -37,9 +37,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0312,
+  "oos_dsr": 0.0251,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0226
+  "oos_dsr_conservative": 0.0179
  },
  "M3c_DAE": {
   "oos_bootstrap": {
@@ -51,9 +51,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.1195,
+  "oos_dsr": 0.1017,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0941
+  "oos_dsr_conservative": 0.0791
  },
  "Carver_EWMAC": {
   "oos_bootstrap": {
@@ -65,9 +65,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.2182,
+  "oos_dsr": 0.1914,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.1796
+  "oos_dsr_conservative": 0.1556
  },
  "Channel_A": {
   "oos_bootstrap": {
@@ -79,9 +79,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0006,
+  "oos_dsr": 0.0004,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0004
+  "oos_dsr_conservative": 0.0003
  },
  "Channel_B": {
   "oos_bootstrap": {
@@ -93,9 +93,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0034,
+  "oos_dsr": 0.0026,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0023
+  "oos_dsr_conservative": 0.0017
  },
  "BuyHold_Gold": {
   "oos_bootstrap": {
@@ -107,9 +107,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.7931,
+  "oos_dsr": 0.7652,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.7515
+  "oos_dsr_conservative": 0.7202
  },
  "M0_Champ_v13": {
   "oos_bootstrap": {
@@ -121,9 +121,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.9418,
+  "oos_dsr": 0.9302,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.9242
+  "oos_dsr_conservative": 0.9098
  },
  "M0_Champ_v13_cap1": {
   "oos_bootstrap": {
@@ -135,37 +135,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.9281,
+  "oos_dsr": 0.9144,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.9073
- },
- "M0_Champ_v13_E1": {
-  "oos_bootstrap": {
-   "sharpe_ci": [
-    -0.48,
-    1.83
-   ],
-   "sharpe_p05": -0.3,
-   "n_boot": 5000,
-   "block": 24
-  },
-  "oos_dsr": 0.0427,
-  "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0316
- },
- "M0_Champ_v13_E2": {
-  "oos_bootstrap": {
-   "sharpe_ci": [
-    -0.658,
-    1.687
-   ],
-   "sharpe_p05": -0.459,
-   "n_boot": 5000,
-   "block": 24
-  },
-  "oos_dsr": 0.0228,
-  "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0163
+  "oos_dsr_conservative": 0.8906
  },
  "M6_AURUM_v2_Ensemble": {
   "oos_bootstrap": {
@@ -177,9 +149,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0051,
+  "oos_dsr": 0.0039,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0034
+  "oos_dsr_conservative": 0.0026
  },
  "M6b_Ensemble_EQW": {
   "oos_bootstrap": {
@@ -191,9 +163,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.0051,
+  "oos_dsr": 0.0039,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.0034
+  "oos_dsr_conservative": 0.0026
  },
  "M7_Active_Grand_Hybrid": {
   "oos_bootstrap": {
@@ -205,9 +177,9 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.6806,
+  "oos_dsr": 0.6466,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.6302
+  "oos_dsr_conservative": 0.5941
  },
  "M7_Core_Satellite": {
   "oos_bootstrap": {
@@ -219,33 +191,31 @@
    "n_boot": 5000,
    "block": 24
   },
-  "oos_dsr": 0.947,
+  "oos_dsr": 0.9361,
   "dsr_passes_95": false,
-  "oos_dsr_conservative": 0.9304
+  "oos_dsr_conservative": 0.9168
  },
  "_meta": {
   "N_trials_ledger": 52,
-  "ledger_rows": 78,
-  "pbo_cscv": 0.0834,
+  "ledger_rows": 156,
+  "pbo_cscv": 0.0802,
   "code_rev": "k6-v2.0.2",
   "dsr_family": "K6 v2.0.2 tournament selection panel, effective-independent families (Bailey-LdP: correlated siblings are not independent trials; frozen FIT Sharpes under causal accounting). Primary = signal families + ONE blend slot (fixed a-priori portfolio constructions over counted members are correlated re-weightings, counted once at their best-FIT variant -- the v2.0.1 pre-registered convention, applied consistently)",
-  "dsr_family_N": 13,
+  "dsr_family_N": 11,
   "dsr_family_sharpes": [
    -2.1423,
    -0.8394,
    -0.5086,
    -0.2957,
    0.0,
-   0.2011,
    0.2519,
    0.3614,
-   0.4065,
    0.6158,
    0.6992,
    2.0126,
    1.4492
   ],
-  "dsr_family_conservative_N": 15,
+  "dsr_family_conservative_N": 13,
   "dsr_family_conservative_sharpes": [
    -2.1423,
    -0.8394,
@@ -253,10 +223,8 @@
    -0.5086,
    -0.2957,
    0.0,
-   0.2011,
    0.2519,
    0.3614,
-   0.4065,
    0.6158,
    0.6992,
    1.4109,
@@ -266,14 +234,14 @@
   "dsr_conservative_note": "conservative accounting: every distinct (deduped) blend stream counts as a trial; flagship DSR under this vintage is exported per strategy as oos_dsr_conservative",
   "trial_sharpe_units": "per-bar (annualized / sqrt(5786))",
   "dsr_sensitivity_m7": {
-   "primary": 0.947,
-   "conservative": 0.9304,
+   "primary": 0.9361,
+   "conservative": 0.9168,
    "with_m7_grid": 0.7603,
    "with_k2_prefix": 0.7603,
    "all_ledger_mixed_units": 0.0,
    "family_N": {
-    "primary": 13,
-    "conservative": 15,
+    "primary": 11,
+    "conservative": 13,
     "with_grid": 38,
     "with_k2": 38,
     "all": 48

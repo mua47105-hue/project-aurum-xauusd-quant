@@ -85,20 +85,6 @@
   "frozen_fit_sharpe": 1.7381,
   "engine_shipped": false
  },
- "M0_Champ_v13_E1": {
-  "sig": "889448a78f11",
-  "forced": "frozen_translation",
-  "engine_fit_sharpe": null,
-  "frozen_fit_sharpe": 0.4065,
-  "engine_shipped": false
- },
- "M0_Champ_v13_E2": {
-  "sig": "ea204bb45e55",
-  "forced": "frozen_translation",
-  "engine_fit_sharpe": null,
-  "frozen_fit_sharpe": 0.2011,
-  "engine_shipped": false
- },
  "M6_AURUM_v2_Ensemble": {
   "sig": "d9ea40524203",
   "engine_fit_sharpe": -0.451,

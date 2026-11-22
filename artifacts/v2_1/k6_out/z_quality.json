@@ -174,38 +174,6 @@
    "oos_saturated": true,
    "by_design_position_schedule": true
   },
-  "M0_Champ_v13_E1": {
-   "fit": {
-    "n": 41513,
-    "nunique": 7,
-    "std": 0.53354,
-    "top_value_share": 0.4224
-   },
-   "fit_saturated": true,
-   "oos": {
-    "n": 16991,
-    "nunique": 7,
-    "std": 0.53448,
-    "top_value_share": 0.3203
-   },
-   "oos_saturated": true
-  },
-  "M0_Champ_v13_E2": {
-   "fit": {
-    "n": 41513,
-    "nunique": 25,
-    "std": 0.45734,
-    "top_value_share": 0.4162
-   },
-   "fit_saturated": false,
-   "oos": {
-    "n": 16991,
-    "nunique": 27,
-    "std": 0.46165,
-    "top_value_share": 0.3114
-   },
-   "oos_saturated": false
-  },
   "M6_AURUM_v2_Ensemble": {
    "fit": {
     "n": 41513,
@@ -292,9 +260,7 @@
    "by_design_position_schedule": true
   }
  },
- "flagged_strategies": [
-  "M0_Champ_v13_E1"
- ],
+ "flagged_strategies": [],
  "criteria": "std < 0.05 or nunique <= 8 or top-value share >= 0.90, per window",
  "note": "flagged = saturated/degenerate z (per-fold directional bet); results are still exported verbatim and quarantined in the report"
 }

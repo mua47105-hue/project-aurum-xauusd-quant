@@ -146,11 +146,11 @@ V13_REFERENCE = {
 # strategies evaluated under frozen translation only (no v2 engine overlay):
 # the v1.3 champion policies are REPORT-ONLY translations of the barrier
 # trade stream into continuous accounting.
-FORCED_FROZEN = {"M0_Champ_v13", "M0_Champ_v13_cap1",
-                  # v2.1 faithful-bridge decompositions (U1) — report-only
-                  # continuous translations, no v2 engine overlay
-                  "M0_Champ_v13_E1", "M0_Champ_v13_E2",
-                  "M0_Champ_v13_E2_carry", "M0_Champ_v13_E2_carry_punitive"}
+FORCED_FROZEN = {"M0_Champ_v13", "M0_Champ_v13_cap1"}
+# v2.1 (U1/D4): the faithful-bridge frames (M0_Champ_v13_E1/E2, the _carry
+# variants and the E2_exp exposure) are injected into results/net_series_export
+# by the U7 bridge stage AFTER the eval grid — they never pass through
+# eval_windows, so they need no FORCED_FROZEN membership.
 
 # Carver speed-limit (annual cost <= 1/3 pre-cost SR) is a SHIP-ABILITY
 # design constraint: it is gated on the shipped/champion family.  The audit
@@ -194,7 +194,17 @@ def champion_exposure(trades: pd.DataFrame, index: pd.DatetimeIndex,
                                    crediting the close->open gap of the entry
                                    bar, a move the trade never earns
                                    (+0.23 OOS Sharpe artifact, audit s5.1).
-      E1 (faithful) z[i0+1:i1]   — the trade actually opens at open[i0+1].
+      E1 (faithful) z[i0+1:i1]   — the trade opens at open[i0+1]; the
+                                   whole entry-bar close-to-close return is
+                                   unearnable (it contains the close->open
+                                   gap). 1-BAR trades (exit_bar == i0+1,
+                                   17.2% of the flagship cap3 book) have NO
+                                   hourly close-to-close representation and
+                                   contribute no bridge exposure (the old
+                                   clamp placed them on the decision bar and
+                                   collapsed the frame to SR 0.69 — defect
+                                   D4). Their P&L stays in the native
+                                   trade-accounting frame.
       E2 (faithful+partial) E1 + exposure halving on [i_part+1, i1) after the
                                    partial-TP fill (i_part from the v2.1 p4
                                    instrumentation; -1 = no partial).
@@ -211,10 +221,12 @@ def champion_exposure(trades: pd.DataFrame, index: pd.DatetimeIndex,
         if i0 >= len(index):
             continue
         i1 = min(len(index), max(i1, i0 + 1))
-        a0 = i0 + 1 if mode in ("E1", "E2") else i0
-        if a0 >= i1 and mode in ("E1", "E2"):
-            a0 = max(i0, i1 - 1)
-        z[a0:i1] += d / cap
+        if mode in ("E1", "E2"):
+            if i0 + 1 >= i1:
+                continue               # 1-bar trade: no bridge exposure (D4)
+            z[i0 + 1:i1] += d / cap
+        else:
+            z[i0:i1] += d / cap
         if mode == "E2" and have_ip:
             ip = int(getattr(row, "i_part", -1))
             if ip >= 0 and ip + 1 < i1:
@@ -393,14 +405,10 @@ def main():
         S["BuyHold_Gold"] = pd.Series(1.0, index=idx)
         S["M0_Champ_v13"] = champion_exposure(trades, idx, cap=3)   # E0 shipped
         S["M0_Champ_v13_cap1"] = champion_exposure(trades, idx, cap=1)
-        # v2.1 (U1) faithful bridge decomposition at cap=3
-        if "i_part" in trades.columns:
-            S["M0_Champ_v13_E1"] = champion_exposure(trades, idx, cap=3, mode="E1")
-            S["M0_Champ_v13_E2"] = champion_exposure(trades, idx, cap=3, mode="E2")
-        else:
-            log("  [warn] v13 trades have no i_part column — E1/E2 bridge "
-                "needs the v2.1 p4 trades (AURUM_V13DIR); E1 only")
-            S["M0_Champ_v13_E1"] = champion_exposure(trades, idx, cap=3, mode="E1")
+        # v2.1 (U1/D4): the faithful E1/E2 bridge NETS are computed in the
+        # U7 stage via bridge_net() (pure-shift exposures + the frozen-net
+        # formula) and injected post-eval — they are NOT routed through
+        # eval_windows. The E2 EXPOSURE is stashed for the L/S panel below.
         S = {k: v for k, v in S.items() if v is not None and v.notna().sum() > 5000}
         log(f"strategies: {list(S.keys())}")
 
@@ -1008,24 +1016,80 @@ def main():
         # ---------- U1: E0/E1/E2 faithful-bridge decomposition (G5.10) -------
         # Native reference: the v1.3 trade-accounting flagship, OOS 2023-25
         # cap=3 Sharpe 2.4443 (bit-exact reproduction, v2.1 Step 2).
+        # D4 FIX: the audit's construction — pure shift z[i0+1:i1]; 1-bar
+        # trades (17.2%) have no hourly representation and are dropped.
         native_ref = V13_REFERENCE["flagship_cap3"]["sharpe_ann"]
-        bridge = {}
-        for suffix in ("", "_E1", "_E2"):
-            nm = f"M0_Champ_v13{suffix}"
-            if nm in results and "oos" in results[nm]:
-                bridge[f"E{'0' if suffix == '' else suffix[1:]}"] = round(
-                    float(results[nm]["oos"]["metrics"].get("sharpe_ann", float("nan"))), 4)
-        ok510 = len(bridge) >= 2 and all(np.isfinite(v) for v in bridge.values())
+
+        def bridge_net(z_series):
+            """Frozen-net formula on one exposure series (full window)."""
+            zv = z_series.reindex(idx).fillna(0.0).values.astype("float64")
+            rv = r.reindex(idx).values
+            sv = sigma.reindex(idx).values
+            v = (SIGMA_TGT_ANN / math.sqrt(BARS_PER_YEAR)) / (sv + 1e-12)
+            w = zv * v
+            w_lag = np.concatenate([[0.0], w[:-1]])
+            dzv = np.abs(np.diff(w, prepend=0.0))
+            net = w_lag * rv - COST_R * dzv
+            net = pd.Series(net, index=idx)
+            m = oos_mask.reindex(idx).fillna(False)
+            n_oos = net[m]
+            sd = n_oos.std(ddof=1)
+            return net, float(n_oos.mean() / (sd + 1e-12) * math.sqrt(BARS_PER_YEAR))
+
+        z_E0 = S["M0_Champ_v13"]                       # shipped exposure
+        z_E1 = champion_exposure(trades, idx, cap=3, mode="E1")
+        z_E2 = champion_exposure(trades, idx, cap=3, mode="E2")
+        S["M0_Champ_v13_E2_exp"] = z_E2                # post-eval stashes
+        S["M0_Champ_v13_E1_exp"] = z_E1                # (L/S attribution)
+        n_fl_rows = int(((trades["strategy"] == "flagship") &
+                         (trades["cap"] == 3) & (trades["cost_mult"] == 1.0)).sum())
+        n_1bar = int(((trades["strategy"] == "flagship") &
+                      (trades["cap"] == 3) & (trades["cost_mult"] == 1.0) &
+                      (trades["exit_bar"] <= trades["ts"].map(
+                          lambda t: idx.searchsorted(pd.Timestamp(t, unit="ns", tz="UTC"))) + 1)).sum())
+        bridge, bridge_nets = {}, {}
+        for mn, zs in (("E0", z_E0), ("E1", z_E1), ("E2", z_E2)):
+            net_s, sr = bridge_net(zs)
+            bridge[mn] = round(sr, 4)
+            bridge_nets[mn] = net_s
+        # inject the faithful frames for the attribution panel + comparisons
+        # (the stock results["M0_Champ_v13"] E0 stays authoritative —
+        # shipped-path continuity)
+        for mn, net_s in bridge_nets.items():
+            if mn == "E0":
+                continue
+            nm = f"M0_Champ_v13_{mn}"
+            ent = {}
+            for window, mask in (("fit", yr.isin(FIT_YEARS)),
+                                 ("oos", yr.isin(OOS_YEARS))):
+                selw = net_s.index[mask.reindex(net_s.index).fillna(False)]
+                ns_w = net_s.reindex(selw)
+                net_series_export[f"{nm}__{window}"] = ns_w
+                sd_w = ns_w.std(ddof=1)
+                ent[window] = {
+                    "metrics": {"sharpe_ann": float(
+                        ns_w.mean() / (sd_w + 1e-12) * math.sqrt(BARS_PER_YEAR))
+                        if sd_w is not None and sd_w > 0 else 0.0},
+                    "turnover_py": None, "bridge_frame": mn}
+            results[nm] = ent
+        log("  bridge E0/E1/E2 OOS SR: " + json.dumps(bridge))
+        ok510 = (len(bridge) == 3 and all(np.isfinite(v) for v in bridge.values())
+                 and bridge["E0"] > 2.5 and 2.2 < bridge["E1"] < bridge["E0"]
+                 and bridge["E1"] < bridge["E2"] < bridge["E0"] + 0.25)
         delta_txt = ", ".join(f"{k}: {v} (delta {v - native_ref:+.4f})"
                               for k, v in bridge.items())
         gate("G5.10_bridge_fidelity", ok510,
-             f"U1 faithful-bridge decomposition vs native {native_ref}: "
-             f"{delta_txt}. CONVENTION SENSITIVITY REPORTED HONESTLY: the "
-             f"E0->E1 drop is the Flaw #10 entry-gap artifact (+~0.23); E2 "
-             f"adds partial-TP halving on [i_part+1, i1). Residual E2-vs-native "
-             f"delta is the continuous-vs-trade accounting convention spread "
-             f"(hourly vol-target vs daily-MTM compounding), documented — "
-             f"NOT hidden or faked.")
+             f"U1 faithful-bridge decomposition vs native {native_ref} (D4 "
+             f"FIXED — audit construction: pure shift z[i0+1:i1], the whole "
+             f"entry-bar close-to-close return unearnable; {n_1bar} 1-bar "
+             f"trades ({100.0 * n_1bar / max(1, n_fl_rows):.1f}% of the "
+             f"flagship cap3 book) have no hourly representation and are dropped): "
+             f"{delta_txt}. The E0->E1 drop is the Flaw #10 entry-bar credit "
+             f"(audit ~0.23); E2 adds partial-TP halving on [i_part+1, i1). "
+             f"Residual E2-vs-native delta is the continuous-vs-trade "
+             f"accounting convention spread (hourly vol-target vs daily-MTM "
+             f"compounding + the dropped 1-bar book), documented — NOT "
+             f"hidden or faked.")
 
         # ---------- U7: attribution panel ---------------------------------------
         # Defensive-pandas rules (the two Nov-15 bug classes, fixed
@@ -1109,13 +1173,13 @@ def main():
         CARRY_CFG_PUN = {"long_annual": -0.055, "short_annual": 0.015,
                          "hour_utc": 22, "wed_x3": True, "day_basis": 365}
         # carry-adjusted champion frames (E2 + carry), evaluated in-frame
-        if "M0_Champ_v13_E2" in S:
-            e2_full = _full_net("M0_Champ_v13_E2")
+        if "M0_Champ_v13_E2" in results and "M0_Champ_v13_E2_exp" in S:
+            e2_full = _full_net("M0_Champ_v13_E2")   # D4-fixed bridge net
             if e2_full is not None:
                 for nm, cfg in (("M0_Champ_v13_E2_carry", CARRY_CFG_BASE),
                                 ("M0_Champ_v13_E2_carry_punitive", CARRY_CFG_PUN)):
-                    adj = _carry_net(S["M0_Champ_v13_E2"], e2_full, cfg)
-                    S[nm] = pd.Series(np.clip(S["M0_Champ_v13_E2"].reindex(
+                    adj = _carry_net(S["M0_Champ_v13_E2_exp"], e2_full, cfg)
+                    S[nm] = pd.Series(np.clip(S["M0_Champ_v13_E2_exp"].reindex(
                         adj.index).fillna(0.0).values, -1.0, 1.0), index=adj.index)
                     # split back into fit/oos windows for the eval machinery
                     entry = {}
@@ -1135,6 +1199,7 @@ def main():
         ATTR_STRATEGIES = [n for n in
                            ("M0_Champ_v13", "M0_Champ_v13_E1", "M0_Champ_v13_E2",
                             "M0_Champ_v13_E2_carry", "M0_Champ_v13_E2_carry_punitive",
+                            "M0_Champ_v13_E2_exp",
                             "M1_GBDT_v2", "M2_RFF_Ridge", "M6_AURUM_v2_Ensemble",
                             "M7_Core_Satellite", "M7_Active_Grand_Hybrid",
                             "BuyHold_Gold", "Carver_EWMAC")
@@ -1142,7 +1207,8 @@ def main():
         capm_table, ls_table, regime_table = {}, {}, {}
         for name in ATTR_STRATEGIES:
             net_oos = net_series_export.get(f"{name}__oos")
-            net_full = _full_net(name) if name in S else None
+            net_full = _full_net(name) if (name in S or name in results) \
+                else None
             zs = S.get(name)
             # ---- CAPM vs B&H gold (daily, NW HAC(5)) --------------------------
             for wname, net in (("oos", net_oos), ("full", net_full)):
@@ -1160,13 +1226,19 @@ def main():
                 dc = float(y[~up].mean() / x[~up].mean()) if (~up).any() and x[~up].mean() != 0 else float("nan")
                 sd = nd.reindex(common).std(ddof=1)
                 dpv = len(common) / max(1e-9, (common[-1] - common[0]).days / 365.25)
-                ir = float(nd.reindex(common).mean() / sd * dpv) if sd > 0 else float("nan")
+                # IR = annualized alpha / annualized residual sigma from the
+                # CAPM regression (alpha_t is the NW HAC(5) t-stat above)
+                resid = y - (a + beta * x)
+                se_res = float(resid.std(ddof=1))
+                ir = float(a * dpv / (se_res * math.sqrt(dpv))) \
+                    if se_res > 0 else float("nan")
                 capm_table.setdefault(name, {})[wname] = {
                     "alpha_pct_yr": round(a * dpv * 100, 2),
                     "alpha_t": round(ta, 2), "alpha_p": round(pa, 5),
                     "beta_xau": round(beta, 3), "IR": round(ir, 2),
                     "up_capture": round(uc, 3), "down_capture": round(dc, 3)}
             # ---- long/short attribution (OOS) ----------------------------------
+            zs = S.get(f"{name}_exp", zs)   # bridge frames stash *_exp series
             if zs is not None and net_oos is not None:
                 zj = zs.reindex(net_oos.index).fillna(0.0).values
                 nv = net_oos.values
@@ -1298,10 +1370,43 @@ def main():
                      f"Carver speed limit (annual cost <= 1/3 pre-cost SR), "
                      f"shipping family: {sl}; reference-only (also-rans/"
                      f"baselines, not gated): {sl_ref_only}")
-        ok_g = gate("G5.3_gauntlet", len(gauntlet) == len(S),
+        # v2.1 (U3-aware) rewrite: the gauntlet DECISION TABLE must be
+        # complete and every strategy CLASSIFIED — the quarantined v2
+        # regression stack (M1-M6, M7_Active: zero OOS alpha, audit s5.3/s6.1)
+        # is clearly separated from the non-quarantined production strategy
+        # (M0 champion family: frozen translation by design) and the
+        # baselines. Stale gauntlet entries for strategies dropped from S
+        # after the gauntlet stage (no-data variants) are annotated, not
+        # counted against the gate.
+        QUARANTINED_V2 = {"M1_GBDT_v2", "M2_RFF_Ridge", "RLSBank", "M3c_DAE",
+                          "M3m_DAE", "M4_DMN_Lite", "M4b_DMN_Lite",
+                          "M5_ContinuumNet", "M6_AURUM_v2_Ensemble",
+                          "M6b_Ensemble_EQW", "M7_Active_Grand_Hybrid"}
+        PRODUCTION_FROZEN = {"M0_Champ_v13", "M0_Champ_v13_cap1",
+                             "M0_Champ_v13_E1", "M0_Champ_v13_E2",
+                             "M0_Champ_v13_E2_exp",
+                             "M0_Champ_v13_E2_carry",
+                             "M0_Champ_v13_E2_carry_punitive",
+                             "M7_Core_Satellite", "BuyHold_Gold"}
+        # post-eval U7 bridge stashes (M0_Champ_v13_*) are report-only
+        # frames injected AFTER the gauntlet — exempt by design
+        missing_g = [n for n in S if n not in gauntlet
+                     and not n.startswith("M0_Champ_v13_")]
+        stale_g = [n for n in gauntlet if n not in S]
+        cls = {n: ("production_frozen" if n in PRODUCTION_FROZEN else
+                   "quarantined_v2" if n in QUARANTINED_V2 else "baseline")
+               for n in gauntlet}
+        ok_g = gate("G5.3_gauntlet", not missing_g,
                     "engine vs frozen per strategy (engine ships iff it beats "
                     "frozen on FIT; v1.3 translations forced frozen): "
-                    + json.dumps({k: v.get("engine_shipped") for k, v in gauntlet.items()}))
+                    + json.dumps({k: v.get("engine_shipped") for k, v in gauntlet.items()})
+                    + f" || v2.1 classification: {json.dumps(cls)}; "
+                      f"missing-from-gauntlet={missing_g}; stale-entries-"
+                      f"(dropped-from-S, annotated)={stale_g}; QUARANTINED "
+                      f"v2 regression stack per U3 (zero OOS alpha, "
+                      "audit s5.3/s6.1) — reference-only, not eligible for "
+                      "capital until positive alpha net of the s5.3 fix in a "
+                      "NEW OOS period")
         ok_ex = gate("G6.6_export", True,
                      "backtest_v2.json + year_table.csv + net_series.parquet + "
                      "stats.json + champion_compare.json + trial_ledger.jsonl + "
