@@ -76,6 +76,28 @@ ASSETS = {
                 "labels (R_actual/beff/evref/excursions/pwin), cohort_idx, codebooks, vocab",
         "extract_into": os.path.join("data", "phase1"),
     },
+    "workspace_backup_v21": {
+        "file": "aurum_v2_workspace_backup_v21.tar.gz",
+        "sha256": "988e7c59b529468c5250c6f0d722c8b1c24962ad0fa8e3184b4348c79a73196b",
+        "dest": os.path.join("backup", "aurum_v2_workspace_backup_v21.tar.gz"),
+        "size_mb": 27.7,
+        "kaggle": ("dataset_zip", "tskdev/aurum-v2-workspace-backup"),
+        "desc": "Spec v2.1.0 lean workspace snapshot: all kernels (frozen "
+                "policy, r1 strategies, M1 walker, U2/U3, D4-fixed bridge, "
+                "U7 attribution, fast-r1 live), 7/7 red-team CI verdicts, "
+                "verified artifacts, autopsy + master report sources",
+    },
+    "trades_all_v21": {
+        "file": "trades_all_v21_380193rows_with_i_part.parquet",
+        "sha256": "4d6b8860ee72c04b55fbbbedb1cd95931750b89c0dde7dcf64a76c2c1071a9a5",
+        "dest": os.path.join("artifacts", "v2_1", "kaggle_runs",
+                             "trades_all_v21.parquet"),
+        "size_mb": 5.3,
+        "kaggle": ("kernel_file", "tskdev/aurum-p4-backtest",
+                   "trades_all.parquet"),
+        "desc": "the v2.1 trade table (380,193 rows incl. r1_fast/r1_clean) "
+                "with the i_part partial-fill instrumentation (bridge input)",
+    },
     "workspace_backup": {
         "file": "aurum_v2_workspace_backup.tar.gz",
         "sha256": "2cc4fcd738b8aa0ee07fc5068fe167b91f0c72942fb7da48e043ab3e788502c4",
