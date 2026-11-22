@@ -1,0 +1,46 @@
+{
+ "suite": "redteam_ci",
+ "spec": "v2.1.0",
+ "written_utc": "2026-11-22 06:53:02",
+ "modules": {
+  "rt1_causality_prefix": {
+   "verdict": "pass",
+   "detail": "future-garbage prefix invariance: 73,907 numeric feature values over 3,000 bars unchanged after appending 500 garbage future bars (diffs=0, max|d|=0.00e+00); scale invariance x1.37: 73,907 values, violations=0. Causality and dimensionlessness hold.",
+   "elapsed_s": 0.5
+  },
+  "rt2_label_shuffle": {
+   "verdict": "pass",
+   "detail": "mechanical-artifact null: duplicate (ts,cell) rows=0/3341; R outcomes 380 unique values (barrier-quantized BY DESIGN: +/-1R, -q25/m, partial composites; top value share=0.180 < 0.5, continuous timeout component present=True); worst 10-day block share of total R=0.104 (<0.5); shipped 5000-draw block-",
+   "elapsed_s": 1.9
+  },
+  "rt3_m1_friction": {
+   "verdict": "pass",
+   "detail": "M1 resolver torture on 400 sampled OOS trades (barrier-mechanics-only, no overlay): pure M1 E[R]=+0.0874 vs H1 +0.0423; +1min delay delta +0.0686 (not catastrophic; the no-overlay barrier-mechanics subset reacts more than the overlay-full book: full-run delta +0.0095); spreads +0.0448 / +0.0277 (mon",
+   "elapsed_s": 2.3
+  },
+  "rt4_bridge_fidelity": {
+   "verdict": "pass",
+   "detail": "D4-fixed bridge recomputation: E0=2.6248 E1=2.3950 E2=2.5873 (audit family: E1 2.36-2.40; E2 partial-TP halving restores part of the book); 1-bar trade share=0.172 (the D4 cohort \u2014 no hourly representation, dropped from the bridge frame by the audit's construction); in-run G5.10 PASS=True; in-run br",
+   "elapsed_s": 1.4
+  },
+  "rt5_attribution_dsr": {
+   "verdict": "pass",
+   "detail": "U7 attribution panel: CAPM champion faithful-E2 OOS alpha=+13.58%/yr (NW t=3.43, beta=0.232) < artifact-E0 +16.91 (Flaw #10 direction, t=3.26); L/S hours 54.9/12.5/32.6 (short share 10.1%); 5-regime finite (bear 2.708, parabolic 3.1); DSR strictly decreasing in N, N=170=0.29 (<0.95 honest miss), car",
+   "elapsed_s": 0.0
+  },
+  "rt6_carry_and_tiers": {
+   "verdict": "pass",
+   "detail": "U5 tier/carry matrix: throttled 13.06% vs un-throttled 23.92% (audit 23.92% EXACT); pilot-0.5% un-throttled 12.54% (audit 12.54% EXACT); carry drag +0.289 SR (audit est. -0.3), punitive drag +0.336; ex-2023 (2024-25) SR 3.181 > full-OOS 2.444 (2023 is the degraded year, Flaw #12). Checks: {\"unthrott",
+   "elapsed_s": 0.0
+  },
+  "rt7_z_quality_quarantine": {
+   "verdict": "pass",
+   "detail": "strict G4.8 on ALL producers: z_rff (fit std=0.425, oos std=0.416) PASS=True; z_gbdt FIXED (fit std=0.395, oos std=0.390, oos |mean|=0.006) PASS=True; negative control fold-local artifact (oos |mean|=0.604, frac|z|>0.99=0.303) FAILS as expected=True; U3 quarantine registry in frozen_policy.json (8 q",
+   "elapsed_s": 0.4
+  }
+ },
+ "n_pass": 7,
+ "n_fail": 0,
+ "n_skip": 0,
+ "verdict": "PASS"
+}

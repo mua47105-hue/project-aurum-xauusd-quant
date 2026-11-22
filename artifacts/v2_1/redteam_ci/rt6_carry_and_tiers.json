@@ -1,0 +1,24 @@
+{
+ "module": "rt6_carry_and_tiers",
+ "verdict": "pass",
+ "detail": "U5 tier/carry matrix: throttled 13.06% vs un-throttled 23.92% (audit 23.92% EXACT); pilot-0.5% un-throttled 12.54% (audit 12.54% EXACT); carry drag +0.289 SR (audit est. -0.3), punitive drag +0.336; ex-2023 (2024-25) SR 3.181 > full-OOS 2.444 (2023 is the degraded year, Flaw #12). Checks: {\"unthrottled_maxdd_23p92_exact\": true, \"unthrottled_dd_gt_throttled\": true, \"throttled_13p06_exact\": true, \"pilot_unthrottled_12p54_exact\": true, \"pilot_dd_lt_standard\": true, \"carry_base_drag\": true, \"carry_punitive_lt_base\": true, \"ex2023_rows_with_and_without_carry\": true, \"ex2023_sharpe_gt_full_oos\": true}",
+ "metrics": {
+  "checks": {
+   "unthrottled_maxdd_23p92_exact": true,
+   "unthrottled_dd_gt_throttled": true,
+   "throttled_13p06_exact": true,
+   "pilot_unthrottled_12p54_exact": true,
+   "pilot_dd_lt_standard": true,
+   "carry_base_drag": true,
+   "carry_punitive_lt_base": true,
+   "ex2023_rows_with_and_without_carry": true,
+   "ex2023_sharpe_gt_full_oos": true
+  },
+  "unthrottled_maxdd": 23.916566008129493,
+  "pilot_unthrottled_maxdd": 12.537811918999042,
+  "carry_drag_sharpe": 0.289
+ },
+ "elapsed_s": 0.0,
+ "written_utc": "2026-11-22 06:53:08",
+ "exit_code": 0
+}

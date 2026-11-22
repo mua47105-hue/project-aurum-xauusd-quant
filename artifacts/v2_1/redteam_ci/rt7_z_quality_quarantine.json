@@ -1,0 +1,28 @@
+{
+ "module": "rt7_z_quality_quarantine",
+ "verdict": "pass",
+ "detail": "strict G4.8 on ALL producers: z_rff (fit std=0.425, oos std=0.416) PASS=True; z_gbdt FIXED (fit std=0.395, oos std=0.390, oos |mean|=0.006) PASS=True; negative control fold-local artifact (oos |mean|=0.604, frac|z|>0.99=0.303) FAILS as expected=True; U3 quarantine registry in frozen_policy.json (8 quarantined v2 models, top-60 pruning -0.215 OOS recorded) OK=True.",
+ "metrics": {
+  "rff_pass": true,
+  "gbm_fixed_pass": true,
+  "negative_control_fails": true,
+  "quarantine_registry_ok": true,
+  "z_gbdt_oos": {
+   "n": 16805,
+   "std": 0.3902071653310277,
+   "f99": 0.0019637012793811367,
+   "f90": 0.012139244272537935,
+   "absmean": 0.005818986566020236
+  },
+  "z_gbdt_foldlocal_oos": {
+   "n": 16991,
+   "std": 0.46445769375055385,
+   "f99": 0.30286622329468543,
+   "f90": 0.4064504737802366,
+   "absmean": 0.603844865042843
+  }
+ },
+ "elapsed_s": 0.4,
+ "written_utc": "2026-11-22 06:53:09",
+ "exit_code": 0
+}

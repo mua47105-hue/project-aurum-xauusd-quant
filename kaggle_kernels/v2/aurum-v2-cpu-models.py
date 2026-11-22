@@ -1060,38 +1060,9 @@ def self_test() -> None:
 
 
 
-# ==================== kernel main ====================
-"""
-AURUM v2.0 -- K2 kernel main: Fast CPU Models & Execution Upgrade
-==================================================================
-Phase 2 of the v2.0 execution plan (0 GPU hours):
-
-  * M1_GBDT_v2  : regularized LightGBM 3-seed ensemble on the ~345 v2
-                  features (max_depth=5, reg_alpha=10, reg_lambda=10,
-                  subsample=0.9, colsample_bytree=0.7), walk-forward yearly
-                  folds 2016-2025, target y_ret24_norm, position z=tanh(2*pred).
-  * M2_RFF_Ridge: Kelly-Malamud closed-form RFF timing (P=2048, gamma=sqrt(2)
-                  dimension-scaled, 10 seeds averaged, ridge sweep
-                  z in {1e0..1e4} selected on the fold's ES slice).
-  * RLSBank     : the hyperparameter-free adaptation floor as a standalone
-                  strategy (delay-aware updates, per-coordinate median bank).
-  * OnlineExecutionEngine evaluation of M1/M2 with Baseline-Gauntlet toggles
-    (buffer / RLS / regimes), cost multipliers 1.0x/1.5x/2.0x, FIT vs OOS.
-  * Master Trial Ledger from Experiment #1.
-
-Outputs: v2_cpu_forecasts.parquet, engine_metrics.json, trial_ledger.jsonl,
-gates.json, run_log.txt.
-"""
-import glob as _glob
-import json
-import math
-import os
-import time
-import traceback
-
-import numpy as np
-import pandas as pd
-
+# ==================== kernel main (v2.1 — regenerated from the patched modular source) ====================
+# v2.1 (U2/Flaw #9): z_gbdt = rff_z_v202(pred_gbdt); strict G4.8
+# on ALL producers; U3 quarantine ledger. See STATE.md.
 GATES = {}
 LOG_LINES = []
 
@@ -1128,6 +1099,65 @@ def stage(name):
 
 FEAT_COLS = None
 
+# ---------------------------------------------------------------------------
+# v2.0.2 (Engineering Flaw #8 fix): causal trailing standardization of the
+# raw RFF prediction.
+#
+# ROOT CAUSE of the flaw: under a heavy ridge penalty (z=1e4) the selected
+# model's predictions carry a fold-level mean drift (1e-3..1e-2) that is up
+# to 100x larger than their within-fold dispersion (~1e-4).  The old fold-
+# local transform tanh(pred / std(pred_es)) divided by a COLLAPSED scale, so
+# pred/scale >> 5 saturated tanh to sign(pred): z_rff became a per-fold
+# constant +-1.0 (OOS 2023-25: 16,991 bars, ONE unique value +1.0; FIT 2017
+# fold: constant -1.0).  M2 silently degraded into passive gold / per-fold
+# sign bets with ~zero per-bar information (G4.8 z-quality audit).
+#
+# FIX: standardize the raw prediction against its OWN trailing history,
+# re-anchored at each yearly re-fit boundary (the walk-forward replaces the
+# model; its prediction scale is a new random variable, and carrying the
+# dead model's mean/std across the boundary injects the very drift artifact
+# being removed):
+#     z_t = tanh( (p_t - EWMA_504(p)_t) / (2.0 * max(EWSTD_504(p)_t, eps)) )
+# min_periods=63 (~2.6 trading days): the first 63 bars of every fold are
+# NaN by design (no trailing history from the new model yet).
+RFF_Z_SPAN = 504          # trailing EWMA/EWSTD span (H1 bars, ~1 month)
+RFF_Z_MINP = 63           # warmup before a z is emitted (per fold)
+RFF_Z_EPS = 1e-9          # scale floor (degenerate constant stretches -> z=0)
+
+
+def rff_z_v202(pred: pd.Series) -> pd.Series:
+    """Causal trailing standardization of pred_rff (v2.0.2 primary)."""
+    out = pd.Series(np.nan, index=pred.index)
+    for _, g in pred.groupby(pred.index.year):   # fold = calendar test year
+        p = g.dropna()
+        if len(p) < 2 * RFF_Z_MINP:
+            continue
+        ewma = p.ewm(span=RFF_Z_SPAN, min_periods=RFF_Z_MINP).mean()
+        ewstd = p.ewm(span=RFF_Z_SPAN, min_periods=RFF_Z_MINP).std()
+        x = (p - ewma) / (2.0 * np.maximum(ewstd, RFF_Z_EPS))
+        out.loc[p.index] = np.tanh(x)
+    return out
+
+
+def rff_z_foldiqr(pred: pd.Series) -> pd.Series:
+    """NEGATIVE-CONTROL variant (kept for documentation only): fold mean
+    RETAINED in the numerator, robust expanding IQR scale (causal within
+    the fold).  Wherever the fold drift >> fold IQR this saturates exactly
+    like the v2.0.1 flaw -- it is exported so the report can show WHY
+    fold-local scaling cannot survive a drift/dispersion ratio >> 1."""
+    out = pd.Series(np.nan, index=pred.index)
+    for _, g in pred.groupby(pred.index.year):
+        p = g.dropna()
+        if len(p) < 2 * RFF_Z_MINP:
+            continue
+        vals = p.values
+        res = np.full(len(vals), np.nan)
+        for i in range(RFF_Z_MINP, len(vals)):
+            q75, q25 = np.percentile(vals[: i + 1], [75, 25])
+            res[i] = np.tanh(vals[i] / max((q75 - q25) / 1.349, RFF_Z_EPS))
+        out.loc[p.index] = res
+    return out
+
 
 def prepare_matrix(feats: pd.DataFrame):
     """Feature matrix (finite-filled) + targets; returns (X, y, names)."""
@@ -1162,6 +1192,8 @@ def main():
     r = feats["r_xau"]
     sigma = feats["sigma"]
     yr = pd.Series(feats.index.year, index=feats.index)
+    fit_mask = yr.isin(FIT_YEARS)
+    oos_mask = yr.isin(OOS_YEARS)
 
     # ---------------- 2) M1_GBDT_v2 walk-forward -----------------------------
     with stage("M1_GBDT_v2 walk-forward"):
@@ -1197,26 +1229,36 @@ def main():
                                           "best_iter": booster.best_iteration},
                            stage="fit", kernel="K2")
             p = np.mean(preds, axis=0)
-            # fold-local scale normalization: z = tanh(pred / std(in-sample pred))
-            # (predictions of vol-normalized 24h returns are tiny; without
-            #  normalization the position collapses to zero and costs dominate)
-            es_pred = booster.predict(Xes, num_iteration=booster.best_iteration)
-            scale = float(np.std(es_pred)) + 1e-9
-            z_gbdt.iloc[test_pos] = np.tanh(p / scale)
             pred_gbdt.iloc[test_pos] = p
             fold_log.append({"fold": yy, "best_iter": booster.best_iteration,
                              "pred_std": float(np.std(p))})
             log(f"  fold {yy}: best_iter={booster.best_iteration} "
                 f"pred_std={np.std(p):.4f}")
+        # v2.1 (U2 / Flaw #9): the fold-local transform tanh(pred/std(es_pred))
+        # is REMOVED. It collapsed DIRECTIONALLY in OOS 2023 (mean z +0.954,
+        # 100% of bars |z|>0.9 — a constant long-gold position, the Flaw-#8
+        # disease through a different producer path) and inflated M1_GBDT_v2's
+        # OOS Sharpe to +1.253. The program's own Flaw-#8 fix — causal trailing
+        # standardization, re-anchored per fold year — is applied to pred_gbdt.
+        # Audit-verified consequence (no retraining): OOS Sharpe collapses to
+        # +0.161 (2023: -1.58, 2024: +0.00, 2025: +1.69), mean OOS exposure
+        # +0.604 -> -0.006. The model is QUARANTINED (U3 block below).
+        z_gbdt = rff_z_v202(pred_gbdt)
         pre_2016 = int((feats.index < pd.Timestamp("2016-01-01", tz="UTC")).sum())
         n_missing = int(z_gbdt.isna().sum())
-        ok21 = gate("G2.1_folds", len(fold_log) == 10 and n_missing == pre_2016,
+        n_folds = len(fold_log)
+        ok21 = gate("G2.1_folds",
+                    n_folds == 10 and n_missing == pre_2016 + (RFF_Z_MINP - 1) * n_folds,
                     f"10/10 folds predicted; NaN z rows={n_missing} "
-                    f"(= pre-2016 warmup {pre_2016}: 2010-2015 excluded by design)")
+                    f"(= pre-2016 warmup {pre_2016} + {RFF_Z_MINP - 1}-bar "
+                    f"trailing-standardization warmup x {n_folds} folds; "
+                    f"2010-2015 excluded by design)")
 
     # ---------------- 3) M2_RFF_Ridge walk-forward ---------------------------
+    # v2.0.2: the model fit itself is UNCHANGED (same seeds, same ridge
+    # sweep, same pred_rff bytes); only the position transform is replaced
+    # by the causal trailing standardization (rff_z_v202).
     with stage("M2_RFF_Ridge walk-forward"):
-        z_rff = pd.Series(np.nan, index=feats.index)
         pred_rff = pd.Series(np.nan, index=feats.index)
         for yy in ALL_FOLD_YEARS:
             res = fold_indices(feats, yy)
@@ -1232,10 +1274,7 @@ def main():
             m2.fit(X.iloc[fit_m].values, y.iloc[fit_m].values,
                    X_val=X.iloc[es_pos].values, y_val=y.iloc[es_pos].values)
             p = m2.predict(X.iloc[test_pos].values)
-            p_es = m2.predict(X.iloc[es_pos].values)
-            scale = float(np.std(p_es)) + 1e-9
             pred_rff.iloc[test_pos] = p
-            z_rff.iloc[test_pos] = np.tanh(p / scale)
             ledger.add("M2_RFF_Ridge", {"fold": yy, "z_selected": m2.z_best,
                                         "p": 2048, "n_seeds": 10,
                                         "gamma": "sqrt(2)/sqrt(d)"},
@@ -1245,9 +1284,129 @@ def main():
             ledger.add("M2_RFF_Ridge", {"ridge_z": z_, "p": 2048, "n_seeds": 10},
                        stage="config", kernel="K2",
                        notes="ridge grid member (selection space for DSR N)")
+        # v2.0.2 position transforms (fold-local ES-scale REMOVED -- Flaw #8)
+        z_rff = rff_z_v202(pred_rff)
+        z_rff_iqr = rff_z_foldiqr(pred_rff)      # negative-control variant
+        ledger.add("M2_RFF_Ridge",
+                   {"rev": "k2-v2.0.2", "transform": "causal trailing",
+                    "z": "tanh((p - EWMA_504(p)) / (2*max(EWSTD_504(p), 1e-9)))",
+                    "re_anchor": "yearly re-fit boundary (fold = test year)",
+                    "span": RFF_Z_SPAN, "min_periods": RFF_Z_MINP,
+                    "eps": RFF_Z_EPS,
+                    "variant_foldiqr": "tanh(p / max(IQR_fold/1.349, eps)) "
+                                       "(negative control, mean retained)"},
+                   stage="config", kernel="K2",
+                   notes="Engineering Flaw #8 producer-side fix")
         ok_rff = gate("G2.1b_rff", int(z_rff.notna().sum()) >= pre_2016 and len(z_rff.dropna()) > 50000,
                       f"RFF predictions cover {int(z_rff.notna().sum())} bars "
-                      f"(2016-2025 span = {len(feats) - pre_2016})")
+                      f"(2016-2025 span = {len(feats) - pre_2016}; "
+                      f"{RFF_Z_MINP}-bar warmup per fold by design)")
+
+        # ---- G4.8 producer-side saturation gate (v2.0.2) --------------------
+        # The z-saturation audit is enforced AT THE PRODUCER now, not just
+        # discovered downstream in K6: std(z) > 0.05 and P(|z|>0.99) < 5%
+        # on BOTH windows, plus a genuinely-active OOS turnover floor
+        # (frozen accounting, > 2 round-turns / year).
+        audit48 = {}
+        ok48 = True
+        for wname, mask in (("fit", fit_mask), ("oos", oos_mask)):
+            sel = z_rff.dropna().index
+            sel = sel[mask.reindex(sel).fillna(False)]
+            if len(sel) < 500:
+                continue
+            v = z_rff[sel].values
+            std = float(np.std(v))
+            sat = float((np.abs(v) > 0.99).mean())
+            fro = frozen_net(z_rff[sel], r[sel], sigma[sel], 1.0)
+            audit48[wname] = {"n": int(len(v)),
+                              "std": round(std, 5),
+                              "sat_frac_gt_0p99": round(sat, 6),
+                              "nunique": int(pd.unique(v).size),
+                              "frozen_turnover_py": round(fro["turnover_py"], 2),
+                              "frozen_sharpe": fro["metrics"].get("sharpe_ann")}
+            ok48 = ok48 and (std > 0.05) and (sat < 0.05)
+        ok48 = ok48 and audit48.get("oos", {}).get("frozen_turnover_py", 0.0) > 2.0
+        # negative-control variant audited for the record (expected to FAIL)
+        neg = {}
+        for wname, mask in (("fit", fit_mask), ("oos", oos_mask)):
+            sel = z_rff_iqr.dropna().index
+            sel = sel[mask.reindex(sel).fillna(False)]
+            if len(sel) < 500:
+                continue
+            vi = z_rff_iqr[sel].values
+            neg[wname] = {"std": round(float(np.std(vi)), 5),
+                          "sat_frac_gt_0p99": round(float((np.abs(vi) > 0.99).mean()), 6),
+                          "nunique": int(pd.unique(vi).size)}
+        ledger.add("M2_RFF_Ridge", {"rev": "k2-v2.0.2", **audit48,
+                                     "negative_control_foldiqr": neg},
+                   audit48.get("oos", {}).get("frozen_sharpe"),
+                   stage="zquality", kernel="K2")
+        ok48g = gate("G4.8_z_rff_producer", ok48,
+                     f"v2.0.2 producer-side saturation gate on z_rff: "
+                     + json.dumps(audit48)
+                     + " -- negative control (fold-mean-retained IQR variant, "
+                       "expected saturated): " + json.dumps(neg))
+
+        # ---- v2.1 strict G4.8 on ALL continuous z producers (Flaw #9) --------
+        # The v2.0.2 gate above was applied only to z_rff; the Red-Team audit
+        # (s5.3) showed it is structurally blind to directional near-
+        # saturation of continuous tanh outputs (z_gbdt OOS 2023: mean +0.954,
+        # 100% of bars |z|>0.9).  v2.1 enforces, per window (FIT + OOS), on
+        # EVERY continuous producer:
+        #   std(z) > 0.05, frac(|z|>0.99) < 0.05, frac(|z|>0.90) < 0.25,
+        #   |mean(z)| < 0.35.
+        def _strict_z_audit(z):
+            aud, okz = {}, True
+            for wname, mask in (("fit", fit_mask), ("oos", oos_mask)):
+                sel = z.dropna().index
+                sel = sel[mask.reindex(sel).fillna(False)]
+                if len(sel) < 500:
+                    continue
+                v = z[sel].values
+                a = {"n": int(len(v)), "std": round(float(np.std(v)), 5),
+                     "frac_gt_0p99": round(float((np.abs(v) > 0.99).mean()), 6),
+                     "frac_gt_0p90": round(float((np.abs(v) > 0.90).mean()), 6),
+                     "abs_mean": round(float(np.abs(np.mean(v))), 5)}
+                aud[wname] = a
+                okz = okz and a["std"] > 0.05 and a["frac_gt_0p99"] < 0.05 \
+                    and a["frac_gt_0p90"] < 0.25 and a["abs_mean"] < 0.35
+            return aud, okz
+        aud_rff_s, okz_rff = _strict_z_audit(z_rff)
+        aud_gbm_s, okz_gbm = _strict_z_audit(z_gbdt)
+        ledger.add("G4.8_v21", {"z_rff": aud_rff_s, "z_gbdt": aud_gbm_s},
+                   stage="zquality", kernel="K2",
+                   notes="v2.1 strict all-producer z-quality (Flaw #9 fix)")
+        gate("G4.8_v21_strict_all_producers", okz_rff and okz_gbm,
+             f"strict z-quality on ALL continuous producers "
+             f"(std>0.05, P(|z|>0.99)<5%, P(|z|>0.90)<25%, |mean|<0.35): "
+             f"z_rff={json.dumps(aud_rff_s)} z_gbdt={json.dumps(aud_gbm_s)}")
+
+        # ---- v2.1 U3: formal quarantine of the v2 active regression stack ----
+        # Audit verdict (s5.3/s5.4/s6.1, Stage-7 U2/U3): with the honest
+        # transform M1_GBDT_v2's OOS Sharpe is +0.161; alpha <= 0 for EVERY
+        # v2-native model (NW t-stats: M1 -0.14, M2 -0.63, M3c -0.08,
+        # M3m -1.58, M4 -1.19, M5 -1.04); the M7 hybrids add nothing beyond
+        # their champion legs.  U3 top-60 feature-pruning evidence (FIT-IC
+        # stable, non-collinear): -0.215 OOS with the fixed transform —
+        # pruning does not wake the model; the SNR is simply absent.
+        # DECISION: the production registry is the v1.3/v1.4 Barrier Engine
+        # (see v1_3/config/frozen_policy.json, AURUM_r1_* strategies) alone;
+        # the v2 active stack is QUARANTINED until it demonstrates positive
+        # alpha net of the s5.3 fix in a NEW OOS period (audit s8.4).
+        ledger.add("QUARANTINE_V21", {
+            "quarantined": ["M1_GBDT_v2", "M2_RFF_Ridge", "M3c_DAE", "M3m_DAE",
+                            "M4_DMN", "M5_ContinuumNet", "M6_Ensemble",
+                            "M7_Active_Grand_Hybrid_active_arm"],
+            "reason": "zero OOS alpha (audit s5.3/s5.4/s6.1); M1 z-saturation "
+                      "artifact collapses 1.253 -> 0.161 under the honest transform",
+            "u3_top60_pruning_evidence": {
+                "oos_sharpe_top60_fixed_transform": -0.215,
+                "verdict": "REJECT pruning as a rescue — the SNR is absent",
+                "source": "Red-Team audit s8 (U3), verified 2026-11-11"},
+            "release_condition": "positive alpha net of the s5.3 fix in a NEW OOS period"},
+            None, stage="quarantine", kernel="K2",
+            notes="v2.1 production registry: AURUM v1.3 Barrier Engine "
+                  "(frozen policy) + AURUM_r1_Fast_Flagship / AURUM_r1_Clean_EV")
 
     # ---------------- 4) RLSBank standalone floor ----------------------------
     with stage("RLSBank standalone floor"):
@@ -1283,8 +1442,6 @@ def main():
 
     # ---------------- 5) engine evaluation (Phase 2 mandate) -----------------
     with stage("engine evaluation"):
-        fit_mask = yr.isin(FIT_YEARS)
-        oos_mask = yr.isin(OOS_YEARS)
         engine_metrics = {}
         for name, zseries in (("M1_GBDT_v2", z_gbdt), ("M2_RFF_Ridge", z_rff),
                               ("RLSBank", z_bank)):
@@ -1359,6 +1516,7 @@ def main():
         out = pd.DataFrame({
             "z_gbdt": z_gbdt, "pred_gbdt": pred_gbdt,
             "z_rff": z_rff, "pred_rff": pred_rff,
+            "z_rff_foldiqr": z_rff_iqr,     # negative control (v2.0.2)
             "z_rlsbank": z_bank, "r_xau": r, "sigma": sigma,
             "y_ret24_norm": feats["y_ret24_norm"],
         })
@@ -1376,7 +1534,7 @@ def main():
                      f"trial_ledger.jsonl ({len(ledger.rows)} entries, "
                      f"{ledger.unique_configs()} unique configs)")
 
-    all_ok = all([ok21, ok_rff, ok_bank, ok_g, ok_ex])
+    all_ok = all([ok21, ok_rff, ok48g, ok_bank, ok_g, ok_ex])
     gate("G2_ALL", all_ok, "all K2 gates green" if all_ok else "K2 gate failure")
     with open(os.path.join(WORK, "gates.json"), "w") as f:
         json.dump(GATES, f, indent=2, default=str)

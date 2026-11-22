@@ -1,0 +1,22 @@
+{
+ "module": "rt2_label_shuffle",
+ "verdict": "pass",
+ "detail": "mechanical-artifact null: duplicate (ts,cell) rows=0/3341; R outcomes 380 unique values (barrier-quantized BY DESIGN: +/-1R, -q25/m, partial composites; top value share=0.180 < 0.5, continuous timeout component present=True); worst 10-day block share of total R=0.104 (<0.5); shipped 5000-draw block-bootstrap E[R] CI95=[+0.0690, +0.2286] excludes 0 -> the edge is statistical, not mechanical. REPORTED FINDING (not gated): within-block permutation p<->R rank correlation rho=-0.0456 (null q95=+0.0161, p=0.990) \u2014 the flagship's edge does NOT come from per-trade probability ranking; it lives in the cell geometry + path overlay + portfolio layers, consistent with the audit's s4.2 finding (raw r=1 EV-argmax beats the pooled flagship, +0.232 vs +0.148).",
+ "metrics": {
+  "dup_rows": 0,
+  "r_nunique": 380,
+  "top_value_share": 0.18,
+  "cont_component": true,
+  "worst_block_share": 0.104,
+  "bootstrap_ci95": [
+   0.06902,
+   0.22859
+  ],
+  "perm_spearman_real": -0.0456,
+  "perm_spearman_null_q95": 0.0161,
+  "perm_p": 0.99
+ },
+ "elapsed_s": 1.9,
+ "written_utc": "2026-11-22 06:53:04",
+ "exit_code": 0
+}

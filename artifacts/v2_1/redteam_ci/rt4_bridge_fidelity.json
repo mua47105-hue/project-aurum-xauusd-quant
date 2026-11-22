@@ -1,0 +1,16 @@
+{
+ "module": "rt4_bridge_fidelity",
+ "verdict": "pass",
+ "detail": "D4-fixed bridge recomputation: E0=2.6248 E1=2.3950 E2=2.5873 (audit family: E1 2.36-2.40; E2 partial-TP halving restores part of the book); 1-bar trade share=0.172 (the D4 cohort \u2014 no hourly representation, dropped from the bridge frame by the audit's construction); in-run G5.10 PASS=True; in-run bridge {'E0': 2.6248, 'E1': 2.395, 'E2': 2.5873} matches recomputation within 0.02: True.",
+ "metrics": {
+  "E0": 2.6248,
+  "E1": 2.395,
+  "E2": 2.5873,
+  "one_bar_share": 0.172,
+  "g510_in_run_pass": true,
+  "recompute_match": true
+ },
+ "elapsed_s": 1.4,
+ "written_utc": "2026-11-22 06:53:08",
+ "exit_code": 0
+}

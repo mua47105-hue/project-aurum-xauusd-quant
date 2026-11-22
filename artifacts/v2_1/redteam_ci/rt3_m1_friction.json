@@ -1,0 +1,25 @@
+{
+ "module": "rt3_m1_friction",
+ "verdict": "pass",
+ "detail": "M1 resolver torture on 400 sampled OOS trades (barrier-mechanics-only, no overlay): pure M1 E[R]=+0.0874 vs H1 +0.0423; +1min delay delta +0.0686 (not catastrophic; the no-overlay barrier-mechanics subset reacts more than the overlay-full book: full-run delta +0.0095); spreads +0.0448 / +0.0277 (monotone degradation); top-decile-RV stop slippage +0.0405 (degrades). Full-run overlay matrix sign structure: True.",
+ "metrics": {
+  "n_sample": 400,
+  "er_h1_no_overlay": 0.04234933480620384,
+  "er_m1_pure_no_overlay": 0.0873807459434703,
+  "er_m1_delay1": 0.15597895170419293,
+  "delta_delay": 0.06859820576072263,
+  "er_spread25": 0.04478203848794859,
+  "er_spread35": 0.027742555505739917,
+  "er_slip2x_topdecile": 0.0405057459434703,
+  "full_run": {
+   "m1_pure": 0.15758872425161827,
+   "m1_delay1": 0.16711833830388975,
+   "m1_spread25": 0.1148978330815446,
+   "m1_spread35": 0.09782147661351508,
+   "m1_slip2x": 0.12836843092626654
+  }
+ },
+ "elapsed_s": 2.3,
+ "written_utc": "2026-11-22 06:53:07",
+ "exit_code": 0
+}

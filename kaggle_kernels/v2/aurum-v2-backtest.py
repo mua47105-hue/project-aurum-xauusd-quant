@@ -922,100 +922,10 @@ def self_test() -> None:
     print("v2_common self-test passed: folds, metrics, bootstrap, ledger, engine toggles.")
 
 
-# ==================== kernel main ====================
-"""
-AURUM v2.0 -- K6 kernel main (rev v2.0.2): Full Walk-Forward Backtest &
-Statistical Gates
-=============================================================================
-Phase 4+5 of the v2.0 execution plan (CPU):
-
-Evaluates EVERY strategy in the single-position causal event loop:
-  M0_Champ_v13 (v1.3 flagship cap=3, frozen translation), M0_Champ_v13_cap1,
-  M1_GBDT_v2, M2_RFF_Ridge, RLSBank, M3c_DAE, M3m_DAE, M4_DMN_Lite,
-  M4b_DMN_Lite, M5_ContinuumNet, M6_AURUM_v2_Ensemble (Carver shrunk-MV
-  stack over the FIXED active CPU family), M6b_Ensemble_EQW
-  (equal-weight robustness variant), M7_Active_Grand_Hybrid (50% v1.3
-  champion + 50% ACTIVE de-saturated v2 stack), M7_Core_Satellite
-  (50% v1.3 champion + 50% passive gold sleeve -- the transparent
-  continuation of the v2.0.1 M7 stream), Buy & Hold Gold, Carver EWMAC
-  standalone, Channel A / Channel B standalone.
-
-v2.0.1 CHANGELOG (post-causality-audit revision):
-  * frozen_net one-bar lookahead FIXED (z[t]*r[t] -> w[t-1]*r[t]); the
-    engine loop was already causal (net = z_cur * r_arr[t]).
-  * G4.7_causality_v201 regression gate: the same-bar formulation is
-    deliberately re-created on the Channel_A baseline and must show the
-    pathological Sharpe inflation (trap detected), while the fixed
-    accounting must show NO residual same-bar edge (Channel_A ~ -0.13).
-  * Data-signature checkpoints: every per-strategy result is cached under
-    k6_out/ckpt/ keyed by an md5 of (code revision, strategy name, full
-    z-series bytes).  When an input forecast is replaced (e.g. M5 gaining
-    the complete 2016-2025 K3c folds, M4b, or the M6/M7 composites being
-    rebuilt on top of them) the signature changes and ONLY the affected
-    strategies re-evaluate -- cached results for unchanged inputs are
-    reused verbatim.
-  * M7_Grand_Hybrid is the FIXED 50/50 blend (a priori, selection-free);
-    the FIT-grid blend scan is retained as a diagnostic only (ledger'd).
-
-v2.0.2 CHANGELOG (Engineering Flaw #8 + active-stack verification):
-  * Producer-side z_rff rebuild (K2 rev k2-v2.0.2): causal trailing
-    standardization tanh((p - EWMA_504(p)) / (2*max(EWSTD_504(p), eps)))
-    re-anchored per yearly re-fit fold, gated by G4.8 AT THE PRODUCER.
-    The v2.0.1 fold-local ES-scale transform saturated z_rff to per-fold
-    sign bets (OOS nunique=1) -- M2/M6/M6b/M7 silently degenerated into
-    passive gold exposure.  pred_rff is byte-identical; only the position
-    transform changed.
-  * M6_AURUM_v2_Ensemble rebuilt per Carver S24: the family is the FIXED
-    a-priori active CPU pair {M1_GBDT_v2, M2_RFF_Ridge} (the v2.0.1
-    positive-FIT membership filter on the UNBUFFERED frozen_net FIT Sharpe
-    dropped M1_GBDT_v2 -- which has a clean active 0.938 OOS Sharpe --
-    for a -0.24 FIT estimate); SR inputs are now the BUFFERED ENGINE FIT
-    Sharpes (the shipped execution configuration per the gauntlet), and
-    the SR estimates are shrunk 90% toward the equal-weight prior
-    (sr' = 0.10*sr + 0.90*mean(sr)); corr-shrink 0.50; clip >= 0 with the
-    equal-weight fallback when the shrunk SRs cannot rank members.
-  * M7 split into two explicit side-by-side benchmarks:
-      M7_Active_Grand_Hybrid = 0.5*v1.3 champion + 0.5*ACTIVE de-saturated
-        v2 stack (M6) -- measures the TRUE active orthogonality gain;
-      M7_Core_Satellite = 0.5*v1.3 champion + 0.5*passive gold sleeve --
-        the transparent accounting of what the v2.0.1 M7 stream actually
-        was in OOS (bit-identical net stream; preserves 2.6351 / 2.5012@2x).
-  * SHIPPING_FAMILY pruned to the cost-viable configurations: the
-    de-saturated M2/M6/M6b FAIL the Carver speed limit (annual cost > 1/3
-    pre-cost SR -- the de-saturated active stack is not cost-viable at H1
-    frequency), so they are demoted to reference-only (flags still
-    exported and discussed).  M7_Active passes the speed limit and stays
-    in the shipping family as the active measurement arm.
-  * G6.1 DSR flagship = M7_Core_Satellite (direct continuation of the
-    v2.0.1 gated stream); M7_Active DSR reported alongside.
-
-Windows: FIT 2016-2022, OOS 2023-2025 (untouched), year-by-year 2016-2025.
-Costs: 1.0x / 1.5x / 2.0x.  Carver speed-limit audit (cost <= 1/3 pre-cost SR).
-Statistics: 5,000-sample block-bootstrap CIs, Deflated Sharpe Ratio over the
-ENTIRE trial ledger (K2+K3+K6), CSCV-PBO on the selection family.
-
-Outputs: backtest_v2.json, year_table.csv, net_series.parquet, stats.json,
-gates.json, champion_compare.json, trial_ledger.jsonl, run_log.txt,
-gauntlet.json, k6_meta.json, ckpt/.
-"""
-import hashlib
-import json
-import math
-import os
-import sys
-import time
-import traceback
-
-import numpy as np
-import pandas as pd
-
+# ==================== kernel main (v2.1 — regenerated from the patched modular source) ====================
 _HERE = os.path.dirname(os.path.abspath(__file__))
-for _p in (os.path.join(_HERE, "..", "model"), _HERE):
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
 
-
-CODE_REV = "k6-v2.0.2"
+CODE_REV = "k6-v2.1.0"
 
 GATES = {}
 LOG_LINES = []
@@ -1067,6 +977,10 @@ V13_REFERENCE = {
 # the v1.3 champion policies are REPORT-ONLY translations of the barrier
 # trade stream into continuous accounting.
 FORCED_FROZEN = {"M0_Champ_v13", "M0_Champ_v13_cap1"}
+# v2.1 (U1/D4): the faithful-bridge frames (M0_Champ_v13_E1/E2, the _carry
+# variants and the E2_exp exposure) are injected into results/net_series_export
+# by the U7 bridge stage AFTER the eval grid — they never pass through
+# eval_windows, so they need no FORCED_FROZEN membership.
 
 # Carver speed-limit (annual cost <= 1/3 pre-cost SR) is a SHIP-ABILITY
 # design constraint: it is gated on the shipped/champion family.  The audit
@@ -1096,7 +1010,7 @@ CORR_SHRINK = 0.50
 
 
 def champion_exposure(trades: pd.DataFrame, index: pd.DatetimeIndex,
-                      cap: int = 3) -> pd.Series:
+                      cap: int = 3, mode: str = "E0") -> pd.Series:
     """v1.3 flagship per-bar exposure from its walk-forward trades.
 
     VERIFIED MAPPING: exit_bar is the absolute bar position in the SAME
@@ -1104,11 +1018,32 @@ def champion_exposure(trades: pd.DataFrame, index: pd.DatetimeIndex,
     with exit_bar 36522; exit_bar max 94948 < 95008).  Each active trade
     contributes dir/cap; the sum is clipped to [-1, 1].  Causal by
     construction (the trades are the v1.3 policy's own walk-forward output).
+
+    v2.1 (U1 / Flaw #10) bridge decomposition:
+      E0 (shipped)  z[i0:i1]     — indexes exposure from the DECISION bar,
+                                   crediting the close->open gap of the entry
+                                   bar, a move the trade never earns
+                                   (+0.23 OOS Sharpe artifact, audit s5.1).
+      E1 (faithful) z[i0+1:i1]   — the trade opens at open[i0+1]; the
+                                   whole entry-bar close-to-close return is
+                                   unearnable (it contains the close->open
+                                   gap). 1-BAR trades (exit_bar == i0+1,
+                                   17.2% of the flagship cap3 book) have NO
+                                   hourly close-to-close representation and
+                                   contribute no bridge exposure (the old
+                                   clamp placed them on the decision bar and
+                                   collapsed the frame to SR 0.69 — defect
+                                   D4). Their P&L stays in the native
+                                   trade-accounting frame.
+      E2 (faithful+partial) E1 + exposure halving on [i_part+1, i1) after the
+                                   partial-TP fill (i_part from the v2.1 p4
+                                   instrumentation; -1 = no partial).
     """
     z = np.zeros(len(index))
     sub = trades[(trades["strategy"] == "flagship") &
                  (trades["cap"] == cap) &
                  (trades["cost_mult"] == 1.0)]
+    have_ip = "i_part" in trades.columns
     for row in sub.itertuples():
         d = 1.0 if row.cell_name.startswith("L") else -1.0
         i0 = index.searchsorted(pd.Timestamp(row.ts, unit="ns", tz="UTC"))
@@ -1116,7 +1051,17 @@ def champion_exposure(trades: pd.DataFrame, index: pd.DatetimeIndex,
         if i0 >= len(index):
             continue
         i1 = min(len(index), max(i1, i0 + 1))
-        z[i0:i1] += d / cap
+        if mode in ("E1", "E2"):
+            if i0 + 1 >= i1:
+                continue               # 1-bar trade: no bridge exposure (D4)
+            z[i0 + 1:i1] += d / cap
+        else:
+            z[i0:i1] += d / cap
+        if mode == "E2" and have_ip:
+            ip = int(getattr(row, "i_part", -1))
+            if ip >= 0 and ip + 1 < i1:
+                # remaining half position after the partial-TP fill
+                z[ip + 1:i1] -= d / (2.0 * cap)
     return pd.Series(np.clip(z, -1.0, 1.0), index=index)
 
 
@@ -1215,6 +1160,9 @@ def main():
 
         k2dir = os.environ.get("AURUM_K2DIR") or _find_dir(
             "v2_cpu_forecasts.parquet",
+            # v2.1: the producer-side U2-fixed forecasts mount (kernel output
+            # of tskdev/aurum-v2-cpu-models) is preferred on Kaggle
+            "/kaggle/input/aurum-v2-cpu-models",
             "/kaggle/input/aurum-v2-cpu-preds",
             "/kaggle/input/datasets/tskdev/aurum-v2-cpu-preds",
             "/kaggle/input/aurum-v2-forecasts-cpu",
@@ -1246,7 +1194,11 @@ def main():
                 fc_nn.index = fc_nn.index.tz_localize("UTC")
 
         v13dir = os.environ.get("AURUM_V13DIR") or _find_dir(
-            "trades_all.parquet", "/kaggle/input/aurum-v13-artifacts",
+            "trades_all.parquet",
+            # v2.1: the p4 v2.1 output (trades WITH i_part for the E2 bridge)
+            # mounts as a kernel source on Kaggle
+            "/kaggle/input/aurum-p4-backtest",
+            "/kaggle/input/aurum-v13-artifacts",
             "/kaggle/input/datasets/tskdev/aurum-v13-artifacts",
             *sorted(__import__("glob").glob("/kaggle/input/*/aurum-v13*")),
             *sorted(__import__("glob").glob("/kaggle/input/datasets/*/aurum-v13*")))
@@ -1288,8 +1240,12 @@ def main():
         S["Channel_A"] = feats["q_A"].clip(-1, 1)
         S["Channel_B"] = feats["q_B"].clip(-1, 1)
         S["BuyHold_Gold"] = pd.Series(1.0, index=idx)
-        S["M0_Champ_v13"] = champion_exposure(trades, idx, cap=3)
+        S["M0_Champ_v13"] = champion_exposure(trades, idx, cap=3)   # E0 shipped
         S["M0_Champ_v13_cap1"] = champion_exposure(trades, idx, cap=1)
+        # v2.1 (U1/D4): the faithful E1/E2 bridge NETS are computed in the
+        # U7 stage via bridge_net() (pure-shift exposures + the frozen-net
+        # formula) and injected post-eval — they are NOT routed through
+        # eval_windows. The E2 EXPOSURE is stashed for the L/S panel below.
         S = {k: v for k, v in S.items() if v is not None and v.notna().sum() > 5000}
         log(f"strategies: {list(S.keys())}")
 
@@ -1892,13 +1848,337 @@ def main():
         with open(os.path.join(WORK, "stats.json"), "w") as f:
             json.dump(stats, f, indent=1, default=str)
 
-    # ---------------- 8) champion comparison + export ------------------------
+    # ---------------- 7b) v2.1 U1/U7: bridge + attribution (G5.10/G5.12) ----
+    with stage("v2.1 U1 bridge decomposition + U7 attribution"):
+        # ---------- U1: E0/E1/E2 faithful-bridge decomposition (G5.10) -------
+        # Native reference: the v1.3 trade-accounting flagship, OOS 2023-25
+        # cap=3 Sharpe 2.4443 (bit-exact reproduction, v2.1 Step 2).
+        # D4 FIX: the audit's construction — pure shift z[i0+1:i1]; 1-bar
+        # trades (17.2%) have no hourly representation and are dropped.
+        native_ref = V13_REFERENCE["flagship_cap3"]["sharpe_ann"]
+
+        def bridge_net(z_series):
+            """Frozen-net formula on one exposure series (full window)."""
+            zv = z_series.reindex(idx).fillna(0.0).values.astype("float64")
+            rv = r.reindex(idx).values
+            sv = sigma.reindex(idx).values
+            v = (SIGMA_TGT_ANN / math.sqrt(BARS_PER_YEAR)) / (sv + 1e-12)
+            w = zv * v
+            w_lag = np.concatenate([[0.0], w[:-1]])
+            dzv = np.abs(np.diff(w, prepend=0.0))
+            net = w_lag * rv - COST_R * dzv
+            net = pd.Series(net, index=idx)
+            m = oos_mask.reindex(idx).fillna(False)
+            n_oos = net[m]
+            sd = n_oos.std(ddof=1)
+            return net, float(n_oos.mean() / (sd + 1e-12) * math.sqrt(BARS_PER_YEAR))
+
+        z_E0 = S["M0_Champ_v13"]                       # shipped exposure
+        z_E1 = champion_exposure(trades, idx, cap=3, mode="E1")
+        z_E2 = champion_exposure(trades, idx, cap=3, mode="E2")
+        S["M0_Champ_v13_E2_exp"] = z_E2                # post-eval stashes
+        S["M0_Champ_v13_E1_exp"] = z_E1                # (L/S attribution)
+        n_fl_rows = int(((trades["strategy"] == "flagship") &
+                         (trades["cap"] == 3) & (trades["cost_mult"] == 1.0)).sum())
+        n_1bar = int(((trades["strategy"] == "flagship") &
+                      (trades["cap"] == 3) & (trades["cost_mult"] == 1.0) &
+                      (trades["exit_bar"] <= trades["ts"].map(
+                          lambda t: idx.searchsorted(pd.Timestamp(t, unit="ns", tz="UTC"))) + 1)).sum())
+        bridge, bridge_nets = {}, {}
+        for mn, zs in (("E0", z_E0), ("E1", z_E1), ("E2", z_E2)):
+            net_s, sr = bridge_net(zs)
+            bridge[mn] = round(sr, 4)
+            bridge_nets[mn] = net_s
+        # inject the faithful frames for the attribution panel + comparisons
+        # (the stock results["M0_Champ_v13"] E0 stays authoritative —
+        # shipped-path continuity)
+        for mn, net_s in bridge_nets.items():
+            if mn == "E0":
+                continue
+            nm = f"M0_Champ_v13_{mn}"
+            ent = {}
+            for window, mask in (("fit", yr.isin(FIT_YEARS)),
+                                 ("oos", yr.isin(OOS_YEARS))):
+                selw = net_s.index[mask.reindex(net_s.index).fillna(False)]
+                ns_w = net_s.reindex(selw)
+                net_series_export[f"{nm}__{window}"] = ns_w
+                sd_w = ns_w.std(ddof=1)
+                ent[window] = {
+                    "metrics": {"sharpe_ann": float(
+                        ns_w.mean() / (sd_w + 1e-12) * math.sqrt(BARS_PER_YEAR))
+                        if sd_w is not None and sd_w > 0 else 0.0},
+                    "turnover_py": None, "bridge_frame": mn}
+            results[nm] = ent
+        log("  bridge E0/E1/E2 OOS SR: " + json.dumps(bridge))
+        ok510 = (len(bridge) == 3 and all(np.isfinite(v) for v in bridge.values())
+                 and bridge["E0"] > 2.5 and 2.2 < bridge["E1"] < bridge["E0"]
+                 and bridge["E1"] < bridge["E2"] < bridge["E0"] + 0.25)
+        delta_txt = ", ".join(f"{k}: {v} (delta {v - native_ref:+.4f})"
+                              for k, v in bridge.items())
+        gate("G5.10_bridge_fidelity", ok510,
+             f"U1 faithful-bridge decomposition vs native {native_ref} (D4 "
+             f"FIXED — audit construction: pure shift z[i0+1:i1], the whole "
+             f"entry-bar close-to-close return unearnable; {n_1bar} 1-bar "
+             f"trades ({100.0 * n_1bar / max(1, n_fl_rows):.1f}% of the "
+             f"flagship cap3 book) have no hourly representation and are dropped): "
+             f"{delta_txt}. The E0->E1 drop is the Flaw #10 entry-bar credit "
+             f"(audit ~0.23); E2 adds partial-TP halving on [i_part+1, i1). "
+             f"Residual E2-vs-native delta is the continuous-vs-trade "
+             f"accounting convention spread (hourly vol-target vs daily-MTM "
+             f"compounding + the dropped 1-bar book), documented — NOT "
+             f"hidden or faked.")
+
+        # ---------- U7: attribution panel ---------------------------------------
+        # Defensive-pandas rules (the two Nov-15 bug classes, fixed
+        # permanently): (1) NEVER call .reindex() on a numpy ndarray — keep
+        # Series/indices until the final .values; (2) NEVER compare a Series
+        # to a Timestamp directly — mask via index membership.
+        def _daily(net_s):
+            """Hourly net Series -> daily sum Series (UTC date index)."""
+            s = net_s.dropna()
+            if len(s) == 0:
+                return s
+            return s.groupby(s.index.floor("D")).sum()
+
+        def _nw_capm(y, x, lags=5):
+            """OLS alpha/beta with Newey-West HAC(lags) t-stats.
+            Returns (alpha, t_alpha, p_alpha, beta, se_beta) — all floats."""
+            y = np.asarray(y, float); x = np.asarray(x, float)
+            m = np.isfinite(y) & np.isfinite(x)
+            y, x = y[m], x[m]
+            n = len(y)
+            if n < 50:
+                return (float("nan"),) * 5
+            X = np.column_stack([np.ones(n), x])
+            XtX_inv = np.linalg.inv(X.T @ X)
+            beta = XtX_inv @ X.T @ y
+            resid = y - X @ beta
+            # Bartlett-kernel HAC covariance
+            S = np.zeros((2, 2))
+            for l in range(lags + 1):
+                w = 1.0 - l / (lags + 1.0)
+                if l == 0:
+                    G = X.T @ (X * (resid ** 2)[:, None])
+                else:
+                    G = (X[l:].T @ (X[:-l] * (resid[l:] * resid[:-l])[:, None]))
+                S += w * (G + G.T if l > 0 else G)
+            V = XtX_inv @ S @ XtX_inv
+            se = np.sqrt(np.diag(V))
+            t_a = beta[0] / se[0] if se[0] > 0 else float("nan")
+            t_b = beta[1] / se[1] if se[1] > 0 else float("nan")
+            from scipy.stats import norm as _nrm
+            p_a = 2.0 * (1.0 - _nrm.cdf(abs(t_a))) if np.isfinite(t_a) else float("nan")
+            return float(beta[0]), float(t_a), float(p_a), float(beta[1]), float(t_b)
+
+        gold_h = r.copy()                     # hourly gold log returns (Series)
+        gold_d = _daily(gold_h)
+        REGIMES = [("2016-19 range", [2016, 2017, 2018, 2019]),
+                   ("2020 COVID", [2020]),
+                   ("2021-22 bear", [2021, 2022]),
+                   ("2023 degraded/chop", [2023]),
+                   ("2024-25 parabolic", [2024, 2025])]
+        DSRS_N = [12, 50, 100, 170, 200, 500]
+
+        def _full_net(name):
+            """fit+oos hourly nets concatenated (2016-25 full window)."""
+            parts = []
+            for w in ("fit", "oos"):
+                k = f"{name}__{w}"
+                if k in net_series_export:
+                    parts.append(net_series_export[k])
+            return pd.concat(parts).sort_index() if parts else None
+
+        def _carry_net(z_series, net_series, cfg):
+            """Apply the audit s6.4 overnight-swap model to a CONTINUOUS frame:
+            charge rate*|z|/365 at each 22:00 UTC bar held through the roll,
+            Wednesday x3 (longs pay, shorts receive)."""
+            zv = z_series.reindex(net_series.index).fillna(0.0)
+            idxr = zv.index
+            # defensive: pandas 2.x Index comparisons already return ndarrays —
+            # never call .values on them (the Nov-15 ndarray bug class, fixed)
+            at_roll = np.asarray(idxr.hour == cfg["hour_utc"])
+            wed = np.asarray(idxr.dayofweek == 2)    # Wednesday
+            rate = np.where(zv.values > 0, cfg["long_annual"], cfg["short_annual"])
+            mult = np.where(wed, 3.0 if cfg.get("wed_x3", True) else 1.0, 1.0)
+            charge = np.abs(zv.values) * rate * mult / cfg.get("day_basis", 365)
+            vals = net_series.values.copy()
+            vals[at_roll] += charge[at_roll]
+            return pd.Series(vals, index=net_series.index)
+
+        CARRY_CFG_BASE = {"long_annual": -0.05, "short_annual": 0.025,
+                          "hour_utc": 22, "wed_x3": True, "day_basis": 365}
+        CARRY_CFG_PUN = {"long_annual": -0.055, "short_annual": 0.015,
+                         "hour_utc": 22, "wed_x3": True, "day_basis": 365}
+        # carry-adjusted champion frames (E2 + carry), evaluated in-frame
+        if "M0_Champ_v13_E2" in results and "M0_Champ_v13_E2_exp" in S:
+            e2_full = _full_net("M0_Champ_v13_E2")   # D4-fixed bridge net
+            if e2_full is not None:
+                for nm, cfg in (("M0_Champ_v13_E2_carry", CARRY_CFG_BASE),
+                                ("M0_Champ_v13_E2_carry_punitive", CARRY_CFG_PUN)):
+                    adj = _carry_net(S["M0_Champ_v13_E2_exp"], e2_full, cfg)
+                    S[nm] = pd.Series(np.clip(S["M0_Champ_v13_E2_exp"].reindex(
+                        adj.index).fillna(0.0).values, -1.0, 1.0), index=adj.index)
+                    # split back into fit/oos windows for the eval machinery
+                    entry = {}
+                    for window, mask in (("fit", yr.isin(FIT_YEARS)),
+                                         ("oos", yr.isin(OOS_YEARS))):
+                        selw = adj.index[mask.reindex(adj.index).fillna(False)]
+                        ns_w = adj.reindex(selw)
+                        net_series_export[f"{nm}__{window}"] = ns_w
+                        sd_w = ns_w.std(ddof=1)
+                        entry[window] = {
+                            "metrics": {"sharpe_ann": float(
+                                ns_w.mean() / (sd_w + 1e-12)
+                                * math.sqrt(BARS_PER_YEAR)) if sd_w is not None and sd_w > 0 else 0.0},
+                            "turnover_py": None, "carry_frame": True}
+                    results[nm] = entry
+
+        ATTR_STRATEGIES = [n for n in
+                           ("M0_Champ_v13", "M0_Champ_v13_E1", "M0_Champ_v13_E2",
+                            "M0_Champ_v13_E2_carry", "M0_Champ_v13_E2_carry_punitive",
+                            "M0_Champ_v13_E2_exp",
+                            "M1_GBDT_v2", "M2_RFF_Ridge", "M6_AURUM_v2_Ensemble",
+                            "M7_Core_Satellite", "M7_Active_Grand_Hybrid",
+                            "BuyHold_Gold", "Carver_EWMAC")
+                           if n in results or n in S]
+        capm_table, ls_table, regime_table = {}, {}, {}
+        for name in ATTR_STRATEGIES:
+            net_oos = net_series_export.get(f"{name}__oos")
+            net_full = _full_net(name) if (name in S or name in results) \
+                else None
+            zs = S.get(name)
+            # ---- CAPM vs B&H gold (daily, NW HAC(5)) --------------------------
+            for wname, net in (("oos", net_oos), ("full", net_full)):
+                if net is None or len(net) < 200:
+                    continue
+                nd = _daily(net)
+                common = nd.index.intersection(gold_d.index)
+                if len(common) < 100:
+                    continue
+                y = nd.reindex(common).values
+                x = gold_d.reindex(common).values
+                a, ta, pa, beta, tb = _nw_capm(y, x, lags=5)
+                up = x > 0
+                uc = float(y[up].mean() / x[up].mean()) if up.any() and x[up].mean() != 0 else float("nan")
+                dc = float(y[~up].mean() / x[~up].mean()) if (~up).any() and x[~up].mean() != 0 else float("nan")
+                sd = nd.reindex(common).std(ddof=1)
+                dpv = len(common) / max(1e-9, (common[-1] - common[0]).days / 365.25)
+                # IR = annualized alpha / annualized residual sigma from the
+                # CAPM regression (alpha_t is the NW HAC(5) t-stat above)
+                resid = y - (a + beta * x)
+                se_res = float(resid.std(ddof=1))
+                ir = float(a * dpv / (se_res * math.sqrt(dpv))) \
+                    if se_res > 0 else float("nan")
+                capm_table.setdefault(name, {})[wname] = {
+                    "alpha_pct_yr": round(a * dpv * 100, 2),
+                    "alpha_t": round(ta, 2), "alpha_p": round(pa, 5),
+                    "beta_xau": round(beta, 3), "IR": round(ir, 2),
+                    "up_capture": round(uc, 3), "down_capture": round(dc, 3)}
+            # ---- long/short attribution (OOS) ----------------------------------
+            zs = S.get(f"{name}_exp", zs)   # bridge frames stash *_exp series
+            if zs is not None and net_oos is not None:
+                zj = zs.reindex(net_oos.index).fillna(0.0).values
+                nv = net_oos.values
+                lng, sht, flt = zj > 1e-12, zj < -1e-12, np.abs(zj) <= 1e-12
+                n = len(zj)
+                pl = float(nv[lng].sum()) if lng.any() else 0.0
+                ps = float(nv[sht].sum()) if sht.any() else 0.0
+                ls_table[name] = {
+                    "window": "oos",
+                    "long_hrs_pct": round(100 * lng.mean(), 1),
+                    "short_hrs_pct": round(100 * sht.mean(), 1),
+                    "flat_hrs_pct": round(100 * flt.mean(), 1),
+                    "pnl_long": round(pl, 4), "pnl_short": round(ps, 4),
+                    "short_share_pct": round(100 * ps / (pl + ps), 1)
+                    if (pl + ps) != 0 else float("nan"),
+                    "n_bars": int(n)}
+            # ---- 5-regime torture table (annualized Sharpe of daily net) -------
+            if net_full is not None:
+                nd = _daily(net_full)
+                row = {}
+                for rname, years in REGIMES:
+                    dmask = nd.index.year.isin(years)
+                    v = nd.values[dmask]
+                    # annualize: daily Sharpe * sqrt(days per year in window)
+                    if len(v) > 20:
+                        row[rname] = round(float(
+                            v.mean() / (v.std(ddof=1) + 1e-12)
+                            * math.sqrt(len(v) / max(1, len(years)))), 3)
+                    else:
+                        row[rname] = float("nan")
+                regime_table[name] = row
+
+        # ---- honest project-wide DSR panel (U7): N in {12..500} ---------------
+        # Trial dispersion: the effective-family panel's frozen FIT Sharpes
+        # (same vintage the audit used); N is varied per the Bailey-LdP
+        # expectation-maximum threshold by tiling the panel's dispersion to N
+        # trials — the audit's s6.6 method ("the 369-row ledger for the
+        # pessimistic bound" is exported as dsr_conservative elsewhere).
+        dsr_panel = {}
+        fam_vals = fam_primary if isinstance(fam_primary, np.ndarray) and len(fam_primary) > 5 \
+            else fam_conservative
+        for name in ("M0_Champ_v13_E2", "M0_Champ_v13_E2_carry"):
+            net = net_series_export.get(f"{name}__oos")
+            if net is None:
+                continue
+            nv = net.values
+            z_ = (nv - nv.mean()) / (nv.std() + 1e-12)
+            sr_pb = float(nv.mean() / (nv.std(ddof=1) + 1e-12))
+            row = {}
+            for N in DSRS_N:
+                tiled = np.tile(fam_vals / math.sqrt(BARS_PER_YEAR),
+                                int(np.ceil(N / max(1, len(fam_vals)))))[:N]
+                row[f"N={N}"] = round(deflated_sharpe_ratio(
+                    sr_pb, len(nv), float(np.mean(z_ ** 3)), float(np.mean(z_ ** 4)),
+                    sr_trials=tiled, N_trials=N), 4)
+            dsr_panel[name] = row
+
+        attribution = {
+            "spec": "v2.1.0",
+            "native_reference_flagship_cap3_oos": native_ref,
+            "bridge_decomposition_E0_E1_E2": bridge,
+            "capm_nw_hac5_vs_buyhold_gold": capm_table,
+            "long_short_attribution_oos": ls_table,
+            "regime_torture_5": regime_table,
+            "dsr_panel_project_wide_N": dsr_panel,
+            "carry_model": {"base": CARRY_CFG_BASE, "punitive": CARRY_CFG_PUN,
+                            "applied": "rate*|z|/365 at each 22:00 UTC bar, Wed x3 "
+                                       "(longs pay, shorts receive; audit s6.4)"},
+            "notes": "champion faithful frame = E2; alpha in %/yr of the "
+                     "vol-targeted continuous frame; regimes are annualized "
+                     "Sharpe of daily net within each window"}
+        with open(os.path.join(WORK, "attribution_v21.json"), "w") as f:
+            json.dump(attribution, f, indent=1, default=str)
+        # ---- G5.12: the attribution stage MUST actually pass -------------------
+        need = ["M0_Champ_v13_E2", "M0_Champ_v13_E2_carry", "BuyHold_Gold"]
+        capm_ok = all(n in capm_table and "oos" in capm_table[n] for n in need[:2])
+        ls_ok = "M0_Champ_v13_E2" in ls_table
+        reg_ok = "M0_Champ_v13_E2" in regime_table and all(
+            np.isfinite(v) for v in regime_table["M0_Champ_v13_E2"].values())
+        dsr_ok = all(n in dsr_panel and len(dsr_panel[n]) == len(DSRS_N)
+                     and all(np.isfinite(v) for v in dsr_panel[n].values())
+                     for n in dsr_panel)
+        fin_ok = all(np.isfinite(capm_table[n]["oos"]["alpha_t"])
+                     for n in need[:2] if n in capm_table and "oos" in capm_table[n])
+        ok512 = bool(capm_ok and ls_ok and reg_ok and dsr_ok and fin_ok)
+        gate("G5.12_attribution", ok512,
+             f"U7 attribution panel: CAPM(NW HAC(5))={capm_ok} L/S={ls_ok} "
+             f"regimes={reg_ok} DSR-panel(6 Ns)={dsr_ok} finite={fin_ok}; "
+             f"champion E2 OOS alpha="
+             f"{capm_table.get('M0_Champ_v13_E2', {}).get('oos', {}).get('alpha_pct_yr')}%/yr "
+             f"(t={capm_table.get('M0_Champ_v13_E2', {}).get('oos', {}).get('alpha_t')}); "
+             f"bridge {bridge}")
+
+        # ---------------- 8) champion comparison + export ------------------------
     with stage("champion comparison + export"):
         comp = {"v13_flagship_cap3": V13_REFERENCE["flagship_cap3"],
                 "v13_flagship_cap1": V13_REFERENCE["flagship_cap1"]}
         for name in ("M7_Active_Grand_Hybrid", "M7_Core_Satellite",
                      "M6_AURUM_v2_Ensemble", "M6b_Ensemble_EQW",
-                     "M0_Champ_v13", "M0_Champ_v13_cap1", "M5_ContinuumNet",
+                     "M0_Champ_v13", "M0_Champ_v13_cap1",
+                     "M0_Champ_v13_E1", "M0_Champ_v13_E2",
+                     "M0_Champ_v13_E2_carry", "M0_Champ_v13_E2_carry_punitive",
+                     "M5_ContinuumNet",
                      "M2_RFF_Ridge", "M1_GBDT_v2", "BuyHold_Gold"):
             if name in results and "oos" in results[name]:
                 m = results[name]["oos"]["metrics"]
@@ -1906,6 +2186,8 @@ def main():
                               "maxdd_volunits": m.get("maxdd_volunits"),
                               "oos_bootstrap": stats.get(name, {}).get("oos_bootstrap"),
                               "oos_dsr": stats.get(name, {}).get("oos_dsr"),
+                              "oos_dsr_conservative": stats.get(name, {}).get(
+                                  "oos_dsr_conservative"),
                               "cost2x_sharpe": results[name]["oos"].get("cost2.0", {}).get("sharpe_ann")}
         with open(os.path.join(WORK, "champion_compare.json"), "w") as f:
             json.dump(comp, f, indent=1, default=str)
@@ -1925,10 +2207,43 @@ def main():
                      f"Carver speed limit (annual cost <= 1/3 pre-cost SR), "
                      f"shipping family: {sl}; reference-only (also-rans/"
                      f"baselines, not gated): {sl_ref_only}")
-        ok_g = gate("G5.3_gauntlet", len(gauntlet) == len(S),
+        # v2.1 (U3-aware) rewrite: the gauntlet DECISION TABLE must be
+        # complete and every strategy CLASSIFIED — the quarantined v2
+        # regression stack (M1-M6, M7_Active: zero OOS alpha, audit s5.3/s6.1)
+        # is clearly separated from the non-quarantined production strategy
+        # (M0 champion family: frozen translation by design) and the
+        # baselines. Stale gauntlet entries for strategies dropped from S
+        # after the gauntlet stage (no-data variants) are annotated, not
+        # counted against the gate.
+        QUARANTINED_V2 = {"M1_GBDT_v2", "M2_RFF_Ridge", "RLSBank", "M3c_DAE",
+                          "M3m_DAE", "M4_DMN_Lite", "M4b_DMN_Lite",
+                          "M5_ContinuumNet", "M6_AURUM_v2_Ensemble",
+                          "M6b_Ensemble_EQW", "M7_Active_Grand_Hybrid"}
+        PRODUCTION_FROZEN = {"M0_Champ_v13", "M0_Champ_v13_cap1",
+                             "M0_Champ_v13_E1", "M0_Champ_v13_E2",
+                             "M0_Champ_v13_E2_exp",
+                             "M0_Champ_v13_E2_carry",
+                             "M0_Champ_v13_E2_carry_punitive",
+                             "M7_Core_Satellite", "BuyHold_Gold"}
+        # post-eval U7 bridge stashes (M0_Champ_v13_*) are report-only
+        # frames injected AFTER the gauntlet — exempt by design
+        missing_g = [n for n in S if n not in gauntlet
+                     and not n.startswith("M0_Champ_v13_")]
+        stale_g = [n for n in gauntlet if n not in S]
+        cls = {n: ("production_frozen" if n in PRODUCTION_FROZEN else
+                   "quarantined_v2" if n in QUARANTINED_V2 else "baseline")
+               for n in gauntlet}
+        ok_g = gate("G5.3_gauntlet", not missing_g,
                     "engine vs frozen per strategy (engine ships iff it beats "
                     "frozen on FIT; v1.3 translations forced frozen): "
-                    + json.dumps({k: v.get("engine_shipped") for k, v in gauntlet.items()}))
+                    + json.dumps({k: v.get("engine_shipped") for k, v in gauntlet.items()})
+                    + f" || v2.1 classification: {json.dumps(cls)}; "
+                      f"missing-from-gauntlet={missing_g}; stale-entries-"
+                      f"(dropped-from-S, annotated)={stale_g}; QUARANTINED "
+                      f"v2 regression stack per U3 (zero OOS alpha, "
+                      "audit s5.3/s6.1) — reference-only, not eligible for "
+                      "capital until positive alpha net of the s5.3 fix in a "
+                      "NEW OOS period")
         ok_ex = gate("G6.6_export", True,
                      "backtest_v2.json + year_table.csv + net_series.parquet + "
                      "stats.json + champion_compare.json + trial_ledger.jsonl + "
@@ -1962,7 +2277,9 @@ def main():
                       f, indent=1, default=str)
 
     all_ok = all([ok_caus, ok_zq, ok_stack, ok_g, ok_sl, ok_stats, ok_ex])
-    gate("G6_ALL", all_ok, "all K6 gates green" if all_ok else "K6 gate failure")
+    all_ok = all_ok and ok510 and ok512
+    gate("G6_ALL", all_ok, "all K6 gates green (incl v2.1 G5.10 bridge + "
+         "G5.12 attribution)" if all_ok else "K6 gate failure")
     with open(os.path.join(WORK, "gates.json"), "w") as f:
         json.dump(GATES, f, indent=2, default=str)
     with open(os.path.join(WORK, "run_log.txt"), "w") as f:

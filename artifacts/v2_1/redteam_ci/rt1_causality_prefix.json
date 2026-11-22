@@ -1,0 +1,15 @@
+{
+ "module": "rt1_causality_prefix",
+ "verdict": "pass",
+ "detail": "future-garbage prefix invariance: 73,907 numeric feature values over 3,000 bars unchanged after appending 500 garbage future bars (diffs=0, max|d|=0.00e+00); scale invariance x1.37: 73,907 values, violations=0. Causality and dimensionlessness hold.",
+ "metrics": {
+  "n_compared": 73907,
+  "n_diff": 0,
+  "max_abs_diff": 0.0,
+  "garbage_bars": 500,
+  "scale_violations": 0
+ },
+ "elapsed_s": 0.5,
+ "written_utc": "2026-11-22 06:53:02",
+ "exit_code": 0
+}

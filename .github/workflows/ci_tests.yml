@@ -1,0 +1,76 @@
+name: ci_tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyflakes scipy
+      - name: py_compile all kernels + tests
+        run: |
+          python -m py_compile kaggle_kernels/v1_3/aurum-p4-backtest.py \
+            kaggle_kernels/v1_3/aurum-live-daily.py \
+            kaggle_kernels/v2/aurum-v2-backtest.py \
+            kaggle_kernels/v2/aurum-v2-cpu-models.py \
+            aurum_v2/kernels/k2_cpu_models.py aurum_v2/kernels/k6_backtest.py \
+            tests/test_local_v2.py tests/test_local_v13.py
+      - name: Unit tests (env -u PYTHONPATH)
+        run: |
+          env -u PYTHONPATH python3 tests/test_local_v13.py quick
+          env -u PYTHONPATH python3 tests/test_local_v2.py
+      - name: Red-team suite (skips gracefully without heavy data)
+        run: python3 scripts/run_redteam_suite.py || \
+          (echo "red-team FAIL (not skip) — see artifacts"; exit 1)
+      - name: Upload red-team verdicts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: redteam_ci
+          path: artifacts/v2_1/redteam_ci/
+          if-no-files-found: ignore
+
+  secret_scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Pattern scan (same rules as the pre-commit blocker)
+        run: |
+          python3 - <<'PY'
+          import re, sys, subprocess
+          # strict patterns (repo docs are NOT exempted here: the CI scan is
+          # stricter than the local allowlist — any hit fails for review)
+          PATTERNS = re.compile(
+              r"ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{60,}|"
+              r"KGAT_[A-Za-z0-9_-]{30,}|\"key\"\s*:\s*\"[A-Za-z0-9]{30,}\"")
+          files = subprocess.run(["git", "ls-files"], capture_output=True,
+                                 text=True).stdout.split()
+          bad = []
+          for f in files:
+              try:
+                  t = open(f, encoding="utf-8", errors="ignore").read()
+              except Exception:
+                  continue
+              if PATTERNS.search(t):
+                  bad.append(f)
+          if bad:
+              print("SECRET PATTERNS FOUND:", bad); sys.exit(1)
+          print(f"secret scan clean over {len(files)} tracked files")
+          PY
+      - name: Install secret hook (documents the local workflow)
+        run: bash scripts/install_secret_hook.sh | head -2

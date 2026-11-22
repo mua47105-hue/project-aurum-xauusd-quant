@@ -1,0 +1,18 @@
+{
+ "module": "rt5_attribution_dsr",
+ "verdict": "pass",
+ "detail": "U7 attribution panel: CAPM champion faithful-E2 OOS alpha=+13.58%/yr (NW t=3.43, beta=0.232) < artifact-E0 +16.91 (Flaw #10 direction, t=3.26); L/S hours 54.9/12.5/32.6 (short share 10.1%); 5-regime finite (bear 2.708, parabolic 3.1); DSR strictly decreasing in N, N=170=0.29 (<0.95 honest miss), carry-adjusted <= raw at every N. G5.12 in-run PASS=True.",
+ "metrics": {
+  "capm_ok": true,
+  "ls_ok": true,
+  "regime_ok": true,
+  "dsr_ok": true,
+  "g512_pass": true,
+  "alpha_e2": 13.58,
+  "alpha_t_e2": 3.43,
+  "dsr_n170": 0.29
+ },
+ "elapsed_s": 0.0,
+ "written_utc": "2026-11-22 06:53:08",
+ "exit_code": 0
+}

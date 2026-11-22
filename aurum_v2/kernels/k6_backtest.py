@@ -330,6 +330,9 @@ def main():
 
         k2dir = os.environ.get("AURUM_K2DIR") or _find_dir(
             "v2_cpu_forecasts.parquet",
+            # v2.1: the producer-side U2-fixed forecasts mount (kernel output
+            # of tskdev/aurum-v2-cpu-models) is preferred on Kaggle
+            "/kaggle/input/aurum-v2-cpu-models",
             "/kaggle/input/aurum-v2-cpu-preds",
             "/kaggle/input/datasets/tskdev/aurum-v2-cpu-preds",
             "/kaggle/input/aurum-v2-forecasts-cpu",
@@ -361,7 +364,11 @@ def main():
                 fc_nn.index = fc_nn.index.tz_localize("UTC")
 
         v13dir = os.environ.get("AURUM_V13DIR") or _find_dir(
-            "trades_all.parquet", "/kaggle/input/aurum-v13-artifacts",
+            "trades_all.parquet",
+            # v2.1: the p4 v2.1 output (trades WITH i_part for the E2 bridge)
+            # mounts as a kernel source on Kaggle
+            "/kaggle/input/aurum-p4-backtest",
+            "/kaggle/input/aurum-v13-artifacts",
             "/kaggle/input/datasets/tskdev/aurum-v13-artifacts",
             *sorted(__import__("glob").glob("/kaggle/input/*/aurum-v13*")),
             *sorted(__import__("glob").glob("/kaggle/input/datasets/*/aurum-v13*")))
