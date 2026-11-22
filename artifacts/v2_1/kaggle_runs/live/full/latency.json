@@ -1,0 +1,10 @@
+{
+ "mode": "full",
+ "stage_s": {
+  "forward_r1_cold_s": 3.142,
+  "forward_r2_cold_s": 3.407,
+  "forward_r3_cold_s": 3.841,
+  "forward_r4_cold_s": 4.237
+ },
+ "total_s": 61.4
+}

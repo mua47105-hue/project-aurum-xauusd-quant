@@ -1,0 +1,15 @@
+{
+ "mode": "fast-r1",
+ "stage_s": {
+  "forward_r1_cold_s": 3.07,
+  "forward_r2_cold_s": 3.407,
+  "forward_r3_cold_s": 3.841,
+  "forward_r4_cold_s": 4.237,
+  "fast_r1_cold_pooled_fallback_r2_s": true,
+  "fast_r1_cold_pooled_fallback_r3_s": true,
+  "fast_r1_cold_pooled_fallback_r4_s": true,
+  "fast_r1_pooled_restore_s": 11.677,
+  "fast_r1_dual_decision_s": 2.403
+ },
+ "total_s": 22.4
+}

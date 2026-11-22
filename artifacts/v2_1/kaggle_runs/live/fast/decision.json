@@ -1,0 +1,229 @@
+{
+ "as_of_bar": "2025-12-29 00:00:00+00:00",
+ "symbol": "XAUUSD",
+ "policy": {
+  "spec": "v1.3",
+  "source": "aurum-p4-backtest v1.3 policy_fit.json; fit window 2016-2022; OOS 2023-25 never touched",
+  "w_pool": [
+   0.6,
+   0.2,
+   0.2
+  ],
+  "kappa": 0.0,
+  "lambda_var": 0.5,
+  "ev_min": 0.0,
+  "cost_base_R": 0.05,
+  "overlay_rule": "path",
+  "ood_threshold": 0.1,
+  "kelly_fraction": 0.25,
+  "equity_risk_cap": 0.01
+ },
+ "model": {
+  "core": "tskdev/aurum-models-v1/core_fp16.pt",
+  "heads": "heads_main.pt",
+  "forward_depths_r": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "pool_depths_r": [
+   1,
+   2,
+   3
+  ],
+  "ood_reference_depth_r": 3,
+  "temperatures": {
+   "h1": 1.0,
+   "h5": 1.5
+  }
+ },
+ "depths_h1_at_selected_cell": {
+  "r1": 0.3142,
+  "r2": 0.3004,
+  "r3": 0.3027,
+  "r4": 0.3093
+ },
+ "pooling": {
+  "w": [
+   0.6,
+   0.2,
+   0.2
+  ],
+  "p_bar_cell": 0.3091,
+  "sigma_loop_cell": 0.006,
+  "ood_mean": 0.00536,
+  "ood_max": 0.0265
+ },
+ "lcb_ev": {
+  "b_geo": 4.0,
+  "cost_R": 0.05,
+  "base_rate_prior_cell": 0.3019,
+  "p_shrunk_cell": 0.3091,
+  "var_penalty_R": 0.0121,
+  "ev_lcb_R": 0.4835,
+  "ev_min_hurdle": 0.0
+ },
+ "gbdt_agreement": {
+  "fold_year": 2025,
+  "train_through": 2024,
+  "n_features": 54,
+  "pL": 0.5124,
+  "pS": 0.3862,
+  "dir": "L",
+  "cell_dir": "L",
+  "agrees": true,
+  "audit": [
+   {
+    "dir": "L",
+    "n_train": 66811,
+    "best_iter": 66,
+    "max_train_year": 2024
+   },
+   {
+    "dir": "S",
+    "n_train": 66811,
+    "best_iter": 62,
+    "max_train_year": 2024
+   }
+  ]
+ },
+ "overlay_path": {
+  "rule": "path",
+  "source": "empirical_le2024_h24",
+  "hard_stop_atr": 1.0,
+  "take_profit_atr": 4.0,
+  "partial_tp_atr": 1.98,
+  "trail_mae_atr": 0.853,
+  "time_stop_bars": 24,
+  "orders_placed_at_entry": true,
+  "partial_tp_active": true,
+  "tightened_stop_active": true
+ },
+ "decision": {
+  "action": "BUY",
+  "cell": "L_m1.0_t4.0_h24",
+  "direction": "long",
+  "stop_atr_mult": 1.0,
+  "tp_atr_mult": 4.0,
+  "horizon_h1_bars": 24,
+  "p_win_pooled": 0.3091,
+  "p_win_shrunk": 0.3091,
+  "b_geo": 4.0,
+  "ev_lcb_R": 0.4835,
+  "kelly_raw": 0.1364,
+  "kelly_fraction_quarter": 0.0341,
+  "risk_fraction_capped_cap1": 0.01,
+  "risk_fraction_capped_cap3": 0.00333,
+  "no_trade_reason": null
+ },
+ "sizing_reference": {
+  "account_usd": 10000.0,
+  "risk_usd_cap1": 100.0,
+  "atr14_h1_usd": 21.42,
+  "close_usd": 4474.18,
+  "stop_distance_usd": 21.42,
+  "position_oz_cap1": 4.669,
+  "position_lots_cap1": 0.0467
+ },
+ "gates": {
+  "ev_lcb_ok": true,
+  "prob_ok": true,
+  "loop_ood_ok": true,
+  "loop_ood_mean": 0.00536,
+  "loop_ood_max": 0.0265,
+  "gbdt_agrees": true,
+  "blackout_clear": true,
+  "blackout_detail": {
+   "nfp_window": false,
+   "vix_shock": false,
+   "mi_vix_d20z": -0.4061943144928922
+  },
+  "overlay_ok": true,
+  "era_score": 0.2255633920431137,
+  "era_disagreement": 0.0836
+ },
+ "heads_detail": null,
+ "generated_at_utc": "2026-11-22 07:17:27",
+ "wall_s": 22.4,
+ "v21_mode": {
+  "fast_r1": true,
+  "policy_frozen": true,
+  "state_hash": "b6eb924b06d2f334",
+  "forward_cache": {
+   "r1": "cold"
+  }
+ },
+ "v21_dual_decision": {
+  "mode": "fast-r1",
+  "frozen_policy_source": "frozen_policy.json",
+  "strategies": [
+   {
+    "strategy": "AURUM_r1_Fast_Flagship",
+    "machinery": "flagship machinery on r=1 only (w=[1,0,0], sigma_loop=0 -> LCB penalty 0)",
+    "action": "BUY",
+    "cell": "L_m1.0_t4.0_h24",
+    "direction": "long",
+    "p_win_r1": 0.3142,
+    "EV_R": 0.5208,
+    "ev_includes_cost": true,
+    "gbdt_agrees": true,
+    "gbdt_dir": "L",
+    "blackout_clear": true,
+    "overlay": {
+     "q50_atr": 1.98,
+     "q25_atr": 0.853,
+     "source": "empirical_le2024_h24"
+    },
+    "risk_fraction_capped": 0.01,
+    "atr14_h1_usd": 21.42,
+    "loop_ood_gate": "deferred (requires full forward)",
+    "trade_ok": true
+   },
+   {
+    "strategy": "AURUM_r1_Clean_EV",
+    "machinery": "raw r=1 EV-argmax + GBDT gate (no LCB, no shrinkage; v1.2 convention: no cost in EV)",
+    "action": "BUY",
+    "cell": "L_m1.0_t4.0_h24",
+    "direction": "long",
+    "p_win_r1": 0.3142,
+    "EV_R": 0.5708,
+    "ev_includes_cost": false,
+    "gbdt_agrees": true,
+    "gbdt_dir": "L",
+    "blackout_clear": true,
+    "overlay": {
+     "q50_atr": 1.98,
+     "q25_atr": 0.853,
+     "source": "empirical_le2024_h24"
+    },
+    "risk_fraction_capped": 0.01,
+    "atr14_h1_usd": 21.42,
+    "loop_ood_gate": "deferred (requires full forward)",
+    "trade_ok": true
+   }
+  ],
+  "frozen_v13_pooled_reference": {
+   "status": "cached_full_forward",
+   "cell": "L_m1.0_t4.0_h24",
+   "p_bar_cell": 0.3091,
+   "ev_lcb_R": 0.4835,
+   "ood_mean": 0.00536,
+   "agrees_gbdt": true
+  },
+  "state_hash": "b6eb924b06d2f334",
+  "latency_note": "single r=1 forward; overlay h48 via empirical fallback (h3 head needs the full forward)"
+ },
+ "v21_latency_s": {
+  "forward_r1_cold_s": 3.07,
+  "forward_r2_cold_s": 3.407,
+  "forward_r3_cold_s": 3.841,
+  "forward_r4_cold_s": 4.237,
+  "fast_r1_cold_pooled_fallback_r2_s": true,
+  "fast_r1_cold_pooled_fallback_r3_s": true,
+  "fast_r1_cold_pooled_fallback_r4_s": true,
+  "fast_r1_pooled_restore_s": 11.677,
+  "fast_r1_dual_decision_s": 2.403,
+  "total": 22.4
+ }
+}
