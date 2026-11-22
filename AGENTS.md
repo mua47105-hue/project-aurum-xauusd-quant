@@ -200,3 +200,32 @@ If you are asked for any number: open the JSON, do not quote from memory.
   remove them.
 - **k-NN soft labels on cohort states (K=200):** memorization, Brier 0.0022 soft vs 0.247
   realized. Realized triangular-smoothed targets only.
+
+## 10. Spec v2.1 permanent operating law (2026-11-22)
+
+1. **GitHub is the only workspace.** Ephemeral sandboxes roll back and
+   destroy local state (it happened twice). Commit AND push after every
+   step; verify `git rev-parse HEAD == git ls-remote`. Resume from
+   `STATE.md` (the live checkpoint ledger).
+2. **Secrets never enter the repo.** Install the pre-commit blocker on
+   every clone: `bash scripts/install_secret_hook.sh` (three layers: strict
+   patterns, hard full-token scan even inside allowlisted files, auditable
+   `.secretscan-allow`). CI re-scans on every push.
+3. **The policy is frozen and the environment is pinned.**
+   `v1_3/config/frozen_policy.json` + `requirements.txt` /
+   `environment.lock.json`. The flagship must reproduce n=3,341 / E[R]=+0.1478
+   / Sharpe 2.4443 / CAGR 54.56% / MaxDD 13.06% bit-exactly; if it does not,
+   STOP — something in the environment drifted (Flaw #11).
+4. **Production registry:** AURUM_v13_Flagship, AURUM_r1_Fast_Flagship,
+   AURUM_r1_Clean_EV. The v2 active regression stack (M1-M6 + the M7 active
+   arm) is QUARANTINED (zero OOS alpha; audit s5.3/s6.1) — do not deploy it;
+   release requires positive alpha net of the U2 fix in a NEW OOS period.
+5. **Honest gates stay visible.** G6.1 (DSR < 0.95) and any future honest
+   miss are reported, never masked (the audit's finding, preserved verbatim).
+6. **Anti-defect rules** (STATE.md defect log D1-D6): never gate `&&` chains
+   on piped `git commit`; execute()'s `sel` indexes the sorted `sub`;
+   strategy conventions come from the repo's own reference implementations;
+   pandas-2.x Index comparisons return ndarrays — never call `.values` on
+   them; Kaggle bundles embed the frozen policy and keep full import blocks.
+7. **Heavy assets** (>25 MB) live in GitHub Releases / Kaggle Datasets with
+   SHA-256 manifests in `scripts/download_heavy_assets.py` — never in Git.

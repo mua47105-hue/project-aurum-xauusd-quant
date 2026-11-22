@@ -187,7 +187,42 @@ folds 2016-2025) → `aurum-p3-tables` (569k-row OOS probability tables) → `au
 ### 3.3 Local reproduction
 
 ```bash
-# 0) restore heavy assets (features parquet, core weights, prob tables, base data)
+# ==================== Spec v2.1 (Pilot Release v2.1.0) ====================
+## What changed in v2.1 (Red-Team Remediation)
+
+- **Frozen policy (Flaw #11):** the flagship decision policy is loaded from
+  `v1_3/config/frozen_policy.json` by default (`--use-frozen-policy`), never
+  re-derived from near-tied FIT grids; environment pinned via
+  `requirements.txt` / `environment.lock.json`. The flagship reproduces
+  **bit-exactly** (OOS 2023-25 cap=3: n=3,341, E[R]=+0.1478, Sharpe 2.4443,
+  CAGR 54.56%, MaxDD 13.06%) — locally and on the official Kaggle run
+  (float-identical).
+- **First-class r=1 strategies (U4):** `AURUM_r1_Fast_Flagship` (E[R]=+0.1466,
+  SR 2.4781) and `AURUM_r1_Clean_EV` (E[R]=+0.2321, SR 2.6114, 718.6R) in the
+  p4 registry; `--fast-r1` live mode with a state-hash forward cache and a
+  dual decision.
+- **Honest accounting (U1/U5):** the faithful bridge E0/E1/E2
+  (2.6248/2.3950/2.5873 vs native 2.4443), the tier x throttle x carry matrix
+  (un-throttled MaxDD 23.92%; pilot-0.5% 12.54%; carry drag ~0.29 SR), and
+  the ex-2023 sensitivity (G1.7 flags the degraded 2023 at -13.1%).
+- **M1 path resolution (U6):** a numba walker over the 5.6M-bar minute feed
+  with the friction survival matrix (pure +0.1576; +1min delay harmless;
+  $0.25/$0.35 spreads; top-decile-RV stop slippage).
+- **The v2 stack quarantine (U2/U3):** the z_gbdt saturation artifact
+  collapses 1.253 -> 0.161 OOS under the program's own causal transform
+  (verified to three decimals vs the audit); M1-M6 + the M7 active arm are
+  quarantined with the top-60 pruning evidence recorded.
+- **Attribution (U7):** NW HAC(5) CAPM (champion faithful frame OOS alpha
+  +13.58%/yr, t=3.43), long/short attribution, the 5-regime table, and the
+  honest project-wide DSR panel (fails the 0.95 bar at every N — reported,
+  not hidden).
+- **Red-team CI (tests/redteam/):** 7/7 adversarial modules executed and
+  passing; `.github/workflows/ci_tests.yml` runs unit tests + secret scan on
+  every push.
+- Full documentation: `docs/reports/AURUM_Spec_v2_1_RedTeam_Remediated_Master_Report.docx`
+  and `docs/ENGINEERING_AUTOPSY_AND_14_FLAWS.md`. Checkpoint ledger: `STATE.md`.
+
+# # 0) restore heavy assets (features parquet, core weights, prob tables, base data)
 python3 scripts/download_heavy_assets.py          # public repo: works anonymously; GITHUB_TOKEN optional (rate-limit lift)
 
 # 1) v2 features already built? verify integrity
