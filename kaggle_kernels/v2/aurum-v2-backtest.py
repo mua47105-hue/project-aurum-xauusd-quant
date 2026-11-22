@@ -925,6 +925,103 @@ def self_test() -> None:
 # ==================== kernel main (v2.1 — regenerated from the patched modular source) ====================
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
+"""
+AURUM v2.0 -- K6 kernel main (rev v2.0.2): Full Walk-Forward Backtest &
+Statistical Gates
+=============================================================================
+Phase 4+5 of the v2.0 execution plan (CPU):
+
+Evaluates EVERY strategy in the single-position causal event loop:
+  M0_Champ_v13 (v1.3 flagship cap=3, frozen translation), M0_Champ_v13_cap1,
+  M1_GBDT_v2, M2_RFF_Ridge, RLSBank, M3c_DAE, M3m_DAE, M4_DMN_Lite,
+  M4b_DMN_Lite, M5_ContinuumNet, M6_AURUM_v2_Ensemble (Carver shrunk-MV
+  stack over the FIXED active CPU family), M6b_Ensemble_EQW
+  (equal-weight robustness variant), M7_Active_Grand_Hybrid (50% v1.3
+  champion + 50% ACTIVE de-saturated v2 stack), M7_Core_Satellite
+  (50% v1.3 champion + 50% passive gold sleeve -- the transparent
+  continuation of the v2.0.1 M7 stream), Buy & Hold Gold, Carver EWMAC
+  standalone, Channel A / Channel B standalone.
+
+v2.0.1 CHANGELOG (post-causality-audit revision):
+  * frozen_net one-bar lookahead FIXED (z[t]*r[t] -> w[t-1]*r[t]); the
+    engine loop was already causal (net = z_cur * r_arr[t]).
+  * G4.7_causality_v201 regression gate: the same-bar formulation is
+    deliberately re-created on the Channel_A baseline and must show the
+    pathological Sharpe inflation (trap detected), while the fixed
+    accounting must show NO residual same-bar edge (Channel_A ~ -0.13).
+  * Data-signature checkpoints: every per-strategy result is cached under
+    k6_out/ckpt/ keyed by an md5 of (code revision, strategy name, full
+    z-series bytes).  When an input forecast is replaced (e.g. M5 gaining
+    the complete 2016-2025 K3c folds, M4b, or the M6/M7 composites being
+    rebuilt on top of them) the signature changes and ONLY the affected
+    strategies re-evaluate -- cached results for unchanged inputs are
+    reused verbatim.
+  * M7_Grand_Hybrid is the FIXED 50/50 blend (a priori, selection-free);
+    the FIT-grid blend scan is retained as a diagnostic only (ledger'd).
+
+v2.0.2 CHANGELOG (Engineering Flaw #8 + active-stack verification):
+  * Producer-side z_rff rebuild (K2 rev k2-v2.0.2): causal trailing
+    standardization tanh((p - EWMA_504(p)) / (2*max(EWSTD_504(p), eps)))
+    re-anchored per yearly re-fit fold, gated by G4.8 AT THE PRODUCER.
+    The v2.0.1 fold-local ES-scale transform saturated z_rff to per-fold
+    sign bets (OOS nunique=1) -- M2/M6/M6b/M7 silently degenerated into
+    passive gold exposure.  pred_rff is byte-identical; only the position
+    transform changed.
+  * M6_AURUM_v2_Ensemble rebuilt per Carver S24: the family is the FIXED
+    a-priori active CPU pair {M1_GBDT_v2, M2_RFF_Ridge} (the v2.0.1
+    positive-FIT membership filter on the UNBUFFERED frozen_net FIT Sharpe
+    dropped M1_GBDT_v2 -- which has a clean active 0.938 OOS Sharpe --
+    for a -0.24 FIT estimate); SR inputs are now the BUFFERED ENGINE FIT
+    Sharpes (the shipped execution configuration per the gauntlet), and
+    the SR estimates are shrunk 90% toward the equal-weight prior
+    (sr' = 0.10*sr + 0.90*mean(sr)); corr-shrink 0.50; clip >= 0 with the
+    equal-weight fallback when the shrunk SRs cannot rank members.
+  * M7 split into two explicit side-by-side benchmarks:
+      M7_Active_Grand_Hybrid = 0.5*v1.3 champion + 0.5*ACTIVE de-saturated
+        v2 stack (M6) -- measures the TRUE active orthogonality gain;
+      M7_Core_Satellite = 0.5*v1.3 champion + 0.5*passive gold sleeve --
+        the transparent accounting of what the v2.0.1 M7 stream actually
+        was in OOS (bit-identical net stream; preserves 2.6351 / 2.5012@2x).
+  * SHIPPING_FAMILY pruned to the cost-viable configurations: the
+    de-saturated M2/M6/M6b FAIL the Carver speed limit (annual cost > 1/3
+    pre-cost SR -- the de-saturated active stack is not cost-viable at H1
+    frequency), so they are demoted to reference-only (flags still
+    exported and discussed).  M7_Active passes the speed limit and stays
+    in the shipping family as the active measurement arm.
+  * G6.1 DSR flagship = M7_Core_Satellite (direct continuation of the
+    v2.0.1 gated stream); M7_Active DSR reported alongside.
+
+Windows: FIT 2016-2022, OOS 2023-2025 (untouched), year-by-year 2016-2025.
+Costs: 1.0x / 1.5x / 2.0x.  Carver speed-limit audit (cost <= 1/3 pre-cost SR).
+Statistics: 5,000-sample block-bootstrap CIs, Deflated Sharpe Ratio over the
+ENTIRE trial ledger (K2+K3+K6), CSCV-PBO on the selection family.
+
+Outputs: backtest_v2.json, year_table.csv, net_series.parquet, stats.json,
+gates.json, champion_compare.json, trial_ledger.jsonl, run_log.txt,
+gauntlet.json, k6_meta.json, ckpt/.
+"""
+import hashlib
+import json
+import math
+import os
+import sys
+import time
+import traceback
+
+import numpy as np
+import pandas as pd
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+for _p in (os.path.join(_HERE, "..", "model"), _HERE):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+from v2_common import (BARS_PER_YEAR, COST_R, FIT_YEARS, OOS_YEARS,
+                       SIGMA_TGT_ANN, TrialLedger, _find_dir,
+                       block_bootstrap_ci, find_features_ds, find_phase1_ds,
+                       frozen_net, load_v2_data, run_online_engine)
+from online_engine import deflated_sharpe_ratio, pbo_cscv
+
 CODE_REV = "k6-v2.1.0"
 
 GATES = {}

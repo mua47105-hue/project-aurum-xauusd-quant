@@ -2241,10 +2241,293 @@ V21_FROZEN_POLICY_PATH = os.environ.get(
 LAT = {}                   # per-stage latency ledger (v2.1)
 
 
+_EMBEDDED_FROZEN_POLICY = r"""{
+  "spec": "v2.1.0",
+  "file": "v1_3/config/frozen_policy.json",
+  "purpose": "FROZEN PRODUCTION POLICY (Flaw #11 fix). The shipped flagship config won its FIT grid by 1.3% (F6 ann-Sharpe 0.89555 vs runner-up 0.88429); under an unpinned xgboost the same grid selects w=[0.5,0,0.5]/lambda_var=0.25 and flagship cap1 OOS Sharpe swings 2.305->2.665. From v2.1 the hyperparameters are FROZEN HERE and loaded by the backtest (--use-frozen-policy, default ON) instead of being re-derived at run time from near-tied grids. Provenance: policy_fit.json of the shipped v1.3 run (Kaggle tskdev/aurum-v13-artifacts, SHA-256 of trades_all.parquet recorded in scripts/download_heavy_assets.py era), re-verified bit-exact in the v2.1 remediation.",
+  "frozen_at": "2026-11-21",
+  "frozen_from": {
+    "source": "v1.3 shipped run artifacts (policy_fit.json, backtest_main.json)",
+    "verified_bit_exact": {
+      "flagship_cap3_oos": {
+        "n": 3341,
+        "E_R": 0.1478,
+        "sharpe": 2.4443,
+        "cagr_pct": 54.56,
+        "maxdd_pct": 13.06
+      }
+    }
+  },
+  "flagship_policy": {
+    "w_pooled_r123": [
+      0.6,
+      0.2,
+      0.2
+    ],
+    "kappa": 0.0,
+    "lambda_var": 0.5,
+    "ev_min": 0.0,
+    "overlay_rule": "path",
+    "stack_u": 0.1,
+    "policy_name": "LCB-EV + pooled p_bar(1:3) + shrinkage + EV_min + GBDT agreement",
+    "kappa_brier_F2_for_stack": 0.4,
+    "w_brier_F1_for_stack": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "fit_provenance": {
+    "fit_window_years": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+    ],
+    "oos_years_never_touched_by_fits": [
+      2023,
+      2024,
+      2025
+    ],
+    "protocol": "F1 w (Brier, 48 cells) -> F2 kappa (Brier of shrunk) -> F3 3-D grid (kappa, lambda_var, EV_min) by FIT-window cap1 ann-Sharpe (clean default) -> F6 pooling-w performance re-fit -> F4 overlay ablation (FIT only) -> F5 stack u (Brier at canonical cells)",
+    "f6_margin": {
+      "winner": {
+        "w": [
+          0.6,
+          0.2,
+          0.2
+        ],
+        "fit_ann_sharpe": 0.89555,
+        "er": 0.13955,
+        "n": 2520
+      },
+      "runner_up": {
+        "w": [
+          0.5,
+          0.0,
+          0.5
+        ],
+        "fit_ann_sharpe": 0.88429,
+        "er": 0.13581,
+        "n": 2567
+      },
+      "margin_pct": 1.27,
+      "warning": "razor-thin: this is WHY the policy is frozen and the environment pinned"
+    },
+    "f3_best_clean": {
+      "sharpe": 0.48809,
+      "er": 0.11573,
+      "n": 2957
+    },
+    "overlay_ablation_chosen": "path",
+    "overlay_choice_basis": "FIT_YEARS 2016-22 standalone cap=1 ann-Sharpe (tie-break E[R]); OOS numbers report-only"
+  },
+  "engine_constants": {
+    "P4_DEPTHS": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "POOL_DEPTHS": [
+      1,
+      2,
+      3
+    ],
+    "EV_TH": 0.0,
+    "OOD_TH": 0.1,
+    "COST_BASE_R": 0.05,
+    "COST_MULTS": [
+      1.0,
+      1.5,
+      2.0
+    ],
+    "WF_YEARS": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "CANON_DIR_CELL": {
+      "L": "L_m1.0_t1.5_h48",
+      "S": "S_m1.0_t1.5_h48"
+    },
+    "EMA_CELL": {
+      "L": "L_m2.0_t2.5_h48",
+      "S": "S_m2.0_t2.5_h48"
+    },
+    "DON_CELL": {
+      "L": "L_m2.0_t4.0_h48",
+      "S": "S_m2.0_t4.0_h48"
+    },
+    "SHOCK_TH": 2.5,
+    "NFP_UTC_HOURS": [
+      12,
+      13,
+      14
+    ],
+    "BOOT_N": 5000,
+    "BOOT_SEED": 1337,
+    "XGB_SEED": 1337,
+    "SEED_ALL": 1337,
+    "MAX_CONCURRENT_MODES": [
+      1,
+      3
+    ],
+    "DAY_BLOCK": 10,
+    "KELLY_FRACTION": 0.25,
+    "HARD_EQUITY_RISK_CAP": 0.01,
+    "THROTTLE_DD_LIMIT": 0.15,
+    "POSTMORTEM_GBDT": 0.0599,
+    "POSTMORTEM_KNN": 0.0078,
+    "POSTMORTEM_TOL": 0.06
+  },
+  "v21_production_registry": {
+    "AURUM_v13_Flagship": {
+      "machinery": "pooled p_bar(1:3) LCB-EV + shrinkage + EV_min + GBDT agreement gate, path overlay",
+      "w": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "kappa": 0.0,
+      "lambda_var": 0.5,
+      "ev_min": 0.0,
+      "caps": [
+        1,
+        3
+      ],
+      "role": "reference production strategy (v1.3 shipped, frozen)",
+      "oos_cap3_reference": {
+        "n": 3341,
+        "E_R": 0.1478,
+        "sharpe": 2.4443,
+        "cagr_pct": 54.56,
+        "maxdd_pct": 13.06
+      }
+    },
+    "AURUM_r1_Fast_Flagship": {
+      "machinery": "IDENTICAL flagship machinery, depth pool restricted to r=1 (w=[1,0,0])",
+      "w": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "kappa": 0.0,
+      "lambda_var": 0.5,
+      "ev_min": 0.0,
+      "caps": [
+        1,
+        3
+      ],
+      "role": "U4 live/low-latency strategy: r=1-only forward pass (3x cheaper inference, drops the Flaw #11 fragile pooling surface)",
+      "oos_cap3_reference": {
+        "E_R": 0.1466,
+        "sharpe": 2.4781,
+        "total_R": 499.7,
+        "n": 3409
+      },
+      "audit_reference": {
+        "E_R": 0.1466,
+        "sharpe": 2.486,
+        "total_R": 499.7,
+        "source": "audit s4.2 re-run, identical machinery, r=1 only"
+      }
+    },
+    "AURUM_r1_Clean_EV": {
+      "machinery": "raw r=1 EV-argmax (no LCB, no shrinkage, no depth pool) + GBDT agreement gate",
+      "w": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "kappa": null,
+      "lambda_var": 0.0,
+      "ev_min": 0.0,
+      "caps": [
+        3
+      ],
+      "role": "U4 audit-verified highest-expectancy variant (v1.2-style decision rule on the r=1 posterior)",
+      "oos_cap3_reference": {
+        "E_R": 0.2321,
+        "sharpe": 2.6114,
+        "total_R": 718.6,
+        "n": 3096
+      },
+      "audit_reference": {
+        "E_R": 0.2305,
+        "sharpe": 2.599,
+        "total_R": 712.8,
+        "source": "audit s4.2 raw v1.2-style r=1 EV-argmax"
+      }
+    },
+    "quarantined": {
+      "v2_active_stack": [
+        "M1_GBDT_v2",
+        "M2_RFF_Ridge",
+        "M3c_DAE",
+        "M3m_DAE",
+        "M4_DMN",
+        "M5_ContinuumNet",
+        "M6_Ensemble",
+        "M7_Active_Grand_Hybrid_active_arm"
+      ],
+      "reason": "zero OOS alpha (audit s5.3/s5.4/s6.1); M1_GBDT is a z-saturation artifact (collapses 1.253->0.161 under the program's own Flaw-#8 fix); M7 hybrids add nothing beyond their champion leg",
+      "decision": "not eligible for capital until positive alpha net of the s5.3 fix in a NEW OOS period (audit s8.4)",
+      "u3_top60_pruning_evidence": {
+        "oos_sharpe_top60_fixed_transform": -0.215,
+        "verdict": "REJECT pruning as a rescue \u2014 the SNR is absent",
+        "source": "Red-Team audit s8 (U3), verified 2026-11-11"
+      }
+    }
+  },
+  "v21_risk_tiers": {
+    "standard": {
+      "risk_per_trade": 0.01,
+      "desc": "shipped 1.0% hard equity risk cap"
+    },
+    "institutional_pilot": {
+      "risk_per_trade": 0.005,
+      "per_slot_at_cap3": 0.0016666666666666666,
+      "desc": "U5/audit-recommended 0.5% pilot tier (halved); 0.167%/slot at cap=3"
+    },
+    "throttle": {
+      "dd_limit": 0.15,
+      "de_risk": "linear to 0 at limit",
+      "unthrottled_reference_maxdd_pct_cap3_oos": 23.92
+    }
+  },
+  "carry_model_v21": {
+    "long_carry_annual_pct": -5.0,
+    "short_carry_annual_pct": 2.5,
+    "punitive_long_pct": -5.5,
+    "punitive_short_pct": 1.5,
+    "overnight_utc_hour": 22,
+    "wednesday_x3": true,
+    "applies_to": "actual held notional through 22:00 UTC (U5)",
+    "source": "audit s6.4"
+  }
+}"""
+
+
 def _load_frozen_live():
-    """Load the frozen policy and verify the LIVE constants match (G6.0)."""
-    with open(V21_FROZEN_POLICY_PATH) as f:
-        fp = json.load(f)
+    """Load the frozen policy and verify the LIVE constants match (G6.0).
+    On Kaggle the repo file is not mounted — the byte-identical embedded
+    copy is the fallback."""
+    if os.path.isfile(V21_FROZEN_POLICY_PATH):
+        with open(V21_FROZEN_POLICY_PATH) as f:
+            fp = json.load(f)
+    else:
+        fp = json.loads(_EMBEDDED_FROZEN_POLICY)
     fpol = fp["flagship_policy"]
     checks = {
         "w_pool": (LIVE_POOL_W == fpol["w_pooled_r123"]),

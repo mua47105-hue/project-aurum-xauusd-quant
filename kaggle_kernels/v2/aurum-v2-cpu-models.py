@@ -1063,6 +1063,69 @@ def self_test() -> None:
 # ==================== kernel main (v2.1 — regenerated from the patched modular source) ====================
 # v2.1 (U2/Flaw #9): z_gbdt = rff_z_v202(pred_gbdt); strict G4.8
 # on ALL producers; U3 quarantine ledger. See STATE.md.
+"""
+AURUM v2.0 -- K2 kernel main: Fast CPU Models & Execution Upgrade
+==================================================================
+Phase 2 of the v2.0 execution plan (0 GPU hours):
+
+  * M1_GBDT_v2  : regularized LightGBM 3-seed ensemble on the ~345 v2
+                  features (max_depth=5, reg_alpha=10, reg_lambda=10,
+                  subsample=0.9, colsample_bytree=0.7), walk-forward yearly
+                  folds 2016-2025, target y_ret24_norm, position z=tanh(2*pred).
+  * M2_RFF_Ridge: Kelly-Malamud closed-form RFF timing (P=2048, gamma=sqrt(2)
+                  dimension-scaled, 10 seeds averaged, ridge sweep
+                  z in {1e0..1e4} selected on the fold's ES slice).
+                  v2.0.2: the position transform is a CAUSAL TRAILING
+                  standardization of the raw prediction (Engineering Flaw #8
+                  fix -- see rff_z_v202 below), gated by G4.8 at the producer.
+  * RLSBank     : the hyperparameter-free adaptation floor as a standalone
+                  strategy (delay-aware updates, per-coordinate median bank).
+  * OnlineExecutionEngine evaluation of M1/M2 with Baseline-Gauntlet toggles
+    (buffer / RLS / regimes), cost multipliers 1.0x/1.5x/2.0x, FIT vs OOS.
+  * Master Trial Ledger from Experiment #1.
+
+Outputs: v2_cpu_forecasts.parquet, engine_metrics.json, trial_ledger.jsonl,
+gates.json, run_log.txt.
+"""
+import glob as _glob
+import json
+import math
+import os
+import sys as _sys  # repro gap #3 fix (Spec v2.1): was undefined in the modular
+                    # source (only the Kaggle bundle imported it), so
+                    # `python3 aurum_v2/kernels/k2_cpu_models.py` crashed at exit.
+import time
+import traceback
+
+import numpy as np
+import pandas as pd
+
+# Repro gap #3 fix (Spec v2.1): sibling-path fallback so this modular source runs
+# standalone from anywhere. main() references TrialLedger / load_v2_data /
+# fold_indices / run_online_engine / frozen_net, which live in
+# aurum_v2/model/v2_common.py (the Kaggle bundle stitches them in; standalone we
+# import them explicitly). The try/except keeps the embedded copy inside the
+# Kaggle bundle working when v2_common is not importable there.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+for _p in (os.path.join(_HERE, os.pardir, "model"), os.path.join(_HERE, os.pardir)):
+    _p = os.path.normpath(_p)
+    if _p not in _sys.path:
+        _sys.path.insert(0, _p)
+try:
+    from v2_common import (TrialLedger, load_v2_data, fold_indices,
+                           run_online_engine, frozen_net)
+    from rff_ridge import RFFRidgeTimingModel
+    from online_engine import RLSBank
+except ImportError:  # Kaggle bundle: symbols are stitched inline below
+    pass
+
+# v2 fold/selection windows (identical to the Kaggle bundle definitions —
+# repro gap #3 fix: the modular source previously relied on the bundle to
+# define these; now they are explicit and single-sourced here for standalone).
+FIT_YEARS = list(range(2016, 2023))     # 2016-2022: selection / stacking window
+OOS_YEARS = [2023, 2024, 2025]          # untouched OOS
+ALL_FOLD_YEARS = list(range(2016, 2026))  # walk-forward fold years
+
 GATES = {}
 LOG_LINES = []
 

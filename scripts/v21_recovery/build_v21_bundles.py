@@ -14,9 +14,11 @@ PULLED = "/tmp/kpull"
 
 
 def kernel_main_body(mod_path, strip_until, code_rev_old, code_rev_new):
+    """v2: keep the FULL modular body (the try/except import shim is
+    Kaggle-safe by design — v2_common/online_engine are inlined above; the
+    stripping round lost `import traceback` -> NameError on Kaggle)."""
     src = open(mod_path).read()
-    i = src.index(strip_until)
-    body = src[i:]
+    body = src
     body = body.replace(code_rev_old, code_rev_new, 1)
     return body
 
@@ -48,9 +50,9 @@ assert "bridge_net" in k6_out and "G5.10_bridge_fidelity" in k6_out \
 
 # ---- k2: strip the import shim; keep from the GATES/LOG section onward -----
 k2_src = open(os.path.join(REPO, "aurum_v2", "kernels", "k2_cpu_models.py")).read()
-# the modular k2 starts its kernel body at the GATES = {} block
-i = k2_src.index("GATES = {}")
-k2_body = k2_src[i:]
+# v2: keep the FULL modular body (imports included; the try/except import
+# shim is Kaggle-safe — v2_common/rff_ridge/online_engine are inlined above)
+k2_body = k2_src
 pulled2 = open(os.path.join(PULLED, "aurum-v2-cpu-models",
                             "aurum-v2-cpu-models.py")).read()
 cut = pulled2.index("# ==================== kernel main")
